@@ -1,19 +1,15 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/danfox/ghupdate/main.coffee":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/danfox/ghupdate/main.cjsx":[function(require,module,exports){
 var App, React;
 
 React = require('react');
 
-App = React.createClass({
-  render: function() {
-    return React.DOM.div(null, "Hello, world!");
-  }
-});
+App = require('./src/App.cjsx');
 
 React.renderComponent(App(null), document.getElementsByTagName('body')[0]);
 
 
 
-},{"react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/node_modules/react/lib/AutoFocusMixin.js":[function(require,module,exports){
+},{"./src/App.cjsx":"/Users/danfox/ghupdate/src/App.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/node_modules/react/lib/AutoFocusMixin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18579,7 +18575,21 @@ module.exports = warning;
 },{"./emptyFunction":"/Users/danfox/ghupdate/node_modules/react/lib/emptyFunction.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/danfox/ghupdate/node_modules/react/react.js":[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":"/Users/danfox/ghupdate/node_modules/react/lib/React.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
+},{"./lib/React":"/Users/danfox/ghupdate/node_modules/react/lib/React.js"}],"/Users/danfox/ghupdate/src/App.cjsx":[function(require,module,exports){
+var React;
+
+React = require('react');
+
+module.exports = React.createClass({
+  displayName: 'App',
+  render: function() {
+    return React.DOM.div(null, "Hello, world!");
+  }
+});
+
+
+
+},{"react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -18644,4 +18654,4 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}]},{},["/Users/danfox/ghupdate/main.coffee"]);
+},{}]},{},["/Users/danfox/ghupdate/main.cjsx"]);

@@ -1,9 +1,4 @@
 React = require 'react'
-
-App = React.createClass
-  render: ->
-  	<div>Hello, world!</div>
+App = require './src/App'
 
 React.renderComponent <App />, document.getElementsByTagName('body')[0]
-
-

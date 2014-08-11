@@ -1,5 +1,5 @@
 all:
-	browserify -t coffee-reactify --extension=".cjsx" main.coffee -o bundle.js
+	browserify -t coffee-reactify main.cjsx -o bundle.js
 
 dev:
-	watchify -t coffee-reactify --extension=".cjsx" main.coffee -o bundle.js
+	watchify -t coffee-reactify main.cjsx -o bundle.js
