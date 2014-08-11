@@ -18583,7 +18583,10 @@ React = require('react');
 module.exports = React.createClass({
   displayName: 'App',
   render: function() {
-    return React.DOM.div(null, "Hello, world!");
+    return React.DOM.div(null, React.DOM.h1(null, "GH Update"), React.DOM.input({
+      "type": "text",
+      "placeholder": "Your GitHub username"
+    }));
   }
 });
 
