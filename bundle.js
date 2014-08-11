@@ -1,4 +1,334 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/danfox/ghupdate/main.cjsx":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/danfox/ghupdate/lib/qwest.js":[function(require,module,exports){
+/*
+	qwest, ajax library with promises and XHR2 support
+
+	Author
+		Aurélien Delogu (dev@dreamysource.fr)
+*/
+
+(function(def){
+	if(typeof define=='function'){
+		define(def);
+	}
+	else if(typeof module!='undefined'){
+		module.exports=def;
+	}
+	else{
+		this.qwest=def;
+	}
+}(function(){
+	
+	var win=window,
+		// Variables for limit mechanism
+		limit=null,
+		requests=0,
+		request_stack=[],
+		// Get XMLHttpRequest object
+		getXHR=function(){
+			return win.XMLHttpRequest?
+					new XMLHttpRequest():
+					new ActiveXObject('Microsoft.XMLHTTP');
+			},
+		// Guess XHR version
+		version2=(getXHR().responseType===''),
+		
+	// Core function
+	qwest=function(method,url,data,options,before){
+
+		// Format
+		data=data || null;
+		options=options || {};
+
+		var typeSupported=false,
+			xhr=getXHR(),
+			async=options.async===undefined?true:!!options.async,
+			cache=options.cache,
+			type=options.type?options.type.toLowerCase():'json',
+			user=options.user || '',
+			password=options.password || '',
+			headers={'X-Requested-With':'XMLHttpRequest'},
+			accepts={
+				xml : 'application/xml, text/xml',
+				html: 'text/html',
+				//text: 'text/plain',
+				json: 'application/json, text/javascript',
+				js  : 'application/javascript, text/javascript'
+			},
+			toUpper=function(match,p1,p2){return p1+p2.toUpperCase();},
+			vars='',
+			i,j,
+			parseError='parseError',
+			serialized,
+			success_stack=[],
+			error_stack=[],
+			complete_stack=[],
+			response,
+			success,
+			error,
+			func,
+			// Define promises
+			promises={
+				success:function(func){
+					if(async){
+						success_stack.push(func);
+					}
+					else if(success){
+						func.apply(xhr,[response]);
+					}
+					return promises;
+				},
+				error:function(func){
+					if(async){
+						error_stack.push(func);
+					}
+					else if(error){
+						func.apply(xhr,[response]);
+					}
+					return promises;
+				},
+				complete:function(func){
+					if(async){
+						complete_stack.push(func);
+					}
+					else{
+						func.apply(xhr);
+					}
+					return promises;
+				}
+			},
+			promises_limit={
+				success:function(func){
+					request_stack[request_stack.length-1].success.push(func);
+					return promises_limit;
+				},
+				error:function(func){
+					request_stack[request_stack.length-1].error.push(func);
+					return promises_limit;
+				},
+				complete:function(func){
+					request_stack[request_stack.length-1].complete.push(func);
+					return promises_limit;
+				}
+			},
+			// Handle the response
+			handleResponse=function(){
+				// Prepare
+				var i,req,p;
+				--requests;
+				// Launch next stacked request
+				if(request_stack.length){
+					req=request_stack.shift();
+					p=qwest(req.method,req.url,req.data,req.options,req.before);
+					for(i=0;func=req.success[i];++i){
+						p.success(func);
+					}
+					for(i=0;func=req.error[i];++i){
+						p.error(func);
+					}
+					for(i=0;func=req.complete[i];++i){
+						p.complete(func);
+					}
+				}
+				// Handle response
+				try{
+					// Verify status code
+					if(!/^2/.test(xhr.status)){
+						throw xhr.status+' ('+xhr.statusText+')';
+					}
+					// Init
+					var responseText='responseText',
+						responseXML='responseXML';
+					// Process response
+					/*if(type=='text' || type=='html'){
+						response=xhr[responseText];
+					}
+					else */if(typeSupported && xhr.response!==undefined){
+						response=xhr.response;
+					}
+					else{
+						switch(type){
+							case 'json':
+								try{
+									if(win.JSON){
+										response=win.JSON.parse(xhr[responseText]);
+									}
+									else{
+										response=eval('('+xhr[responseText]+')');
+									}
+								}
+								catch(e){
+									throw "Error while parsing JSON body";
+								}
+								break;
+							case 'js':
+								response=eval(xhr[responseText]);
+								break;
+							case 'xml':
+								if(!xhr[responseXML] || (xhr[responseXML][parseError] && xhr[responseXML][parseError].errorCode && xhr[responseXML][parseError].reason)){
+									throw "Error while parsing XML body";
+								}
+								else{
+									response=xhr[responseXML];
+								}
+								break;
+							default:
+								//throw "Unsupported "+type+" type";
+								response=xhr[responseText];
+						}
+					}
+					// Execute success stack
+					success=true;
+					if(async){
+						for(i=0;func=success_stack[i];++i){
+							func.apply(xhr,[response]);
+						}
+					}
+				}
+				catch(e){
+					error=true;
+					response="Request to '"+url+"' aborted: "+e;
+					// Execute error stack
+					if(async){
+						for(i=0;func=error_stack[i];++i){
+							func.apply(xhr,[response]);
+						}
+					}
+				}
+				// Execute complete stack
+				if(async){
+					for(i=0;func=complete_stack[i];++i){
+						func.apply(xhr);
+					}
+				}
+			},
+			// Recursively build the query string
+			buildData = function(data, key) {
+				var res = [],
+					enc = encodeURIComponent;
+				if(typeof data === 'object' && data != null) {
+					for(var p in data) {
+						if(data.hasOwnProperty(p)) {
+							res = res.concat(buildData(data[p], key ? key + '[' + p + ']' : p));
+						}
+					}
+				} else if(data != null && key != null) {
+					res.push(enc(key) + '=' + enc(data));
+				}
+				return res.join('&');
+			};
+
+		// Limit requests
+		if(limit && requests==limit){
+			// Stock current request
+			request_stack.push({
+				method      : method,
+				url         : url,
+				data        : data,
+				options     : options,
+				before      : before,
+				success     : [],
+				error       : [],
+				complete    : []
+			});
+			// Return promises
+			return promises_limit;
+		}
+		// New request
+		++requests;
+		// Prepare data
+		if(
+			win.ArrayBuffer && 
+			(data instanceof ArrayBuffer ||
+			data instanceof Blob ||
+			data instanceof Document ||
+			data instanceof FormData)
+		){
+			if(method=='GET'){
+				data=null;
+			}
+		}
+		else{
+			data = buildData(data);
+			serialized=true;
+		}
+		// Prepare URL
+		if(method=='GET'){
+			vars+=data;
+		}
+		if(cache==null){
+			cache=(method=='POST');
+		}
+		if(!cache){
+			if(vars){
+				vars+='&';
+			}
+			vars+='__t='+Date.now();
+		}
+		if(vars){
+			url+=(/\?/.test(url)?'&':'?')+vars;
+		}
+		// Open connection
+		xhr.open(method,url,async,user,password);
+		// Identify supported XHR version
+		if(type && version2){
+			try{
+				xhr.responseType=type;
+				typeSupported=(xhr.responseType==type);
+			}
+			catch(e){}
+		}
+		// Plug response handler
+		if(version2){
+			xhr.onload=handleResponse;
+		}
+		else{
+			xhr.onreadystatechange=function(){
+				if(xhr.readyState==4){
+					handleResponse();
+				}
+			};
+		}
+		// Prepare headers
+		for(i in headers){
+			j=i.replace(/(^|-)([^-])/g,toUpper);
+			headers[j]=headers[i];
+			delete headers[i];
+			xhr.setRequestHeader(j,headers[j]);
+		}
+		if(!headers['Content-Type'] && serialized && method=='POST'){
+			xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		}
+		if(!headers.Accept){
+			xhr.setRequestHeader('Accept',accepts[type]);
+		}
+		// Before
+		if(before){
+			before.apply(xhr);
+		}
+		// Send request
+		xhr.send(method=='POST'?data:null);
+		// Return promises
+		return promises;
+		
+	};
+
+	// Return final qwest object
+	return {
+		get:function(url,data,options,before){
+			return qwest('GET',url,data,options,before);
+		},
+		post:function(url,data,options,before){
+			return qwest('POST',url,data,options,before);
+		},
+		xhr2:version2,
+		limit:function(by){
+			limit=by;
+		}
+	};
+	
+}()));
+
+},{}],"/Users/danfox/ghupdate/main.cjsx":[function(require,module,exports){
 var App, React;
 
 React = require('react');
@@ -18576,23 +18906,71 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":"/Users/danfox/ghupdate/node_modules/react/lib/React.js"}],"/Users/danfox/ghupdate/src/App.cjsx":[function(require,module,exports){
-var React;
+var App, React, RepoList, qwest;
 
 React = require('react');
 
-module.exports = React.createClass({
+qwest = require('../lib/qwest.js');
+
+App = module.exports = React.createClass({
   displayName: 'App',
+  getInitialState: function() {
+    return {
+      username: null
+    };
+  },
+  updateRepoList: function() {
+    return this.setState({
+      'username': this.refs.username.state.value
+    });
+  },
   render: function() {
     return React.DOM.div(null, React.DOM.h1(null, "GH Update"), React.DOM.input({
-      "type": "text",
-      "placeholder": "Your GitHub username"
-    }));
+      "type": 'text',
+      "ref": 'username',
+      "placeholder": 'Your GitHub username'
+    }), React.DOM.button({
+      "onClick": this.updateRepoList
+    }, "Go"), (this.state.username != null ? RepoList({
+      "username": this.state.username
+    }) : void 0));
+  }
+});
+
+RepoList = React.createClass({
+  displayName: 'RepoList',
+  getInitialState: function() {
+    return {
+      repos: null
+    };
+  },
+  componentDidMount: function() {
+    return console.log('didMount:', qwest);
+  },
+  render: function() {
+    var repo;
+    return React.DOM.div(null, ((function() {
+      var _i, _len, _ref, _results;
+      if (this.state.repos != null) {
+        _ref = this.state.repos;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          repo = _ref[_i];
+          _results.push(React.DOM.a({
+            "href": '#'
+          }, repo.name));
+        }
+        return _results;
+      } else {
+        return 'Loading...';
+      }
+    }).call(this)));
   }
 });
 
 
 
-},{"react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
+},{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
