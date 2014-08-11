@@ -21763,7 +21763,7 @@ App = module.exports = React.createClass({
 
 
 },{"./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoList.cjsx":"/Users/danfox/ghupdate/src/RepoList.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/FileChooser.cjsx":[function(require,module,exports){
-var FileChooser, React, TreeView, qwest;
+var FileChooser, React, TreeFileView, TreeView, qwest;
 
 React = require('react');
 
@@ -21799,8 +21799,9 @@ FileChooser = module.exports = React.createClass({
     })(this));
   },
   render: function() {
-    return React.DOM.div(null, "Choose a file", (this.state.tree != null ? TreeView({
-      "tree": this.state.tree
+    return React.DOM.div(null, (this.state.tree != null ? TreeView({
+      "tree": this.state.tree,
+      "rootName": this.props.repo.name
     }) : React.DOM.span(null, "Loading...")));
   }
 });
@@ -21808,20 +21809,51 @@ FileChooser = module.exports = React.createClass({
 TreeView = React.createClass({
   displayName: 'TreeView',
   propTypes: {
-    tree: React.PropTypes.array.isRequired
+    tree: React.PropTypes.array.isRequired,
+    rootName: React.PropTypes.string.isRequired
   },
   render: function() {
-    var file;
-    return React.DOM.div(null, (function() {
+    var item;
+    return React.DOM.div({
+      "className": "treeView"
+    }, React.DOM.h2(null, this.props.rootName), React.DOM.p(null, "Choose a file"), React.DOM.ul(null, (function() {
       var _i, _len, _ref, _results;
       _ref = this.props.tree;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        file = _ref[_i];
-        _results.push(React.DOM.span(null, file.path));
+        item = _ref[_i];
+        if (item.type === 'tree') {
+          _results.push(React.DOM.li({
+            "className": 'tree',
+            "key": item.path
+          }, item.path));
+        } else if (/\.html/.test(item.path)) {
+          _results.push(TreeFileView({
+            "item": item
+          }));
+        } else {
+          _results.push(void 0);
+        }
       }
       return _results;
-    }).call(this));
+    }).call(this)));
+  }
+});
+
+TreeFileView = React.createClass({
+  displayName: 'TreeFileView',
+  propTypes: {
+    item: React.PropTypes.object.isRequired
+  },
+  selectFile: function() {
+    return console.log('selectFile', this.props.item.path);
+  },
+  render: function() {
+    return React.DOM.li({
+      "className": 'file',
+      "key": this.props.item.path,
+      "onClick": this.selectFile
+    }, this.props.item.path);
   }
 });
 

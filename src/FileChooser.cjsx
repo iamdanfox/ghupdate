@@ -28,9 +28,8 @@ FileChooser = module.exports = React.createClass
 
   render: ->
     <div>
-      Choose a file
       { if @state.tree?
-          <TreeView tree={@state.tree} />
+          <TreeView tree={@state.tree} rootName={@props.repo.name} />
         else
           <span>Loading...</span> }
     </div>
@@ -41,9 +40,30 @@ TreeView = React.createClass
 
   propTypes:
     tree: React.PropTypes.array.isRequired
+    rootName: React.PropTypes.string.isRequired
 
   render: ->
-    <div>
-      { for file in @props.tree
-        <span>{file.path}</span> }
+    <div className="treeView">
+    <h2>{@props.rootName}</h2>
+    <p>Choose a file</p>
+    <ul>
+      { for item in @props.tree
+          if item.type is 'tree'
+            <li className='tree' key={item.path}>{item.path}</li>
+          else if /\.html/.test item.path
+            <TreeFileView item={item} /> }
+    </ul>
     </div>
+
+
+TreeFileView = React.createClass
+  displayName: 'TreeFileView'
+
+  propTypes:
+    item: React.PropTypes.object.isRequired
+
+  selectFile: ->
+    console.log 'selectFile', @props.item.path
+
+  render: ->
+    <li className='file' key={@props.item.path} onClick={@selectFile}>{@props.item.path}</li>
