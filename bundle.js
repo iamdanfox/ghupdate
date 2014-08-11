@@ -329,17 +329,17 @@
 }()));
 
 },{}],"/Users/danfox/ghupdate/main.cjsx":[function(require,module,exports){
-var App, React;
+var React, Router;
 
 React = require('react');
 
-App = require('./src/App.cjsx');
+Router = require('./src/Router.cjsx');
 
-React.renderComponent(App(null), document.getElementsByTagName('body')[0]);
+React.renderComponent(Router(null), document.getElementsByTagName('body')[0]);
 
 
 
-},{"./src/App.cjsx":"/Users/danfox/ghupdate/src/App.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/node_modules/moment/moment.js":[function(require,module,exports){
+},{"./src/Router.cjsx":"/Users/danfox/ghupdate/src/Router.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/node_modules/moment/moment.js":[function(require,module,exports){
 (function (global){
 //! moment.js
 //! version : 2.8.1
@@ -3151,6 +3151,2186 @@ React.renderComponent(App(null), document.getElementsByTagName('body')[0]);
 }).call(this);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/Route.js":[function(require,module,exports){
+module.exports = require('./modules/components/Route');
+
+},{"./modules/components/Route":"/Users/danfox/ghupdate/node_modules/react-router/modules/components/Route.js"}],"/Users/danfox/ghupdate/node_modules/react-router/Routes.js":[function(require,module,exports){
+module.exports = require('./modules/components/Routes');
+
+},{"./modules/components/Routes":"/Users/danfox/ghupdate/node_modules/react-router/modules/components/Routes.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/components/Route.js":[function(require,module,exports){
+var React = require('react');
+var withoutProperties = require('../helpers/withoutProperties');
+
+/**
+ * A map of <Route> component props that are reserved for use by the
+ * router and/or React. All other props are considered "static" and
+ * are passed through to the route handler.
+ */
+var RESERVED_PROPS = {
+  handler: true,
+  path: true,
+  children: true // ReactChildren
+};
+
+/**
+ * <Route> components specify components that are rendered to the page when the
+ * URL matches a given pattern.
+ *
+ * Routes are arranged in a nested tree structure. When a new URL is requested,
+ * the tree is searched depth-first to find a route whose path matches the URL.
+ * When one is found, all routes in the tree that lead to it are considered
+ * "active" and their components are rendered into the DOM, nested in the same
+ * order as they are in the tree.
+ *
+ * Unlike Ember, a nested route's path does not build upon that of its parents.
+ * This may seem like it creates more work up front in specifying URLs, but it
+ * has the nice benefit of decoupling nested UI from "nested" URLs.
+ *
+ * The preferred way to configure a router is using JSX. The XML-like syntax is
+ * a great way to visualize how routes are laid out in an application.
+ *
+ *   React.renderComponent((
+ *     <Routes handler={App}>
+ *       <Route name="login" handler={Login}/>
+ *       <Route name="logout" handler={Logout}/>
+ *       <Route name="about" handler={About}/>
+ *     </Routes>
+ *   ), document.body);
+ *
+ * If you don't use JSX, you can also assemble a Router programmatically using
+ * the standard React component JavaScript API.
+ *
+ *   React.renderComponent((
+ *     Routes({ handler: App },
+ *       Route({ name: 'login', handler: Login }),
+ *       Route({ name: 'logout', handler: Logout }),
+ *       Route({ name: 'about', handler: About })
+ *     )
+ *   ), document.body);
+ *
+ * Handlers for Route components that contain children can render their active
+ * child route using the activeRouteHandler prop.
+ *
+ *   var App = React.createClass({
+ *     render: function () {
+ *       return (
+ *         <div class="application">
+ *           {this.props.activeRouteHandler()}
+ *         </div>
+ *       );
+ *     }
+ *   });
+ */
+var Route = React.createClass({
+  displayName: 'Route',
+
+  statics: {
+
+    getUnreservedProps: function (props) {
+      return withoutProperties(props, RESERVED_PROPS);
+    },
+
+  },
+
+  getDefaultProps: function() {
+    return {
+      preserveScrollPosition: false
+    };
+  },
+
+  propTypes: {
+    handler: React.PropTypes.any.isRequired,
+    path: React.PropTypes.string,
+    name: React.PropTypes.string,
+    preserveScrollPosition: React.PropTypes.bool
+  },
+
+  render: function () {
+    throw new Error(
+      'The <Route> component should not be rendered directly. You may be ' +
+      'missing a <Routes> wrapper around your list of routes.');
+  }
+
+});
+
+module.exports = Route;
+
+},{"../helpers/withoutProperties":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/withoutProperties.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/components/Routes.js":[function(require,module,exports){
+var React = require('react');
+var warning = require('react/lib/warning');
+var ExecutionEnvironment = require('react/lib/ExecutionEnvironment');
+var mergeProperties = require('../helpers/mergeProperties');
+var goBack = require('../helpers/goBack');
+var replaceWith = require('../helpers/replaceWith');
+var transitionTo = require('../helpers/transitionTo');
+var Route = require('../components/Route');
+var Path = require('../helpers/Path');
+var ActiveStore = require('../stores/ActiveStore');
+var RouteStore = require('../stores/RouteStore');
+var URLStore = require('../stores/URLStore');
+var Promise = require('es6-promise').Promise;
+
+/**
+ * The ref name that can be used to reference the active route component.
+ */
+var REF_NAME = '__activeRoute__';
+
+/**
+ * The <Routes> component configures the route hierarchy and renders the
+ * route matching the current location when rendered into a document.
+ *
+ * See the <Route> component for more details.
+ */
+var Routes = React.createClass({
+  displayName: 'Routes',
+
+  statics: {
+
+    /**
+     * Handles errors that were thrown asynchronously. By default, the
+     * error is re-thrown so we don't swallow them silently.
+     */
+    handleAsyncError: function (error, route) {
+      throw error; // This error probably originated in a transition hook.
+    },
+
+    /**
+     * Handles cancelled transitions. By default, redirects replace the
+     * current URL and aborts roll it back.
+     */
+    handleCancelledTransition: function (transition, routes) {
+      var reason = transition.cancelReason;
+
+      if (reason instanceof Redirect) {
+        replaceWith(reason.to, reason.params, reason.query);
+      } else if (reason instanceof Abort) {
+        goBack();
+      }
+    }
+
+  },
+
+  propTypes: {
+    location: React.PropTypes.oneOf([ 'hash', 'history' ]).isRequired,
+    preserveScrollPosition: React.PropTypes.bool
+  },
+
+  getDefaultProps: function () {
+    return {
+      location: 'hash',
+      preserveScrollPosition: false
+    };
+  },
+
+  getInitialState: function () {
+    return {};
+  },
+
+  componentWillMount: function () {
+    React.Children.forEach(this.props.children, function (child) {
+      RouteStore.registerRoute(child);
+    });
+
+    if (!URLStore.isSetup() && ExecutionEnvironment.canUseDOM)
+      URLStore.setup(this.props.location);
+
+    URLStore.addChangeListener(this.handleRouteChange);
+  },
+
+  componentDidMount: function () {
+    this.dispatch(URLStore.getCurrentPath());
+  },
+
+  componentWillUnmount: function () {
+    URLStore.removeChangeListener(this.handleRouteChange);
+  },
+
+  handleRouteChange: function () {
+    this.dispatch(URLStore.getCurrentPath());
+  },
+
+  /**
+   * Performs a depth-first search for the first route in the tree that matches
+   * on the given path. Returns an array of all routes in the tree leading to
+   * the one that matched in the format { route, params } where params is an
+   * object that contains the URL parameters relevant to that route. Returns
+   * null if no route in the tree matches the path.
+   *
+   *   React.renderComponent(
+   *     <Routes>
+   *       <Route handler={App}>
+   *         <Route name="posts" handler={Posts}/>
+   *         <Route name="post" path="/posts/:id" handler={Post}/>
+   *       </Route>
+   *     </Routes>
+   *   ).match('/posts/123'); => [ { route: <AppRoute>, params: {} },
+   *                               { route: <PostRoute>, params: { id: '123' } } ]
+   */
+  match: function (path) {
+    var rootRoutes = this.props.children;
+    if (!Array.isArray(rootRoutes)) {
+      rootRoutes = [rootRoutes];
+    }
+    var matches = null;
+    for (var i = 0; matches == null && i < rootRoutes.length; i++) {
+      matches = findMatches(Path.withoutQuery(path), rootRoutes[i]);
+    }
+    return matches;
+  },
+
+  /**
+   * Performs a transition to the given path and returns a promise for the
+   * Transition object that was used.
+   *
+   * In order to do this, the router first determines which routes are involved
+   * in the transition beginning with the current route, up the route tree to
+   * the first parent route that is shared with the destination route, and back
+   * down the tree to the destination route. The willTransitionFrom static
+   * method is invoked on all route handlers we're transitioning away from, in
+   * reverse nesting order. Likewise, the willTransitionTo static method
+   * is invoked on all route handlers we're transitioning to.
+   *
+   * Both willTransitionFrom and willTransitionTo hooks may either abort or
+   * redirect the transition. If they need to resolve asynchronously, they may
+   * return a promise.
+   *
+   * Any error that occurs asynchronously during the transition is re-thrown in
+   * the top-level scope unless returnRejectedPromise is true, in which case a
+   * rejected promise is returned so the caller may handle the error.
+   *
+   * Note: This function does not update the URL in a browser's location bar.
+   * If you want to keep the URL in sync with transitions, use Router.transitionTo,
+   * Router.replaceWith, or Router.goBack instead.
+   */
+  dispatch: function (path, returnRejectedPromise) {
+    var transition = new Transition(path);
+    var routes = this;
+
+    var promise = syncWithTransition(routes, transition).then(function (newState) {
+      if (transition.isCancelled) {
+        Routes.handleCancelledTransition(transition, routes);
+      } else if (newState) {
+        ActiveStore.updateState(newState);
+      }
+
+      return transition;
+    });
+
+    if (!returnRejectedPromise) {
+      promise = promise.then(undefined, function (error) {
+        // Use setTimeout to break the promise chain.
+        setTimeout(function () {
+          Routes.handleAsyncError(error, routes);
+        });
+      });
+    }
+
+    return promise;
+  },
+
+  render: function () {
+    if (!this.state.path)
+      return null;
+
+    var matches = this.state.matches;
+    if (matches.length) {
+      // matches[0] corresponds to the top-most match
+      return matches[0].route.props.handler(computeHandlerProps(matches, this.state.activeQuery));
+    } else {
+      return null;
+    }
+  }
+
+});
+
+function Transition(path) {
+  this.path = path;
+  this.cancelReason = null;
+  this.isCancelled = false;
+}
+
+mergeProperties(Transition.prototype, {
+
+  abort: function () {
+    this.cancelReason = new Abort();
+    this.isCancelled = true;
+  },
+
+  redirect: function (to, params, query) {
+    this.cancelReason = new Redirect(to, params, query);
+    this.isCancelled = true;
+  },
+
+  retry: function () {
+    transitionTo(this.path);
+  }
+
+});
+
+function Abort() {}
+
+function Redirect(to, params, query) {
+  this.to = to;
+  this.params = params;
+  this.query = query;
+}
+
+function findMatches(path, route) {
+  var children = route.props.children, matches;
+  var params;
+
+  // Check the subtree first to find the most deeply-nested match.
+  if (Array.isArray(children)) {
+    for (var i = 0, len = children.length; matches == null && i < len; ++i) {
+      matches = findMatches(path, children[i]);
+    }
+  } else if (children) {
+    matches = findMatches(path, children);
+  }
+
+  if (matches) {
+    var rootParams = getRootMatch(matches).params;
+    params = {};
+
+    Path.extractParamNames(route.props.path).forEach(function (paramName) {
+      params[paramName] = rootParams[paramName];
+    });
+
+    matches.unshift(makeMatch(route, params));
+
+    return matches;
+  }
+
+  // No routes in the subtree matched, so check this route.
+  params = Path.extractParams(route.props.path, path);
+
+  if (params)
+    return [ makeMatch(route, params) ];
+
+  return null;
+}
+
+function makeMatch(route, params) {
+  return { route: route, params: params };
+}
+
+function hasMatch(matches, match) {
+  return matches.some(function (m) {
+    if (m.route !== match.route)
+      return false;
+
+    for (var property in m.params) {
+      if (m.params[property] !== match.params[property])
+        return false;
+    }
+
+    return true;
+  });
+}
+
+function getRootMatch(matches) {
+  return matches[matches.length - 1];
+}
+
+function updateMatchComponents(matches, refs) {
+  var i = 0, component;
+  while (component = refs[REF_NAME]) {
+    matches[i++].component = component;
+    refs = component.refs;
+  }
+}
+
+/**
+ * Runs all transition hooks that are required to get from the current state
+ * to the state specified by the given transition and updates the current state
+ * if they all pass successfully. Returns a promise that resolves to the new
+ * state if it needs to be updated, or undefined if not.
+ */
+function syncWithTransition(routes, transition) {
+  if (routes.state.path === transition.path)
+    return Promise.resolve(); // Nothing to do!
+
+  var currentMatches = routes.state.matches;
+  var nextMatches = routes.match(transition.path);
+
+  warning(
+    nextMatches,
+    'No route matches path "' + transition.path + '". Make sure you have ' +
+    '<Route path="' + transition.path + '"> somewhere in your routes'
+  );
+
+  if (!nextMatches)
+    nextMatches = [];
+
+  var fromMatches, toMatches;
+  if (currentMatches) {
+    updateMatchComponents(currentMatches, routes.refs);
+
+    fromMatches = currentMatches.filter(function (match) {
+      return !hasMatch(nextMatches, match);
+    });
+
+    toMatches = nextMatches.filter(function (match) {
+      return !hasMatch(currentMatches, match);
+    });
+  } else {
+    fromMatches = [];
+    toMatches = nextMatches;
+  }
+
+  return checkTransitionFromHooks(fromMatches, transition).then(function () {
+    if (transition.isCancelled)
+      return; // No need to continue.
+
+    return checkTransitionToHooks(toMatches, transition).then(function () {
+      if (transition.isCancelled)
+        return; // No need to continue.
+
+      var rootMatch = getRootMatch(nextMatches);
+      var params = (rootMatch && rootMatch.params) || {};
+      var query = Path.extractQuery(transition.path) || {};
+      var state = {
+        path: transition.path,
+        matches: nextMatches,
+        activeParams: params,
+        activeQuery: query,
+        activeRoutes: nextMatches.map(function (match) {
+          return match.route;
+        })
+      };
+
+      // TODO: add functional test
+      maybeScrollWindow(routes, toMatches[toMatches.length - 1]);
+      routes.setState(state);
+
+      return state;
+    });
+  });
+}
+
+/**
+ * Calls the willTransitionFrom hook of all handlers in the given matches
+ * serially in reverse with the transition object and the current instance of
+ * the route's handler, so that the deepest nested handlers are called first.
+ * Returns a promise that resolves after the last handler.
+ */
+function checkTransitionFromHooks(matches, transition) {
+  var promise = Promise.resolve();
+
+  reversedArray(matches).forEach(function (match) {
+    promise = promise.then(function () {
+      var handler = match.route.props.handler;
+
+      if (!transition.isCancelled && handler.willTransitionFrom)
+        return handler.willTransitionFrom(transition, match.component);
+    });
+  });
+
+  return promise;
+}
+
+/**
+ * Calls the willTransitionTo hook of all handlers in the given matches serially
+ * with the transition object and any params that apply to that handler. Returns
+ * a promise that resolves after the last handler.
+ */
+function checkTransitionToHooks(matches, transition) {
+  var promise = Promise.resolve();
+
+  matches.forEach(function (match, index) {
+    promise = promise.then(function () {
+      var handler = match.route.props.handler;
+
+      if (!transition.isCancelled && handler.willTransitionTo)
+        return handler.willTransitionTo(transition, match.params);
+    });
+  });
+
+  return promise;
+}
+
+/**
+ * Given an array of matches as returned by findMatches, return a descriptor for
+ * the handler hierarchy specified by the route.
+ */
+function computeHandlerProps(matches, query) {
+  var props = {
+    ref: null,
+    key: null,
+    params: null,
+    query: null,
+    activeRouteHandler: returnNull
+  };
+
+  var childHandler;
+  reversedArray(matches).forEach(function (match) {
+    var route = match.route;
+
+    props = Route.getUnreservedProps(route.props);
+
+    props.ref = REF_NAME;
+    props.key = Path.injectParams(route.props.path, match.params);
+    props.params = match.params;
+    props.query = query;
+
+    if (childHandler) {
+      props.activeRouteHandler = childHandler;
+    } else {
+      props.activeRouteHandler = returnNull;
+    }
+
+    childHandler = function (props, addedProps) {
+      if (arguments.length > 2 && typeof arguments[2] !== 'undefined')
+        throw new Error('Passing children to a route handler is not supported');
+
+      return route.props.handler(mergeProperties(props, addedProps));
+    }.bind(this, props);
+  });
+
+  return props;
+}
+
+function returnNull() {
+  return null;
+}
+
+function reversedArray(array) {
+  return array.slice(0).reverse();
+}
+
+function maybeScrollWindow(routes, match) {
+  if (routes.props.preserveScrollPosition)
+    return;
+
+  if (!match || match.route.props.preserveScrollPosition)
+    return;
+
+  window.scrollTo(0, 0);
+}
+
+module.exports = Routes;
+
+},{"../components/Route":"/Users/danfox/ghupdate/node_modules/react-router/modules/components/Route.js","../helpers/Path":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/Path.js","../helpers/goBack":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/goBack.js","../helpers/mergeProperties":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/mergeProperties.js","../helpers/replaceWith":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/replaceWith.js","../helpers/transitionTo":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/transitionTo.js","../stores/ActiveStore":"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/ActiveStore.js","../stores/RouteStore":"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/RouteStore.js","../stores/URLStore":"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/URLStore.js","es6-promise":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/main.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js","react/lib/ExecutionEnvironment":"/Users/danfox/ghupdate/node_modules/react/lib/ExecutionEnvironment.js","react/lib/warning":"/Users/danfox/ghupdate/node_modules/react/lib/warning.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/Path.js":[function(require,module,exports){
+var invariant = require('react/lib/invariant');
+var qs = require('querystring');
+var mergeProperties = require('./mergeProperties');
+var URL = require('./URL');
+
+var paramMatcher = /((?::[a-z_$][a-z0-9_$]*)|\*)/ig;
+var queryMatcher = /\?(.+)/;
+
+function getParamName(pathSegment) {
+  return pathSegment === '*' ? 'splat' : pathSegment.substr(1);
+}
+
+var _compiledPatterns = {};
+
+function compilePattern(pattern) {
+  if (_compiledPatterns[pattern])
+    return _compiledPatterns[pattern];
+
+  var compiled = _compiledPatterns[pattern] = {};
+  var paramNames = compiled.paramNames = [];
+
+  var source = pattern.replace(paramMatcher, function (match, pathSegment) {
+    paramNames.push(getParamName(pathSegment));
+    return pathSegment === '*' ? '(.*?)' : '([^/?#]+)';
+  });
+
+  compiled.matcher = new RegExp('^' + source + '$', 'i');
+
+  return compiled;
+}
+
+function isDynamicPattern(pattern) {
+  return pattern.indexOf(':') !== -1 || pattern.indexOf('*') !== -1;
+}
+
+var Path = {
+
+  /**
+   * Extracts the portions of the given URL path that match the given pattern
+   * and returns an object of param name => value pairs. Returns null if the
+   * pattern does not match the given path.
+   */
+  extractParams: function (pattern, path) {
+    if (!pattern)
+      return null;
+
+    if (!isDynamicPattern(pattern)) {
+      if (pattern === URL.decode(path))
+        return {}; // No dynamic segments, but the paths match.
+
+      return null;
+    }
+
+    var compiled = compilePattern(pattern);
+    var match = URL.decode(path).match(compiled.matcher);
+
+    if (!match)
+      return null;
+
+    var params = {};
+
+    compiled.paramNames.forEach(function (paramName, index) {
+      params[paramName] = match[index + 1];
+    });
+
+    return params;
+  },
+
+  /**
+   * Returns an array of the names of all parameters in the given pattern.
+   */
+  extractParamNames: function (pattern) {
+    if (!pattern)
+      return [];
+    return compilePattern(pattern).paramNames;
+  },
+
+  /**
+   * Returns a version of the given route path with params interpolated. Throws
+   * if there is a dynamic segment of the route path for which there is no param.
+   */
+  injectParams: function (pattern, params) {
+    if (!pattern)
+      return null;
+
+    if (!isDynamicPattern(pattern))
+      return pattern;
+
+    params = params || {};
+
+    return pattern.replace(paramMatcher, function (match, pathSegment) {
+      var paramName = getParamName(pathSegment);
+
+      invariant(
+        params[paramName] != null,
+        'Missing "' + paramName + '" parameter for path "' + pattern + '"'
+      );
+
+      // Preserve forward slashes.
+      return String(params[paramName]).split('/').map(URL.encode).join('/');
+    });
+  },
+
+  /**
+   * Returns an object that is the result of parsing any query string contained in
+   * the given path, null if the path contains no query string.
+   */
+  extractQuery: function (path) {
+    var match = path.match(queryMatcher);
+    return match && qs.parse(match[1]);
+  },
+
+  /**
+   * Returns a version of the given path without the query string.
+   */
+  withoutQuery: function (path) {
+    return path.replace(queryMatcher, '');
+  },
+
+  /**
+   * Returns a version of the given path with the parameters in the given query
+   * added to the query string.
+   */
+  withQuery: function (path, query) {
+    var existingQuery = Path.extractQuery(path);
+
+    if (existingQuery)
+      query = query ? mergeProperties(existingQuery, query) : existingQuery;
+
+    var queryString = query && qs.stringify(query);
+
+    if (queryString)
+      return Path.withoutQuery(path) + '?' + queryString;
+
+    return path;
+  },
+
+  /**
+   * Returns a normalized version of the given path.
+   */
+  normalize: function (path) {
+    return path.replace(/^\/*/, '/');
+  }
+
+};
+
+module.exports = Path;
+
+},{"./URL":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/URL.js","./mergeProperties":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/mergeProperties.js","querystring":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/querystring-es3/index.js","react/lib/invariant":"/Users/danfox/ghupdate/node_modules/react/lib/invariant.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/URL.js":[function(require,module,exports){
+var urlEncodedSpaceRE = /\+/g;
+var encodedSpaceRE = /%20/g;
+
+var URL = {
+
+  /* These functions were copied from the https://github.com/cujojs/rest source, MIT licensed */
+
+  decode: function (str) {
+    // spec says space should be encoded as '+'
+    str = str.replace(urlEncodedSpaceRE, ' ');
+    return decodeURIComponent(str);
+  },
+
+  encode: function (str) {
+    str = encodeURIComponent(str);
+    // spec says space should be encoded as '+'
+    return str.replace(encodedSpaceRE, '+');
+  }
+
+};
+
+module.exports = URL;
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/goBack.js":[function(require,module,exports){
+var URLStore = require('../stores/URLStore');
+
+function goBack() {
+  URLStore.back();
+}
+
+module.exports = goBack;
+
+},{"../stores/URLStore":"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/URLStore.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/makePath.js":[function(require,module,exports){
+var invariant = require('react/lib/invariant');
+var RouteStore = require('../stores/RouteStore');
+var Path = require('./Path');
+
+/**
+ * Returns an absolute URL path created from the given route name, URL
+ * parameters, and query values.
+ */
+function makePath(to, params, query) {
+  var path;
+  if (to.charAt(0) === '/') {
+    path = Path.normalize(to); // Absolute path.
+  } else {
+    var route = RouteStore.getRouteByName(to);
+
+    invariant(
+      route,
+      'Unable to find a route named "' + to + '". Make sure you have ' +
+      'a <Route name="' + to + '"> defined somewhere in your routes'
+    );
+
+    path = route.props.path;
+  }
+
+  return Path.withQuery(Path.injectParams(path, params), query);
+}
+
+module.exports = makePath;
+
+},{"../stores/RouteStore":"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/RouteStore.js","./Path":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/Path.js","react/lib/invariant":"/Users/danfox/ghupdate/node_modules/react/lib/invariant.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/mergeProperties.js":[function(require,module,exports){
+function mergeProperties(object, properties) {
+  for (var property in properties) {
+    if (properties.hasOwnProperty(property))
+      object[property] = properties[property];
+  }
+
+  return object;
+}
+
+module.exports = mergeProperties;
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/replaceWith.js":[function(require,module,exports){
+var URLStore = require('../stores/URLStore');
+var makePath = require('./makePath');
+
+/**
+ * Transitions to the URL specified in the arguments by replacing
+ * the current URL in the history stack.
+ */
+function replaceWith(to, params, query) {
+  URLStore.replace(makePath(to, params, query));
+}
+
+module.exports = replaceWith;
+
+},{"../stores/URLStore":"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/URLStore.js","./makePath":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/makePath.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/transitionTo.js":[function(require,module,exports){
+var URLStore = require('../stores/URLStore');
+var makePath = require('./makePath');
+
+/**
+ * Transitions to the URL specified in the arguments by pushing
+ * a new URL onto the history stack.
+ */
+function transitionTo(to, params, query) {
+  URLStore.push(makePath(to, params, query));
+}
+
+module.exports = transitionTo;
+
+},{"../stores/URLStore":"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/URLStore.js","./makePath":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/makePath.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/withoutProperties.js":[function(require,module,exports){
+function withoutProperties(object, properties) {
+  var result = {};
+
+  for (var property in object) {
+    if (object.hasOwnProperty(property) && !properties[property])
+      result[property] = object[property];
+  }
+
+  return result;
+}
+
+module.exports = withoutProperties;
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/ActiveStore.js":[function(require,module,exports){
+var _activeRoutes = [];
+var _activeParams = {};
+var _activeQuery = {};
+
+function routeIsActive(routeName) {
+  return _activeRoutes.some(function (route) {
+    return route.props.name === routeName;
+  });
+}
+
+function paramsAreActive(params) {
+  for (var property in params) {
+    if (_activeParams[property] !== String(params[property]))
+      return false;
+  }
+
+  return true;
+}
+
+function queryIsActive(query) {
+  for (var property in query) {
+    if (_activeQuery[property] !== String(query[property]))
+      return false;
+  }
+
+  return true;
+}
+
+var EventEmitter = require('event-emitter');
+var _events = EventEmitter();
+
+function notifyChange() {
+  _events.emit('change');
+}
+
+/**
+ * The ActiveStore keeps track of which routes, URL and query parameters are
+ * currently active on a page. <Link>s subscribe to the ActiveStore to know
+ * whether or not they are active.
+ */
+var ActiveStore = {
+
+  /**
+   * Adds a listener that will be called when this store changes.
+   */
+  addChangeListener: function (listener) {
+    _events.on('change', listener);
+  },
+
+  /**
+   * Removes the given change listener.
+   */
+  removeChangeListener: function (listener) {
+    _events.off('change', listener);
+  },
+
+  /**
+   * Updates the currently active state and notifies all listeners.
+   * This is automatically called by routes as they become active.
+   */
+  updateState: function (state) {
+    state = state || {};
+
+    _activeRoutes = state.activeRoutes || [];
+    _activeParams = state.activeParams || {};
+    _activeQuery = state.activeQuery || {};
+
+    notifyChange();
+  },
+
+  /**
+   * Returns true if the route with the given name, URL parameters, and query
+   * are all currently active.
+   */
+  isActive: function (routeName, params, query) {
+    var isActive = routeIsActive(routeName) && paramsAreActive(params);
+
+    if (query)
+      return isActive && queryIsActive(query);
+
+    return isActive;
+  }
+
+};
+
+module.exports = ActiveStore;
+
+},{"event-emitter":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/index.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/RouteStore.js":[function(require,module,exports){
+var React = require('react');
+var invariant = require('react/lib/invariant');
+var warning = require('react/lib/warning');
+var Path = require('../helpers/Path');
+
+var _namedRoutes = {};
+
+/**
+ * The RouteStore contains a directory of all <Route>s in the system. It is
+ * used primarily for looking up routes by name so that <Link>s can use a
+ * route name in the "to" prop and users can use route names in `Router.transitionTo`
+ * and other high-level utility methods.
+ */
+var RouteStore = {
+
+  /**
+   * Removes all references to <Route>s from the store. Should only ever
+   * really be used in tests to clear the store between test runs.
+   */
+  unregisterAllRoutes: function () {
+    _namedRoutes = {};
+  },
+
+  /**
+   * Removes the reference to the given <Route> and all of its children
+   * from the store.
+   */
+  unregisterRoute: function (route) {
+    if (route.props.name)
+      delete _namedRoutes[route.props.name];
+
+    React.Children.forEach(route.props.children, function (child) {
+      RouteStore.unregisterRoute(child);
+    });
+  },
+
+  /**
+   * Registers a <Route> and all of its children with the store. Also,
+   * does some normalization and validation on route props.
+   */
+  registerRoute: function (route, _parentRoute) {
+    // Make sure the <Route>'s path begins with a slash. Default to its name.
+    // We can't do this in getDefaultProps because it may not be called on
+    // <Route>s that are never actually mounted.
+    if (route.props.path || route.props.name) {
+      route.props.path = Path.normalize(route.props.path || route.props.name);
+    } else {
+      route.props.path = '/';
+    }
+
+    // Make sure the <Route> has a valid React component for a handler.
+    invariant(
+      React.isValidClass(route.props.handler),
+      'The handler for Route "' + (route.props.name || route.props.path) + '" ' +
+      'must be a valid React component'
+    );
+
+    // Make sure the <Route> has all params that its parent needs.
+    if (_parentRoute) {
+      var paramNames = Path.extractParamNames(route.props.path);
+
+      Path.extractParamNames(_parentRoute.props.path).forEach(function (paramName) {
+        invariant(
+          paramNames.indexOf(paramName) !== -1,
+          'The nested route path "' + route.props.path + '" is missing the "' + paramName + '" ' +
+          'parameter of its parent path "' + _parentRoute.props.path + '"'
+        );
+      });
+    }
+
+    // Make sure the <Route> can be looked up by <Link>s.
+    if (route.props.name) {
+      var existingRoute = _namedRoutes[route.props.name];
+
+      invariant(
+        !existingRoute || route === existingRoute,
+        'You cannot use the name "' + route.props.name + '" for more than one route'
+      );
+
+      _namedRoutes[route.props.name] = route;
+    }
+
+    React.Children.forEach(route.props.children, function (child) {
+      RouteStore.registerRoute(child, route);
+    });
+  },
+
+  /**
+   * Returns the Route object with the given name, if one exists.
+   */
+  getRouteByName: function (routeName) {
+    return _namedRoutes[routeName] || null;
+  }
+
+};
+
+module.exports = RouteStore;
+
+},{"../helpers/Path":"/Users/danfox/ghupdate/node_modules/react-router/modules/helpers/Path.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js","react/lib/invariant":"/Users/danfox/ghupdate/node_modules/react/lib/invariant.js","react/lib/warning":"/Users/danfox/ghupdate/node_modules/react/lib/warning.js"}],"/Users/danfox/ghupdate/node_modules/react-router/modules/stores/URLStore.js":[function(require,module,exports){
+var ExecutionEnvironment = require('react/lib/ExecutionEnvironment');
+var invariant = require('react/lib/invariant');
+var warning = require('react/lib/warning');
+
+var _location;
+var _currentPath = '/';
+var _lastPath = null;
+
+function getWindowChangeEvent(location) {
+  if (location === 'history')
+    return 'popstate';
+
+  return window.addEventListener ? 'hashchange' : 'onhashchange';
+}
+
+function getWindowPath() {
+  return window.location.pathname + window.location.search;
+}
+
+var EventEmitter = require('event-emitter');
+var _events = EventEmitter();
+
+function notifyChange() {
+  _events.emit('change');
+}
+
+/**
+ * The URLStore keeps track of the current URL. In DOM environments, it may be
+ * attached to window.location to automatically sync with the URL in a browser's
+ * location bar. <Route>s subscribe to the URLStore to know when the URL changes.
+ */
+var URLStore = {
+
+  /**
+   * Adds a listener that will be called when this store changes.
+   */
+  addChangeListener: function (listener) {
+    _events.on('change', listener);
+  },
+
+  /**
+   * Removes the given change listener.
+   */
+  removeChangeListener: function (listener) {
+    _events.off('change', listener);
+  },
+
+  /**
+   * Returns the type of navigation that is currently being used.
+   */
+  getLocation: function () {
+    return _location || 'hash';
+  },
+
+  /**
+   * Returns the value of the current URL path.
+   */
+  getCurrentPath: function () {
+    if (_location === 'history' || _location === 'disabledHistory')
+      return getWindowPath();
+
+    if (_location === 'hash')
+      return window.location.hash.substr(1);
+
+    return _currentPath;
+  },
+
+  /**
+   * Pushes the given path onto the browser navigation stack.
+   */
+  push: function (path) {
+    if (path === this.getCurrentPath())
+      return;
+
+    if (_location === 'disabledHistory')
+      return window.location = path;
+
+    if (_location === 'history') {
+      window.history.pushState({ path: path }, '', path);
+      notifyChange();
+    } else if (_location === 'hash') {
+      window.location.hash = path;
+    } else {
+      _lastPath = _currentPath;
+      _currentPath = path;
+      notifyChange();
+    }
+  },
+
+  /**
+   * Replaces the current URL path with the given path without adding an entry
+   * to the browser's history.
+   */
+  replace: function (path) {
+    if (_location === 'disabledHistory') {
+      window.location.replace(path);
+    } else if (_location === 'history') {
+      window.history.replaceState({ path: path }, '', path);
+      notifyChange();
+    } else if (_location === 'hash') {
+      window.location.replace(getWindowPath() + '#' + path);
+    } else {
+      _currentPath = path;
+      notifyChange();
+    }
+  },
+
+  /**
+   * Reverts the URL to whatever it was before the last update.
+   */
+  back: function () {
+    if (_location != null) {
+      window.history.back();
+    } else {
+      invariant(
+        _lastPath,
+        'You cannot make the URL store go back more than once when it does not use the DOM'
+      );
+
+      _currentPath = _lastPath;
+      _lastPath = null;
+      notifyChange();
+    }
+  },
+
+  /**
+   * Returns true if the URL store has already been setup.
+   */
+  isSetup: function () {
+    return _location != null;
+  },
+
+  /**
+   * Sets up the URL store to get the value of the current path from window.location
+   * as it changes. The location argument may be either "hash" or "history".
+   */
+  setup: function (location) {
+    invariant(
+      ExecutionEnvironment.canUseDOM,
+      'You cannot setup the URL store in an environment with no DOM'
+    );
+
+    if (_location != null) {
+      warning(
+        _location === location,
+        'The URL store was already setup using ' + _location + ' location. ' +
+        'You cannot use ' + location + ' location on the same page'
+      );
+
+      return; // Don't setup twice.
+    }
+
+    if (location === 'history' && !supportsHistory()) {
+      _location = 'disabledHistory';
+      return;
+    }
+
+    var changeEvent = getWindowChangeEvent(location);
+
+    invariant(
+      changeEvent || location === 'disabledHistory',
+      'The URL store location "' + location + '" is not valid. ' +
+      'It must be either "hash" or "history"'
+    );
+
+    _location = location;
+
+    if (location === 'hash' && window.location.hash === '')
+      URLStore.replace('/');
+
+    if (window.addEventListener) {
+      window.addEventListener(changeEvent, notifyChange, false);
+    } else {
+      window.attachEvent(changeEvent, notifyChange);
+    }
+
+    notifyChange();
+  },
+
+  /**
+   * Stops listening for changes to window.location.
+   */
+  teardown: function () {
+    if (_location == null)
+      return;
+
+    var changeEvent = getWindowChangeEvent(_location);
+
+    if (window.removeEventListener) {
+      window.removeEventListener(changeEvent, notifyChange, false);
+    } else {
+      window.detachEvent(changeEvent, notifyChange);
+    }
+
+    _location = null;
+    _currentPath = '/';
+  }
+
+};
+
+function supportsHistory() {
+  /*! taken from modernizr
+   * https://github.com/Modernizr/Modernizr/blob/master/LICENSE
+   * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/history.js
+   */
+  var ua = navigator.userAgent;
+  if ((ua.indexOf('Android 2.') !== -1 ||
+      (ua.indexOf('Android 4.0') !== -1)) &&
+      ua.indexOf('Mobile Safari') !== -1 &&
+      ua.indexOf('Chrome') === -1) {
+    return false;
+  }
+  return (window.history && 'pushState' in window.history);
+}
+
+module.exports = URLStore;
+
+},{"event-emitter":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/index.js","react/lib/ExecutionEnvironment":"/Users/danfox/ghupdate/node_modules/react/lib/ExecutionEnvironment.js","react/lib/invariant":"/Users/danfox/ghupdate/node_modules/react/lib/invariant.js","react/lib/warning":"/Users/danfox/ghupdate/node_modules/react/lib/warning.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/main.js":[function(require,module,exports){
+"use strict";
+var Promise = require("./promise/promise").Promise;
+var polyfill = require("./promise/polyfill").polyfill;
+exports.Promise = Promise;
+exports.polyfill = polyfill;
+},{"./promise/polyfill":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/polyfill.js","./promise/promise":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/promise.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/all.js":[function(require,module,exports){
+"use strict";
+/* global toString */
+
+var isArray = require("./utils").isArray;
+var isFunction = require("./utils").isFunction;
+
+/**
+  Returns a promise that is fulfilled when all the given promises have been
+  fulfilled, or rejected if any of them become rejected. The return promise
+  is fulfilled with an array that gives all the values in the order they were
+  passed in the `promises` array argument.
+
+  Example:
+
+  ```javascript
+  var promise1 = RSVP.resolve(1);
+  var promise2 = RSVP.resolve(2);
+  var promise3 = RSVP.resolve(3);
+  var promises = [ promise1, promise2, promise3 ];
+
+  RSVP.all(promises).then(function(array){
+    // The array here would be [ 1, 2, 3 ];
+  });
+  ```
+
+  If any of the `promises` given to `RSVP.all` are rejected, the first promise
+  that is rejected will be given as an argument to the returned promises's
+  rejection handler. For example:
+
+  Example:
+
+  ```javascript
+  var promise1 = RSVP.resolve(1);
+  var promise2 = RSVP.reject(new Error("2"));
+  var promise3 = RSVP.reject(new Error("3"));
+  var promises = [ promise1, promise2, promise3 ];
+
+  RSVP.all(promises).then(function(array){
+    // Code here never runs because there are rejected promises!
+  }, function(error) {
+    // error.message === "2"
+  });
+  ```
+
+  @method all
+  @for RSVP
+  @param {Array} promises
+  @param {String} label
+  @return {Promise} promise that is fulfilled when all `promises` have been
+  fulfilled, or rejected if any of them become rejected.
+*/
+function all(promises) {
+  /*jshint validthis:true */
+  var Promise = this;
+
+  if (!isArray(promises)) {
+    throw new TypeError('You must pass an array to all.');
+  }
+
+  return new Promise(function(resolve, reject) {
+    var results = [], remaining = promises.length,
+    promise;
+
+    if (remaining === 0) {
+      resolve([]);
+    }
+
+    function resolver(index) {
+      return function(value) {
+        resolveAll(index, value);
+      };
+    }
+
+    function resolveAll(index, value) {
+      results[index] = value;
+      if (--remaining === 0) {
+        resolve(results);
+      }
+    }
+
+    for (var i = 0; i < promises.length; i++) {
+      promise = promises[i];
+
+      if (promise && isFunction(promise.then)) {
+        promise.then(resolver(i), reject);
+      } else {
+        resolveAll(i, promise);
+      }
+    }
+  });
+}
+
+exports.all = all;
+},{"./utils":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/utils.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/asap.js":[function(require,module,exports){
+(function (process,global){
+"use strict";
+var browserGlobal = (typeof window !== 'undefined') ? window : {};
+var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
+var local = (typeof global !== 'undefined') ? global : (this === undefined? window:this);
+
+// node
+function useNextTick() {
+  return function() {
+    process.nextTick(flush);
+  };
+}
+
+function useMutationObserver() {
+  var iterations = 0;
+  var observer = new BrowserMutationObserver(flush);
+  var node = document.createTextNode('');
+  observer.observe(node, { characterData: true });
+
+  return function() {
+    node.data = (iterations = ++iterations % 2);
+  };
+}
+
+function useSetTimeout() {
+  return function() {
+    local.setTimeout(flush, 1);
+  };
+}
+
+var queue = [];
+function flush() {
+  for (var i = 0; i < queue.length; i++) {
+    var tuple = queue[i];
+    var callback = tuple[0], arg = tuple[1];
+    callback(arg);
+  }
+  queue = [];
+}
+
+var scheduleFlush;
+
+// Decide what async method to use to triggering processing of queued callbacks:
+if (typeof process !== 'undefined' && {}.toString.call(process) === '[object process]') {
+  scheduleFlush = useNextTick();
+} else if (BrowserMutationObserver) {
+  scheduleFlush = useMutationObserver();
+} else {
+  scheduleFlush = useSetTimeout();
+}
+
+function asap(callback, arg) {
+  var length = queue.push([callback, arg]);
+  if (length === 1) {
+    // If length is 1, that means that we need to schedule an async flush.
+    // If additional callbacks are queued before the queue is flushed, they
+    // will be processed by this flush that we are scheduling.
+    scheduleFlush();
+  }
+}
+
+exports.asap = asap;
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/config.js":[function(require,module,exports){
+"use strict";
+var config = {
+  instrument: false
+};
+
+function configure(name, value) {
+  if (arguments.length === 2) {
+    config[name] = value;
+  } else {
+    return config[name];
+  }
+}
+
+exports.config = config;
+exports.configure = configure;
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/polyfill.js":[function(require,module,exports){
+(function (global){
+"use strict";
+/*global self*/
+var RSVPPromise = require("./promise").Promise;
+var isFunction = require("./utils").isFunction;
+
+function polyfill() {
+  var local;
+
+  if (typeof global !== 'undefined') {
+    local = global;
+  } else if (typeof window !== 'undefined' && window.document) {
+    local = window;
+  } else {
+    local = self;
+  }
+
+  var es6PromiseSupport = 
+    "Promise" in local &&
+    // Some of these methods are missing from
+    // Firefox/Chrome experimental implementations
+    "resolve" in local.Promise &&
+    "reject" in local.Promise &&
+    "all" in local.Promise &&
+    "race" in local.Promise &&
+    // Older version of the spec had a resolver object
+    // as the arg rather than a function
+    (function() {
+      var resolve;
+      new local.Promise(function(r) { resolve = r; });
+      return isFunction(resolve);
+    }());
+
+  if (!es6PromiseSupport) {
+    local.Promise = RSVPPromise;
+  }
+}
+
+exports.polyfill = polyfill;
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./promise":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/promise.js","./utils":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/utils.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/promise.js":[function(require,module,exports){
+"use strict";
+var config = require("./config").config;
+var configure = require("./config").configure;
+var objectOrFunction = require("./utils").objectOrFunction;
+var isFunction = require("./utils").isFunction;
+var now = require("./utils").now;
+var all = require("./all").all;
+var race = require("./race").race;
+var staticResolve = require("./resolve").resolve;
+var staticReject = require("./reject").reject;
+var asap = require("./asap").asap;
+
+var counter = 0;
+
+config.async = asap; // default async is asap;
+
+function Promise(resolver) {
+  if (!isFunction(resolver)) {
+    throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+  }
+
+  if (!(this instanceof Promise)) {
+    throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+  }
+
+  this._subscribers = [];
+
+  invokeResolver(resolver, this);
+}
+
+function invokeResolver(resolver, promise) {
+  function resolvePromise(value) {
+    resolve(promise, value);
+  }
+
+  function rejectPromise(reason) {
+    reject(promise, reason);
+  }
+
+  try {
+    resolver(resolvePromise, rejectPromise);
+  } catch(e) {
+    rejectPromise(e);
+  }
+}
+
+function invokeCallback(settled, promise, callback, detail) {
+  var hasCallback = isFunction(callback),
+      value, error, succeeded, failed;
+
+  if (hasCallback) {
+    try {
+      value = callback(detail);
+      succeeded = true;
+    } catch(e) {
+      failed = true;
+      error = e;
+    }
+  } else {
+    value = detail;
+    succeeded = true;
+  }
+
+  if (handleThenable(promise, value)) {
+    return;
+  } else if (hasCallback && succeeded) {
+    resolve(promise, value);
+  } else if (failed) {
+    reject(promise, error);
+  } else if (settled === FULFILLED) {
+    resolve(promise, value);
+  } else if (settled === REJECTED) {
+    reject(promise, value);
+  }
+}
+
+var PENDING   = void 0;
+var SEALED    = 0;
+var FULFILLED = 1;
+var REJECTED  = 2;
+
+function subscribe(parent, child, onFulfillment, onRejection) {
+  var subscribers = parent._subscribers;
+  var length = subscribers.length;
+
+  subscribers[length] = child;
+  subscribers[length + FULFILLED] = onFulfillment;
+  subscribers[length + REJECTED]  = onRejection;
+}
+
+function publish(promise, settled) {
+  var child, callback, subscribers = promise._subscribers, detail = promise._detail;
+
+  for (var i = 0; i < subscribers.length; i += 3) {
+    child = subscribers[i];
+    callback = subscribers[i + settled];
+
+    invokeCallback(settled, child, callback, detail);
+  }
+
+  promise._subscribers = null;
+}
+
+Promise.prototype = {
+  constructor: Promise,
+
+  _state: undefined,
+  _detail: undefined,
+  _subscribers: undefined,
+
+  then: function(onFulfillment, onRejection) {
+    var promise = this;
+
+    var thenPromise = new this.constructor(function() {});
+
+    if (this._state) {
+      var callbacks = arguments;
+      config.async(function invokePromiseCallback() {
+        invokeCallback(promise._state, thenPromise, callbacks[promise._state - 1], promise._detail);
+      });
+    } else {
+      subscribe(this, thenPromise, onFulfillment, onRejection);
+    }
+
+    return thenPromise;
+  },
+
+  'catch': function(onRejection) {
+    return this.then(null, onRejection);
+  }
+};
+
+Promise.all = all;
+Promise.race = race;
+Promise.resolve = staticResolve;
+Promise.reject = staticReject;
+
+function handleThenable(promise, value) {
+  var then = null,
+  resolved;
+
+  try {
+    if (promise === value) {
+      throw new TypeError("A promises callback cannot return that same promise.");
+    }
+
+    if (objectOrFunction(value)) {
+      then = value.then;
+
+      if (isFunction(then)) {
+        then.call(value, function(val) {
+          if (resolved) { return true; }
+          resolved = true;
+
+          if (value !== val) {
+            resolve(promise, val);
+          } else {
+            fulfill(promise, val);
+          }
+        }, function(val) {
+          if (resolved) { return true; }
+          resolved = true;
+
+          reject(promise, val);
+        });
+
+        return true;
+      }
+    }
+  } catch (error) {
+    if (resolved) { return true; }
+    reject(promise, error);
+    return true;
+  }
+
+  return false;
+}
+
+function resolve(promise, value) {
+  if (promise === value) {
+    fulfill(promise, value);
+  } else if (!handleThenable(promise, value)) {
+    fulfill(promise, value);
+  }
+}
+
+function fulfill(promise, value) {
+  if (promise._state !== PENDING) { return; }
+  promise._state = SEALED;
+  promise._detail = value;
+
+  config.async(publishFulfillment, promise);
+}
+
+function reject(promise, reason) {
+  if (promise._state !== PENDING) { return; }
+  promise._state = SEALED;
+  promise._detail = reason;
+
+  config.async(publishRejection, promise);
+}
+
+function publishFulfillment(promise) {
+  publish(promise, promise._state = FULFILLED);
+}
+
+function publishRejection(promise) {
+  publish(promise, promise._state = REJECTED);
+}
+
+exports.Promise = Promise;
+},{"./all":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/all.js","./asap":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/asap.js","./config":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/config.js","./race":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/race.js","./reject":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/reject.js","./resolve":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/resolve.js","./utils":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/utils.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/race.js":[function(require,module,exports){
+"use strict";
+/* global toString */
+var isArray = require("./utils").isArray;
+
+/**
+  `RSVP.race` allows you to watch a series of promises and act as soon as the
+  first promise given to the `promises` argument fulfills or rejects.
+
+  Example:
+
+  ```javascript
+  var promise1 = new RSVP.Promise(function(resolve, reject){
+    setTimeout(function(){
+      resolve("promise 1");
+    }, 200);
+  });
+
+  var promise2 = new RSVP.Promise(function(resolve, reject){
+    setTimeout(function(){
+      resolve("promise 2");
+    }, 100);
+  });
+
+  RSVP.race([promise1, promise2]).then(function(result){
+    // result === "promise 2" because it was resolved before promise1
+    // was resolved.
+  });
+  ```
+
+  `RSVP.race` is deterministic in that only the state of the first completed
+  promise matters. For example, even if other promises given to the `promises`
+  array argument are resolved, but the first completed promise has become
+  rejected before the other promises became fulfilled, the returned promise
+  will become rejected:
+
+  ```javascript
+  var promise1 = new RSVP.Promise(function(resolve, reject){
+    setTimeout(function(){
+      resolve("promise 1");
+    }, 200);
+  });
+
+  var promise2 = new RSVP.Promise(function(resolve, reject){
+    setTimeout(function(){
+      reject(new Error("promise 2"));
+    }, 100);
+  });
+
+  RSVP.race([promise1, promise2]).then(function(result){
+    // Code here never runs because there are rejected promises!
+  }, function(reason){
+    // reason.message === "promise2" because promise 2 became rejected before
+    // promise 1 became fulfilled
+  });
+  ```
+
+  @method race
+  @for RSVP
+  @param {Array} promises array of promises to observe
+  @param {String} label optional string for describing the promise returned.
+  Useful for tooling.
+  @return {Promise} a promise that becomes fulfilled with the value the first
+  completed promises is resolved with if the first completed promise was
+  fulfilled, or rejected with the reason that the first completed promise
+  was rejected with.
+*/
+function race(promises) {
+  /*jshint validthis:true */
+  var Promise = this;
+
+  if (!isArray(promises)) {
+    throw new TypeError('You must pass an array to race.');
+  }
+  return new Promise(function(resolve, reject) {
+    var results = [], promise;
+
+    for (var i = 0; i < promises.length; i++) {
+      promise = promises[i];
+
+      if (promise && typeof promise.then === 'function') {
+        promise.then(resolve, reject);
+      } else {
+        resolve(promise);
+      }
+    }
+  });
+}
+
+exports.race = race;
+},{"./utils":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/utils.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/reject.js":[function(require,module,exports){
+"use strict";
+/**
+  `RSVP.reject` returns a promise that will become rejected with the passed
+  `reason`. `RSVP.reject` is essentially shorthand for the following:
+
+  ```javascript
+  var promise = new RSVP.Promise(function(resolve, reject){
+    reject(new Error('WHOOPS'));
+  });
+
+  promise.then(function(value){
+    // Code here doesn't run because the promise is rejected!
+  }, function(reason){
+    // reason.message === 'WHOOPS'
+  });
+  ```
+
+  Instead of writing the above, your code now simply becomes the following:
+
+  ```javascript
+  var promise = RSVP.reject(new Error('WHOOPS'));
+
+  promise.then(function(value){
+    // Code here doesn't run because the promise is rejected!
+  }, function(reason){
+    // reason.message === 'WHOOPS'
+  });
+  ```
+
+  @method reject
+  @for RSVP
+  @param {Any} reason value that the returned promise will be rejected with.
+  @param {String} label optional string for identifying the returned promise.
+  Useful for tooling.
+  @return {Promise} a promise that will become rejected with the given
+  `reason`.
+*/
+function reject(reason) {
+  /*jshint validthis:true */
+  var Promise = this;
+
+  return new Promise(function (resolve, reject) {
+    reject(reason);
+  });
+}
+
+exports.reject = reject;
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/resolve.js":[function(require,module,exports){
+"use strict";
+function resolve(value) {
+  /*jshint validthis:true */
+  if (value && typeof value === 'object' && value.constructor === this) {
+    return value;
+  }
+
+  var Promise = this;
+
+  return new Promise(function(resolve) {
+    resolve(value);
+  });
+}
+
+exports.resolve = resolve;
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/es6-promise/dist/commonjs/promise/utils.js":[function(require,module,exports){
+"use strict";
+function objectOrFunction(x) {
+  return isFunction(x) || (typeof x === "object" && x !== null);
+}
+
+function isFunction(x) {
+  return typeof x === "function";
+}
+
+function isArray(x) {
+  return Object.prototype.toString.call(x) === "[object Array]";
+}
+
+// Date.now is not available in browsers < IE9
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now#Compatibility
+var now = Date.now || function() { return new Date().getTime(); };
+
+
+exports.objectOrFunction = objectOrFunction;
+exports.isFunction = isFunction;
+exports.isArray = isArray;
+exports.now = now;
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/index.js":[function(require,module,exports){
+'use strict';
+
+var d        = require('d')
+  , callable = require('es5-ext/object/valid-callable')
+
+  , apply = Function.prototype.apply, call = Function.prototype.call
+  , create = Object.create, defineProperty = Object.defineProperty
+  , defineProperties = Object.defineProperties
+  , hasOwnProperty = Object.prototype.hasOwnProperty
+  , descriptor = { configurable: true, enumerable: false, writable: true }
+
+  , on, once, off, emit, methods, descriptors, base;
+
+on = function (type, listener) {
+	var data;
+
+	callable(listener);
+
+	if (!hasOwnProperty.call(this, '__ee__')) {
+		data = descriptor.value = create(null);
+		defineProperty(this, '__ee__', descriptor);
+		descriptor.value = null;
+	} else {
+		data = this.__ee__;
+	}
+	if (!data[type]) data[type] = listener;
+	else if (typeof data[type] === 'object') data[type].push(listener);
+	else data[type] = [data[type], listener];
+
+	return this;
+};
+
+once = function (type, listener) {
+	var once, self;
+
+	callable(listener);
+	self = this;
+	on.call(this, type, once = function () {
+		off.call(self, type, once);
+		apply.call(listener, this, arguments);
+	});
+
+	once.__eeOnceListener__ = listener;
+	return this;
+};
+
+off = function (type, listener) {
+	var data, listeners, candidate, i;
+
+	callable(listener);
+
+	if (!hasOwnProperty.call(this, '__ee__')) return this;
+	data = this.__ee__;
+	if (!data[type]) return this;
+	listeners = data[type];
+
+	if (typeof listeners === 'object') {
+		for (i = 0; (candidate = listeners[i]); ++i) {
+			if ((candidate === listener) ||
+					(candidate.__eeOnceListener__ === listener)) {
+				if (listeners.length === 2) data[type] = listeners[i ? 0 : 1];
+				else listeners.splice(i, 1);
+			}
+		}
+	} else {
+		if ((listeners === listener) ||
+				(listeners.__eeOnceListener__ === listener)) {
+			delete data[type];
+		}
+	}
+
+	return this;
+};
+
+emit = function (type) {
+	var i, l, listener, listeners, args;
+
+	if (!hasOwnProperty.call(this, '__ee__')) return;
+	listeners = this.__ee__[type];
+	if (!listeners) return;
+
+	if (typeof listeners === 'object') {
+		l = arguments.length;
+		args = new Array(l - 1);
+		for (i = 1; i < l; ++i) args[i - 1] = arguments[i];
+
+		listeners = listeners.slice();
+		for (i = 0; (listener = listeners[i]); ++i) {
+			apply.call(listener, this, args);
+		}
+	} else {
+		switch (arguments.length) {
+		case 1:
+			call.call(listeners, this);
+			break;
+		case 2:
+			call.call(listeners, this, arguments[1]);
+			break;
+		case 3:
+			call.call(listeners, this, arguments[1], arguments[2]);
+			break;
+		default:
+			l = arguments.length;
+			args = new Array(l - 1);
+			for (i = 1; i < l; ++i) {
+				args[i - 1] = arguments[i];
+			}
+			apply.call(listeners, this, args);
+		}
+	}
+};
+
+methods = {
+	on: on,
+	once: once,
+	off: off,
+	emit: emit
+};
+
+descriptors = {
+	on: d(on),
+	once: d(once),
+	off: d(off),
+	emit: d(emit)
+};
+
+base = defineProperties({}, descriptors);
+
+module.exports = exports = function (o) {
+	return (o == null) ? create(base) : defineProperties(Object(o), descriptors);
+};
+exports.methods = methods;
+
+},{"d":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/d/index.js","es5-ext/object/valid-callable":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/valid-callable.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/d/index.js":[function(require,module,exports){
+'use strict';
+
+var assign        = require('es5-ext/object/assign')
+  , normalizeOpts = require('es5-ext/object/normalize-options')
+  , isCallable    = require('es5-ext/object/is-callable')
+  , contains      = require('es5-ext/string/#/contains')
+
+  , d;
+
+d = module.exports = function (dscr, value/*, options*/) {
+	var c, e, w, options, desc;
+	if ((arguments.length < 2) || (typeof dscr !== 'string')) {
+		options = value;
+		value = dscr;
+		dscr = null;
+	} else {
+		options = arguments[2];
+	}
+	if (dscr == null) {
+		c = w = true;
+		e = false;
+	} else {
+		c = contains.call(dscr, 'c');
+		e = contains.call(dscr, 'e');
+		w = contains.call(dscr, 'w');
+	}
+
+	desc = { value: value, configurable: c, enumerable: e, writable: w };
+	return !options ? desc : assign(normalizeOpts(options), desc);
+};
+
+d.gs = function (dscr, get, set/*, options*/) {
+	var c, e, options, desc;
+	if (typeof dscr !== 'string') {
+		options = set;
+		set = get;
+		get = dscr;
+		dscr = null;
+	} else {
+		options = arguments[3];
+	}
+	if (get == null) {
+		get = undefined;
+	} else if (!isCallable(get)) {
+		options = get;
+		get = set = undefined;
+	} else if (set == null) {
+		set = undefined;
+	} else if (!isCallable(set)) {
+		options = set;
+		set = undefined;
+	}
+	if (dscr == null) {
+		c = true;
+		e = false;
+	} else {
+		c = contains.call(dscr, 'c');
+		e = contains.call(dscr, 'e');
+	}
+
+	desc = { get: get, set: set, configurable: c, enumerable: e };
+	return !options ? desc : assign(normalizeOpts(options), desc);
+};
+
+},{"es5-ext/object/assign":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/assign/index.js","es5-ext/object/is-callable":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/is-callable.js","es5-ext/object/normalize-options":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/normalize-options.js","es5-ext/string/#/contains":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/string/#/contains/index.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/assign/index.js":[function(require,module,exports){
+'use strict';
+
+module.exports = require('./is-implemented')()
+	? Object.assign
+	: require('./shim');
+
+},{"./is-implemented":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/assign/is-implemented.js","./shim":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/assign/shim.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/assign/is-implemented.js":[function(require,module,exports){
+'use strict';
+
+module.exports = function () {
+	var assign = Object.assign, obj;
+	if (typeof assign !== 'function') return false;
+	obj = { foo: 'raz' };
+	assign(obj, { bar: 'dwa' }, { trzy: 'trzy' });
+	return (obj.foo + obj.bar + obj.trzy) === 'razdwatrzy';
+};
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/assign/shim.js":[function(require,module,exports){
+'use strict';
+
+var keys  = require('../keys')
+  , value = require('../valid-value')
+
+  , max = Math.max;
+
+module.exports = function (dest, src/*, …srcn*/) {
+	var error, i, l = max(arguments.length, 2), assign;
+	dest = Object(value(dest));
+	assign = function (key) {
+		try { dest[key] = src[key]; } catch (e) {
+			if (!error) error = e;
+		}
+	};
+	for (i = 1; i < l; ++i) {
+		src = arguments[i];
+		keys(src).forEach(assign);
+	}
+	if (error !== undefined) throw error;
+	return dest;
+};
+
+},{"../keys":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/keys/index.js","../valid-value":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/valid-value.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/is-callable.js":[function(require,module,exports){
+// Deprecated
+
+'use strict';
+
+module.exports = function (obj) { return typeof obj === 'function'; };
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/keys/index.js":[function(require,module,exports){
+'use strict';
+
+module.exports = require('./is-implemented')()
+	? Object.keys
+	: require('./shim');
+
+},{"./is-implemented":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/keys/is-implemented.js","./shim":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/keys/shim.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/keys/is-implemented.js":[function(require,module,exports){
+'use strict';
+
+module.exports = function () {
+	try {
+		Object.keys('primitive');
+		return true;
+	} catch (e) { return false; }
+};
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/keys/shim.js":[function(require,module,exports){
+'use strict';
+
+var keys = Object.keys;
+
+module.exports = function (object) {
+	return keys(object == null ? object : Object(object));
+};
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/normalize-options.js":[function(require,module,exports){
+'use strict';
+
+var assign = require('./assign')
+
+  , forEach = Array.prototype.forEach
+  , create = Object.create, getPrototypeOf = Object.getPrototypeOf
+
+  , process;
+
+process = function (src, obj) {
+	var proto = getPrototypeOf(src);
+	return assign(proto ? process(proto, obj) : obj, src);
+};
+
+module.exports = function (options/*, …options*/) {
+	var result = create(null);
+	forEach.call(arguments, function (options) {
+		if (options == null) return;
+		process(Object(options), result);
+	});
+	return result;
+};
+
+},{"./assign":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/assign/index.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/valid-callable.js":[function(require,module,exports){
+'use strict';
+
+module.exports = function (fn) {
+	if (typeof fn !== 'function') throw new TypeError(fn + " is not a function");
+	return fn;
+};
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/object/valid-value.js":[function(require,module,exports){
+'use strict';
+
+module.exports = function (value) {
+	if (value == null) throw new TypeError("Cannot use null or undefined");
+	return value;
+};
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/string/#/contains/index.js":[function(require,module,exports){
+'use strict';
+
+module.exports = require('./is-implemented')()
+	? String.prototype.contains
+	: require('./shim');
+
+},{"./is-implemented":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/string/#/contains/is-implemented.js","./shim":"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/string/#/contains/shim.js"}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/string/#/contains/is-implemented.js":[function(require,module,exports){
+'use strict';
+
+var str = 'razdwatrzy';
+
+module.exports = function () {
+	if (typeof str.contains !== 'function') return false;
+	return ((str.contains('dwa') === true) && (str.contains('foo') === false));
+};
+
+},{}],"/Users/danfox/ghupdate/node_modules/react-router/node_modules/event-emitter/node_modules/es5-ext/string/#/contains/shim.js":[function(require,module,exports){
+'use strict';
+
+var indexOf = String.prototype.indexOf;
+
+module.exports = function (searchString/*, position*/) {
+	return indexOf.call(this, searchString, arguments[1]) > -1;
+};
+
 },{}],"/Users/danfox/ghupdate/node_modules/react/lib/AutoFocusMixin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -21718,51 +23898,24 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":"/Users/danfox/ghupdate/node_modules/react/lib/React.js"}],"/Users/danfox/ghupdate/src/App.cjsx":[function(require,module,exports){
-var App, FileChooser, React, RepoList;
+var App, FileChooser, React, RepoContainer;
 
 React = require('react');
 
-RepoList = require('./RepoList.cjsx');
-
 FileChooser = require('./FileChooser.cjsx');
+
+RepoContainer = require('./RepoContainer.cjsx');
 
 App = module.exports = React.createClass({
   displayName: 'App',
-  getInitialState: function() {
-    return {
-      username: null,
-      repo: null
-    };
-  },
-  selectRepo: function(repo) {
-    return this.setState({
-      repo: repo
-    });
-  },
-  updateRepoList: function() {
-    return this.setState({
-      'username': this.refs.username.state.value
-    });
-  },
   render: function() {
-    return React.DOM.div(null, React.DOM.h1(null, "GH Update"), (this.state.repo == null ? React.DOM.div(null, React.DOM.input({
-      "type": 'text',
-      "ref": 'username',
-      "placeholder": 'Your GitHub username'
-    }), React.DOM.button({
-      "onClick": this.updateRepoList
-    }, "Go"), (this.state.username != null ? RepoList({
-      "username": this.state.username,
-      "selectRepo": this.selectRepo
-    }) : void 0)) : FileChooser({
-      "repo": this.state.repo
-    })));
+    return React.DOM.div(null, React.DOM.h1(null, "GH Update"), this.props.activeRouteHandler());
   }
 });
 
 
 
-},{"./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoList.cjsx":"/Users/danfox/ghupdate/src/RepoList.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/FileChooser.cjsx":[function(require,module,exports){
+},{"./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoContainer.cjsx":"/Users/danfox/ghupdate/src/RepoContainer.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/FileChooser.cjsx":[function(require,module,exports){
 var FileChooser, React, TreeFileView, TreeView, qwest;
 
 React = require('react');
@@ -21772,9 +23925,13 @@ qwest = require('../lib/qwest.js');
 FileChooser = module.exports = React.createClass({
   displayName: 'FileChooser',
   propTypes: {
-    repo: React.PropTypes.shape({
+    preLoadedRepo: React.PropTypes.shape({
       owner: React.PropTypes.object.isRequired,
       commits_url: React.PropTypes.string.isRequired
+    }),
+    params: React.PropTypes.shape({
+      repo: React.PropTypes.string.isRequired,
+      username: React.PropTypes.string.isRequired
     })
   },
   getInitialState: function() {
@@ -21783,16 +23940,30 @@ FileChooser = module.exports = React.createClass({
     };
   },
   componentDidMount: function() {
-    var commitsUrl;
-    commitsUrl = this.props.repo.commits_url.replace('{/sha}', '?per_page=1');
-    return qwest.get(commitsUrl).success((function(_this) {
-      return function(commits) {
-        var lastCommit, treeUrl;
-        lastCommit = commits[0];
-        treeUrl = lastCommit.commit.tree.url;
-        return qwest.get(treeUrl).success(function(response) {
-          return _this.setState({
-            tree: response.tree
+    var initialPromise;
+    if (this.props.preLoadedRepo != null) {
+      initialPromise = {
+        success: (function(_this) {
+          return function(continuation) {
+            return continuation(_this.props.preLoadedRepo);
+          };
+        })(this)
+      };
+    } else {
+      initialPromise = qwest.get('https://api.github.com/repos/' + this.props.params.username + '/' + this.props.params.repo);
+    }
+    return initialPromise.success((function(_this) {
+      return function(loadedRepo) {
+        var commitsUrl;
+        commitsUrl = loadedRepo.commits_url.replace('{/sha}', '?per_page=1');
+        return qwest.get(commitsUrl).success(function(commits) {
+          var lastCommit, treeUrl;
+          lastCommit = commits[0];
+          treeUrl = lastCommit.commit.tree.url;
+          return qwest.get(treeUrl).success(function(response) {
+            return _this.setState({
+              tree: response.tree
+            });
           });
         });
       };
@@ -21800,8 +23971,7 @@ FileChooser = module.exports = React.createClass({
   },
   render: function() {
     return React.DOM.div(null, (this.state.tree != null ? TreeView({
-      "tree": this.state.tree,
-      "rootName": this.props.repo.name
+      "tree": this.state.tree
     }) : React.DOM.span(null, "Loading...")));
   }
 });
@@ -21809,14 +23979,13 @@ FileChooser = module.exports = React.createClass({
 TreeView = React.createClass({
   displayName: 'TreeView',
   propTypes: {
-    tree: React.PropTypes.array.isRequired,
-    rootName: React.PropTypes.string.isRequired
+    tree: React.PropTypes.array.isRequired
   },
   render: function() {
     var item;
     return React.DOM.div({
       "className": "treeView"
-    }, React.DOM.h2(null, this.props.rootName), React.DOM.p(null, "Choose a file"), React.DOM.ul(null, (function() {
+    }, React.DOM.p(null, "Choose a file"), React.DOM.ul(null, (function() {
       var _i, _len, _ref, _results;
       _ref = this.props.tree;
       _results = [];
@@ -21859,8 +24028,8 @@ TreeFileView = React.createClass({
 
 
 
-},{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/RepoList.cjsx":[function(require,module,exports){
-var React, RepoLink, RepoList, moment, qwest;
+},{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/RepoContainer.cjsx":[function(require,module,exports){
+var React, RepoContainer, RepoLink, RepoList, moment, qwest;
 
 React = require('react');
 
@@ -21868,7 +24037,30 @@ qwest = require('../lib/qwest.js');
 
 moment = require('moment');
 
-RepoList = module.exports = React.createClass({
+RepoContainer = module.exports = React.createClass({
+  displayName: 'RepoContainer',
+  selectRepo: function(loadedRepo) {
+    this.setState({
+      loadedRepo: loadedRepo
+    });
+    return window.location += '/repo/' + loadedRepo.name;
+  },
+  getInitialState: function() {
+    return {
+      loadedRepo: null
+    };
+  },
+  render: function() {
+    return React.DOM.div(null, React.DOM.h2(null, this.props.params.username), (this.props.activeRouteHandler() == null ? RepoList({
+      "username": this.props.params.username,
+      "selectRepo": this.selectRepo
+    }) : this.props.activeRouteHandler({
+      preLoadedRepo: this.state.loadedRepo
+    })));
+  }
+});
+
+RepoList = React.createClass({
   displayName: 'RepoList',
   propTypes: {
     username: React.PropTypes.string.isRequired,
@@ -21913,7 +24105,6 @@ RepoLink = React.createClass({
     return React.DOM.li({
       "key": this.props.repo.id
     }, React.DOM.a({
-      "href": '#',
       "onClick": ((function(_this) {
         return function() {
           return _this.props.selectRepo(_this.props.repo);
@@ -21927,7 +24118,67 @@ RepoLink = React.createClass({
 
 
 
-},{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","moment":"/Users/danfox/ghupdate/node_modules/moment/moment.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
+},{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","moment":"/Users/danfox/ghupdate/node_modules/moment/moment.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/Router.cjsx":[function(require,module,exports){
+var App, FileChooser, React, RepoContainer, Route, Router, Routes, UsernameChooser;
+
+React = require('react');
+
+Routes = require('react-router/Routes');
+
+Route = require('react-router/Route');
+
+App = require('./App.cjsx');
+
+UsernameChooser = require('./UsernameChooser.cjsx');
+
+RepoContainer = require('./RepoContainer.cjsx');
+
+FileChooser = require('./FileChooser.cjsx');
+
+Router = module.exports = React.createClass({
+  displayName: 'Router',
+  render: function() {
+    return Routes(null, Route({
+      "handler": App
+    }, Route({
+      "path": "/",
+      "handler": UsernameChooser
+    }), Route({
+      "path": "/user/:username",
+      "handler": RepoContainer
+    }, Route({
+      "path": "/user/:username/repo/:repo",
+      "handler": FileChooser
+    }))));
+  }
+});
+
+
+
+},{"./App.cjsx":"/Users/danfox/ghupdate/src/App.cjsx","./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoContainer.cjsx":"/Users/danfox/ghupdate/src/RepoContainer.cjsx","./UsernameChooser.cjsx":"/Users/danfox/ghupdate/src/UsernameChooser.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js","react-router/Route":"/Users/danfox/ghupdate/node_modules/react-router/Route.js","react-router/Routes":"/Users/danfox/ghupdate/node_modules/react-router/Routes.js"}],"/Users/danfox/ghupdate/src/UsernameChooser.cjsx":[function(require,module,exports){
+var React, UsernameChooser;
+
+React = require('react');
+
+UsernameChooser = module.exports = React.createClass({
+  displayName: 'UsernameChooser',
+  selectUsername: function() {
+    return window.location += 'user/' + this.refs.username.state.value;
+  },
+  render: function() {
+    return React.DOM.div(null, React.DOM.input({
+      "type": 'text',
+      "ref": 'username',
+      "placeholder": 'Your GitHub username'
+    }), React.DOM.button({
+      "onClick": this.selectUsername
+    }, "Go"));
+  }
+});
+
+
+
+},{"react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -21992,4 +24243,183 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}]},{},["/Users/danfox/ghupdate/main.cjsx"]);
+},{}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/querystring-es3/decode.js":[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+// If obj.hasOwnProperty has been overridden, then calling
+// obj.hasOwnProperty(prop) will break.
+// See: https://github.com/joyent/node/issues/1707
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+module.exports = function(qs, sep, eq, options) {
+  sep = sep || '&';
+  eq = eq || '=';
+  var obj = {};
+
+  if (typeof qs !== 'string' || qs.length === 0) {
+    return obj;
+  }
+
+  var regexp = /\+/g;
+  qs = qs.split(sep);
+
+  var maxKeys = 1000;
+  if (options && typeof options.maxKeys === 'number') {
+    maxKeys = options.maxKeys;
+  }
+
+  var len = qs.length;
+  // maxKeys <= 0 means that we should not limit keys count
+  if (maxKeys > 0 && len > maxKeys) {
+    len = maxKeys;
+  }
+
+  for (var i = 0; i < len; ++i) {
+    var x = qs[i].replace(regexp, '%20'),
+        idx = x.indexOf(eq),
+        kstr, vstr, k, v;
+
+    if (idx >= 0) {
+      kstr = x.substr(0, idx);
+      vstr = x.substr(idx + 1);
+    } else {
+      kstr = x;
+      vstr = '';
+    }
+
+    k = decodeURIComponent(kstr);
+    v = decodeURIComponent(vstr);
+
+    if (!hasOwnProperty(obj, k)) {
+      obj[k] = v;
+    } else if (isArray(obj[k])) {
+      obj[k].push(v);
+    } else {
+      obj[k] = [obj[k], v];
+    }
+  }
+
+  return obj;
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+},{}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/querystring-es3/encode.js":[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+var stringifyPrimitive = function(v) {
+  switch (typeof v) {
+    case 'string':
+      return v;
+
+    case 'boolean':
+      return v ? 'true' : 'false';
+
+    case 'number':
+      return isFinite(v) ? v : '';
+
+    default:
+      return '';
+  }
+};
+
+module.exports = function(obj, sep, eq, name) {
+  sep = sep || '&';
+  eq = eq || '=';
+  if (obj === null) {
+    obj = undefined;
+  }
+
+  if (typeof obj === 'object') {
+    return map(objectKeys(obj), function(k) {
+      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+      if (isArray(obj[k])) {
+        return map(obj[k], function(v) {
+          return ks + encodeURIComponent(stringifyPrimitive(v));
+        }).join(sep);
+      } else {
+        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+      }
+    }).join(sep);
+
+  }
+
+  if (!name) return '';
+  return encodeURIComponent(stringifyPrimitive(name)) + eq +
+         encodeURIComponent(stringifyPrimitive(obj));
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+function map (xs, f) {
+  if (xs.map) return xs.map(f);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    res.push(f(xs[i], i));
+  }
+  return res;
+}
+
+var objectKeys = Object.keys || function (obj) {
+  var res = [];
+  for (var key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
+  }
+  return res;
+};
+
+},{}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/querystring-es3/index.js":[function(require,module,exports){
+'use strict';
+
+exports.decode = exports.parse = require('./decode');
+exports.encode = exports.stringify = require('./encode');
+
+},{"./decode":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/querystring-es3/decode.js","./encode":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/querystring-es3/encode.js"}]},{},["/Users/danfox/ghupdate/main.cjsx"]);
