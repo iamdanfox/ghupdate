@@ -21718,11 +21718,13 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":"/Users/danfox/ghupdate/node_modules/react/lib/React.js"}],"/Users/danfox/ghupdate/src/App.cjsx":[function(require,module,exports){
-var App, React, RepoList;
+var App, FileChooser, React, RepoList;
 
 React = require('react');
 
 RepoList = require('./RepoList.cjsx');
+
+FileChooser = require('./FileChooser.cjsx');
 
 App = module.exports = React.createClass({
   displayName: 'App',
@@ -21733,7 +21735,6 @@ App = module.exports = React.createClass({
     };
   },
   selectRepo: function(repo) {
-    console.debug(repo);
     return this.setState({
       repo: repo
     });
@@ -21744,7 +21745,7 @@ App = module.exports = React.createClass({
     });
   },
   render: function() {
-    return React.DOM.div(null, React.DOM.h1(null, "GH Update"), React.DOM.input({
+    return React.DOM.div(null, React.DOM.h1(null, "GH Update"), (this.state.repo == null ? React.DOM.div(null, React.DOM.input({
       "type": 'text',
       "ref": 'username',
       "placeholder": 'Your GitHub username'
@@ -21753,13 +21754,29 @@ App = module.exports = React.createClass({
     }, "Go"), (this.state.username != null ? RepoList({
       "username": this.state.username,
       "selectRepo": this.selectRepo
-    }) : void 0));
+    }) : void 0)) : FileChooser({
+      "repo": this.state.repo
+    })));
   }
 });
 
 
 
-},{"./RepoList.cjsx":"/Users/danfox/ghupdate/src/RepoList.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/RepoList.cjsx":[function(require,module,exports){
+},{"./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoList.cjsx":"/Users/danfox/ghupdate/src/RepoList.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/FileChooser.cjsx":[function(require,module,exports){
+var FileChooser, React;
+
+React = require('react');
+
+FileChooser = module.exports = React.createClass({
+  displaName: 'FileChooser',
+  render: function() {
+    return React.DOM.div(null, "FileChooser");
+  }
+});
+
+
+
+},{"react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/RepoList.cjsx":[function(require,module,exports){
 var React, RepoLink, RepoList, moment, qwest;
 
 React = require('react');
