@@ -26,7 +26,9 @@ RepoList = React.createClass
     repos: null # null signifies not loaded yet
 
   componentDidMount: ->
-    console.log 'didMount:', qwest
+    qwest.get 'https://api.github.com/users/iamdanfox/repos'
+      .success (response) ->
+        console.log 'response', response
 
   render: ->
     <div>

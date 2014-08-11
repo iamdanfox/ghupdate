@@ -18945,7 +18945,9 @@ RepoList = React.createClass({
     };
   },
   componentDidMount: function() {
-    return console.log('didMount:', qwest);
+    return qwest.get('https://api.github.com/users/iamdanfox/repos').success(function(response) {
+      return console.log('response', response);
+    });
   },
   render: function() {
     var repo;
