@@ -2,7 +2,9 @@
 	"folders":
 	[
 		{
-			"path": "/Users/danfox/ghupdate"
+			"path": "/Users/danfox/ghupdate",
+      "file_exclude_patterns": ["bundle.js", ".bundle.js"],
+      "folder_exclude_patterns": ["node_modules"]
 		}
 	]
 }
