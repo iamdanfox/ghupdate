@@ -21763,20 +21763,71 @@ App = module.exports = React.createClass({
 
 
 },{"./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoList.cjsx":"/Users/danfox/ghupdate/src/RepoList.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/FileChooser.cjsx":[function(require,module,exports){
-var FileChooser, React;
+var FileChooser, React, TreeView, qwest;
 
 React = require('react');
 
+qwest = require('../lib/qwest.js');
+
 FileChooser = module.exports = React.createClass({
-  displaName: 'FileChooser',
+  displayName: 'FileChooser',
+  propTypes: {
+    repo: React.PropTypes.shape({
+      owner: React.PropTypes.object.isRequired,
+      commits_url: React.PropTypes.string.isRequired
+    })
+  },
+  getInitialState: function() {
+    return {
+      tree: null
+    };
+  },
+  componentDidMount: function() {
+    var commitsUrl;
+    commitsUrl = this.props.repo.commits_url.replace('{/sha}', '?per_page=1');
+    return qwest.get(commitsUrl).success((function(_this) {
+      return function(commits) {
+        var lastCommit, treeUrl;
+        lastCommit = commits[0];
+        treeUrl = lastCommit.commit.tree.url;
+        return qwest.get(treeUrl).success(function(response) {
+          return _this.setState({
+            tree: response.tree
+          });
+        });
+      };
+    })(this));
+  },
   render: function() {
-    return React.DOM.div(null, "FileChooser");
+    return React.DOM.div(null, "Choose a file", (this.state.tree != null ? TreeView({
+      "tree": this.state.tree
+    }) : React.DOM.span(null, "Loading...")));
+  }
+});
+
+TreeView = React.createClass({
+  displayName: 'TreeView',
+  propTypes: {
+    tree: React.PropTypes.array.isRequired
+  },
+  render: function() {
+    var file;
+    return React.DOM.div(null, (function() {
+      var _i, _len, _ref, _results;
+      _ref = this.props.tree;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        file = _ref[_i];
+        _results.push(React.DOM.span(null, file.path));
+      }
+      return _results;
+    }).call(this));
   }
 });
 
 
 
-},{"react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/RepoList.cjsx":[function(require,module,exports){
+},{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/RepoList.cjsx":[function(require,module,exports){
 var React, RepoLink, RepoList, moment, qwest;
 
 React = require('react');
@@ -21785,8 +21836,12 @@ qwest = require('../lib/qwest.js');
 
 moment = require('moment');
 
-module.exports = RepoList = React.createClass({
+RepoList = module.exports = React.createClass({
   displayName: 'RepoList',
+  propTypes: {
+    username: React.PropTypes.string.isRequired,
+    selectRepo: React.PropTypes.func.isRequired
+  },
   getInitialState: function() {
     return {
       repos: null

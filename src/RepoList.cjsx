@@ -2,8 +2,12 @@ React = require 'react'
 qwest = require '../lib/qwest.js'
 moment = require 'moment'
 
-module.exports = RepoList = React.createClass
+RepoList = module.exports = React.createClass
   displayName: 'RepoList'
+
+  propTypes:
+    username: React.PropTypes.string.isRequired
+    selectRepo: React.PropTypes.func.isRequired
 
   getInitialState: ->
     repos: null # null signifies not loaded yet
