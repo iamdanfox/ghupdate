@@ -2,7 +2,30 @@ React = require 'react'
 qwest = require '../lib/qwest.js'
 moment = require 'moment'
 
-RepoList = module.exports = React.createClass
+
+
+RepoContainer = module.exports = React.createClass
+  displayName: 'RepoContainer'
+
+  selectRepo: (loadedRepo) ->
+    @setState loadedRepo:loadedRepo
+    window.location += ('/repo/' + loadedRepo.name)
+
+  getInitialState: ->
+    loadedRepo: null
+
+  render: ->
+    <div>
+      <h2>{@props.params.username}</h2>
+      { if not @props.activeRouteHandler()?
+          <RepoList username={@props.params.username} selectRepo={@selectRepo} />
+        else
+          @props.activeRouteHandler
+            preLoadedRepo: @state.loadedRepo }
+    </div>
+
+
+RepoList = React.createClass
   displayName: 'RepoList'
 
   propTypes:
@@ -29,11 +52,12 @@ RepoList = module.exports = React.createClass
           'Loading...' }
     </div>
 
+
 RepoLink = React.createClass
   displayName: 'RepoLink'
 
   render: ->
     <li key={@props.repo.id}>
-      <a href='#' onClick={=> @props.selectRepo @props.repo}>{@props.repo.name}</a>
+      <a onClick={=> @props.selectRepo @props.repo}>{@props.repo.name}</a>
       <span className='pushedAt'>Last updated: { moment(@props.repo.pushed_at).fromNow() }</span>
     </li>

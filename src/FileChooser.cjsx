@@ -6,30 +6,36 @@ FileChooser = module.exports = React.createClass
   displayName: 'FileChooser'
 
   propTypes:
-    repo: React.PropTypes.shape
-            owner: React.PropTypes.object.isRequired
-            commits_url: React.PropTypes.string.isRequired
+    preLoadedRepo: React.PropTypes.shape # optional
+                    owner: React.PropTypes.object.isRequired
+                    commits_url: React.PropTypes.string.isRequired
+    params: React.PropTypes.shape
+              repo: React.PropTypes.string.isRequired
+              username: React.PropTypes.string.isRequired
 
   getInitialState: ->
     tree: null
 
   componentDidMount: ->
-    commitsUrl = @props.repo.commits_url.replace '{/sha}', '?per_page=1'
-    qwest
-      .get commitsUrl
-      .success (commits) =>
+    if @props.preLoadedRepo?
+      initialPromise =
+        success: (continuation) => continuation @props.preLoadedRepo
+    else
+      initialPromise = qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo
+
+    initialPromise.success (loadedRepo) =>
+      commitsUrl = loadedRepo.commits_url.replace '{/sha}', '?per_page=1'
+      qwest.get(commitsUrl).success (commits) =>
         lastCommit = commits[0]
         treeUrl = lastCommit.commit.tree.url
 
-        qwest
-          .get treeUrl
-          .success (response) =>
-            @setState tree:response.tree
+        qwest.get(treeUrl).success (response) =>
+          @setState tree: response.tree
 
   render: ->
     <div>
       { if @state.tree?
-          <TreeView tree={@state.tree} rootName={@props.repo.name} />
+          <TreeView tree={@state.tree} />
         else
           <span>Loading...</span> }
     </div>
@@ -40,11 +46,9 @@ TreeView = React.createClass
 
   propTypes:
     tree: React.PropTypes.array.isRequired
-    rootName: React.PropTypes.string.isRequired
 
   render: ->
     <div className="treeView">
-    <h2>{@props.rootName}</h2>
     <p>Choose a file</p>
     <ul>
       { for item in @props.tree
