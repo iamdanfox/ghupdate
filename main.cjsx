@@ -1,4 +1,4 @@
 React = require 'react'
-App = require './src/App.cjsx'
+Router = require './src/Router.cjsx'
 
-React.renderComponent <App />, document.getElementsByTagName('body')[0]
+React.renderComponent <Router />, document.getElementsByTagName('body')[0]
