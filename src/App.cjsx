@@ -6,9 +6,13 @@ App = module.exports = React.createClass
 
   getInitialState: ->
     username: null
+    repoId: null
+
+  selectRepo: (id) ->
+    alert 'selected'
+    @setState repoId:repoId
 
   updateRepoList: ->
-
     @setState 'username':@refs.username.state.value
 
   render: ->
@@ -16,8 +20,9 @@ App = module.exports = React.createClass
       <h1>GH Update</h1>
       <input type='text' ref='username' placeholder='Your GitHub username' />
       <button onClick={@updateRepoList}>Go</button>
-      { <RepoList username={@state.username} /> if @state.username? }
+      { <RepoList username={@state.username} selectRepo={@selectRepo} /> if @state.username? }
     </div>
+
 
 RepoList = React.createClass
   displayName: 'RepoList'
@@ -26,15 +31,26 @@ RepoList = React.createClass
     repos: null # null signifies not loaded yet
 
   componentDidMount: ->
-    qwest.get 'https://api.github.com/users/iamdanfox/repos'
-      .success (response) ->
-        console.log 'response', response
+    qwest
+      .get('https://api.github.com/users/'+@props.username+'/repos')
+      .success (repos) =>
+        @setState repos:repos
 
   render: ->
     <div>
       { if @state.repos?
-          for repo in @state.repos
-            <a href='#'>{repo.name}</a>
+          <ul>
+          { for repo in @state.repos
+              <RepoLink name={repo.name} id={repo.id} selectRepo={@props.selectRepo} /> }
+          </ul>
         else
           'Loading...' }
     </div>
+
+RepoLink = React.createClass
+  displayName: 'RepoLink'
+
+  render: ->
+    <li key={@props.id}>
+      <a href='#' onClick={=> @props.selectRepo(@props.id)}>{@props.name}</a>
+    </li>  

@@ -18906,7 +18906,7 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":"/Users/danfox/ghupdate/node_modules/react/lib/React.js"}],"/Users/danfox/ghupdate/src/App.cjsx":[function(require,module,exports){
-var App, React, RepoList, qwest;
+var App, React, RepoLink, RepoList, qwest;
 
 React = require('react');
 
@@ -18916,8 +18916,15 @@ App = module.exports = React.createClass({
   displayName: 'App',
   getInitialState: function() {
     return {
-      username: null
+      username: null,
+      repoId: null
     };
+  },
+  selectRepo: function(id) {
+    alert('selected');
+    return this.setState({
+      repoId: repoId
+    });
   },
   updateRepoList: function() {
     return this.setState({
@@ -18932,7 +18939,8 @@ App = module.exports = React.createClass({
     }), React.DOM.button({
       "onClick": this.updateRepoList
     }, "Go"), (this.state.username != null ? RepoList({
-      "username": this.state.username
+      "username": this.state.username,
+      "selectRepo": this.selectRepo
     }) : void 0));
   }
 });
@@ -18945,28 +18953,46 @@ RepoList = React.createClass({
     };
   },
   componentDidMount: function() {
-    return qwest.get('https://api.github.com/users/iamdanfox/repos').success(function(response) {
-      return console.log('response', response);
-    });
+    return qwest.get('https://api.github.com/users/' + this.props.username + '/repos').success((function(_this) {
+      return function(repos) {
+        return _this.setState({
+          repos: repos
+        });
+      };
+    })(this));
   },
   render: function() {
     var repo;
-    return React.DOM.div(null, ((function() {
+    return React.DOM.div(null, (this.state.repos != null ? React.DOM.ul(null, (function() {
       var _i, _len, _ref, _results;
-      if (this.state.repos != null) {
-        _ref = this.state.repos;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          repo = _ref[_i];
-          _results.push(React.DOM.a({
-            "href": '#'
-          }, repo.name));
-        }
-        return _results;
-      } else {
-        return 'Loading...';
+      _ref = this.state.repos;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        repo = _ref[_i];
+        _results.push(RepoLink({
+          "name": repo.name,
+          "id": repo.id,
+          "selectRepo": this.props.selectRepo
+        }));
       }
-    }).call(this)));
+      return _results;
+    }).call(this)) : 'Loading...'));
+  }
+});
+
+RepoLink = React.createClass({
+  displayName: 'RepoLink',
+  render: function() {
+    return React.DOM.li({
+      "key": this.props.id
+    }, React.DOM.a({
+      "href": '#',
+      "onClick": ((function(_this) {
+        return function() {
+          return _this.props.selectRepo(_this.props.id);
+        };
+      })(this))
+    }, this.props.name));
   }
 });
 
