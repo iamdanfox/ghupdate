@@ -67,7 +67,8 @@ TreeFileView = React.createClass
     item: React.PropTypes.object.isRequired
 
   selectFile: ->
-    console.log 'selectFile', @props.item.path
+    console.log 'selectFile', @props.item
+    window.location += '/file/'+@props.item.sha
 
   render: ->
     <li className='file' key={@props.item.path} onClick={@selectFile}>{@props.item.path}</li>

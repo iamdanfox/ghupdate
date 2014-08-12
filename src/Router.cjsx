@@ -6,6 +6,7 @@ App = require './App.cjsx'
 UsernameChooser = require './UsernameChooser.cjsx'
 RepoContainer = require './RepoContainer.cjsx'
 FileChooser = require './FileChooser.cjsx'
+EditorView = require './EditorView.cjsx'
 
 
 Router = module.exports = React.createClass
@@ -18,5 +19,6 @@ Router = module.exports = React.createClass
         <Route path="/user/:username" handler={RepoContainer}>
           <Route path="/user/:username/repo/:repo" handler={FileChooser} />
         </Route>
+        <Route path="/user/:username/repo/:repo/file/:sha" handler={EditorView} />
       </Route>
     </Routes>

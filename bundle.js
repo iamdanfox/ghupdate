@@ -23915,7 +23915,44 @@ App = module.exports = React.createClass({
 
 
 
-},{"./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoContainer.cjsx":"/Users/danfox/ghupdate/src/RepoContainer.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/FileChooser.cjsx":[function(require,module,exports){
+},{"./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoContainer.cjsx":"/Users/danfox/ghupdate/src/RepoContainer.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/EditorView.cjsx":[function(require,module,exports){
+var EditorView, React, qwest;
+
+React = require('react');
+
+qwest = require('../lib/qwest.js');
+
+EditorView = module.exports = React.createClass({
+  displayName: 'EditorView',
+  propTypes: {
+    params: React.PropTypes.shape({
+      username: React.PropTypes.string.isRequired,
+      repo: React.PropTypes.string.isRequired,
+      sha: React.PropTypes.string.isRequired
+    })
+  },
+  getInitialState: function() {
+    return {
+      html: null
+    };
+  },
+  componentDidMount: function() {
+    return qwest.get('https://api.github.com/repos/' + this.props.params.username + '/' + this.props.params.repo + '/git/blobs/' + this.props.params.sha).success((function(_this) {
+      return function(response) {
+        return _this.setState({
+          html: atob(response.content)
+        });
+      };
+    })(this));
+  },
+  render: function() {
+    return React.DOM.div(null, React.DOM.h2(null, "EditorView"), React.DOM.div(null, (this.state.html != null ? React.DOM.span(null, this.state.html.length) : React.DOM.span(null, "Loading..."))));
+  }
+});
+
+
+
+},{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/FileChooser.cjsx":[function(require,module,exports){
 var FileChooser, React, TreeFileView, TreeView, qwest;
 
 React = require('react');
@@ -24015,7 +24052,8 @@ TreeFileView = React.createClass({
     item: React.PropTypes.object.isRequired
   },
   selectFile: function() {
-    return console.log('selectFile', this.props.item.path);
+    console.log('selectFile', this.props.item);
+    return window.location += '/file/' + this.props.item.sha;
   },
   render: function() {
     return React.DOM.li({
@@ -24119,7 +24157,7 @@ RepoLink = React.createClass({
 
 
 },{"../lib/qwest.js":"/Users/danfox/ghupdate/lib/qwest.js","moment":"/Users/danfox/ghupdate/node_modules/moment/moment.js","react":"/Users/danfox/ghupdate/node_modules/react/react.js"}],"/Users/danfox/ghupdate/src/Router.cjsx":[function(require,module,exports){
-var App, FileChooser, React, RepoContainer, Route, Router, Routes, UsernameChooser;
+var App, EditorView, FileChooser, React, RepoContainer, Route, Router, Routes, UsernameChooser;
 
 React = require('react');
 
@@ -24135,6 +24173,8 @@ RepoContainer = require('./RepoContainer.cjsx');
 
 FileChooser = require('./FileChooser.cjsx');
 
+EditorView = require('./EditorView.cjsx');
+
 Router = module.exports = React.createClass({
   displayName: 'Router',
   render: function() {
@@ -24149,13 +24189,16 @@ Router = module.exports = React.createClass({
     }, Route({
       "path": "/user/:username/repo/:repo",
       "handler": FileChooser
-    }))));
+    })), Route({
+      "path": "/user/:username/repo/:repo/file/:sha",
+      "handler": EditorView
+    })));
   }
 });
 
 
 
-},{"./App.cjsx":"/Users/danfox/ghupdate/src/App.cjsx","./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoContainer.cjsx":"/Users/danfox/ghupdate/src/RepoContainer.cjsx","./UsernameChooser.cjsx":"/Users/danfox/ghupdate/src/UsernameChooser.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js","react-router/Route":"/Users/danfox/ghupdate/node_modules/react-router/Route.js","react-router/Routes":"/Users/danfox/ghupdate/node_modules/react-router/Routes.js"}],"/Users/danfox/ghupdate/src/UsernameChooser.cjsx":[function(require,module,exports){
+},{"./App.cjsx":"/Users/danfox/ghupdate/src/App.cjsx","./EditorView.cjsx":"/Users/danfox/ghupdate/src/EditorView.cjsx","./FileChooser.cjsx":"/Users/danfox/ghupdate/src/FileChooser.cjsx","./RepoContainer.cjsx":"/Users/danfox/ghupdate/src/RepoContainer.cjsx","./UsernameChooser.cjsx":"/Users/danfox/ghupdate/src/UsernameChooser.cjsx","react":"/Users/danfox/ghupdate/node_modules/react/react.js","react-router/Route":"/Users/danfox/ghupdate/node_modules/react-router/Route.js","react-router/Routes":"/Users/danfox/ghupdate/node_modules/react-router/Routes.js"}],"/Users/danfox/ghupdate/src/UsernameChooser.cjsx":[function(require,module,exports){
 var React, UsernameChooser;
 
 React = require('react');
