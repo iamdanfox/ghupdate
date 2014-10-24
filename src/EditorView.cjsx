@@ -27,7 +27,7 @@ EditorView = module.exports = React.createClass
     <h2>EditorView</h2>
     <div>
     { if @state.html?
-        <span>{@state.html}</span>
+        <textarea style={{width:'100%',height:'40em'}}>{@state.html}</textarea>
       else
         <span>Loading...</span> }
     </div>

@@ -23631,7 +23631,12 @@ EditorView = module.exports = React.createClass({
     })(this));
   },
   render: function() {
-    return React.DOM.div(null, React.DOM.h2(null, "EditorView"), React.DOM.div(null, (this.state.html != null ? React.DOM.span(null, this.state.html) : React.DOM.span(null, "Loading..."))));
+    return React.DOM.div(null, React.DOM.h2(null, "EditorView"), React.DOM.div(null, (this.state.html != null ? React.DOM.textarea({
+      "style": {
+        width: '100%',
+        height: '40em'
+      }
+    }, this.state.html) : React.DOM.span(null, "Loading..."))));
   }
 });
 
