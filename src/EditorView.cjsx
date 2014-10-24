@@ -17,14 +17,17 @@ EditorView = module.exports = React.createClass
   componentDidMount: ->
     qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo+'/git/blobs/'+@props.params.sha
       .success (response) =>
-        @setState html:atob(response.content)
+        fixedBase64 = response.content.replace /\n/g, ''
+        @setState html: atob(fixedBase64)
+      .error (err) =>
+        console.error err
 
   render: ->
     <div>
     <h2>EditorView</h2>
     <div>
     { if @state.html?
-        <span>{@state.html.length}</span>
+        <span>{@state.html}</span>
       else
         <span>Loading...</span> }
     </div>
