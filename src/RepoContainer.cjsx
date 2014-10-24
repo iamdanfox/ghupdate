@@ -1,7 +1,7 @@
+require './RepoContainer.less'
 React = require 'react'
 qwest = require '../lib/qwest.js'
 moment = require 'moment'
-
 
 
 RepoContainer = module.exports = React.createClass
@@ -16,7 +16,7 @@ RepoContainer = module.exports = React.createClass
 
   render: ->
     <div>
-      <h2>{@props.params.username}</h2>
+      <h2 className='ghu-username'>{@props.params.username}</h2>
       { if not @props.activeRouteHandler()?
           <RepoList username={@props.params.username} selectRepo={@selectRepo} />
         else
@@ -43,9 +43,13 @@ RepoList = React.createClass
 
   render: ->
     <div>
-      { if @state.repos?
-          <ul>
-          { for repo in @state.repos
+      { if @state.repos? then do =>
+          sortedRepos = @state.repos.slice 0
+          sortedRepos.sort (a,b) ->
+            new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime()
+
+          <ul className='ghu-repo-list'>
+          { for repo in sortedRepos
               <RepoLink repo={repo} selectRepo={@props.selectRepo} key={repo.name} /> }
           </ul>
         else
@@ -57,7 +61,8 @@ RepoLink = React.createClass
   displayName: 'RepoLink'
 
   render: ->
-    <li key={@props.repo.id}>
-      <a onClick={=> @props.selectRepo @props.repo}>{@props.repo.name}</a>
-      <span className='pushedAt'>Last updated: { moment(@props.repo.pushed_at).fromNow() }</span>
+    console.log new Date(@props.repo.pushed_at).getTime()
+    <li key={@props.repo.id} className='ghu-repo-link' onClick={=> @props.selectRepo @props.repo}>
+      <a>{@props.repo.name}</a>
+      <span className='ghu-last-updated'>last updated { moment(@props.repo.pushed_at).fromNow() }</span>
     </li>

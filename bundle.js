@@ -164,6 +164,8 @@
 
 	var React, RepoContainer, RepoLink, RepoList, moment, qwest;
 
+	__webpack_require__(277);
+
 	React = __webpack_require__(2);
 
 	qwest = __webpack_require__(11);
@@ -184,7 +186,9 @@
 	    };
 	  },
 	  render: function() {
-	    return React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, null, this.props.params.username), (this.props.activeRouteHandler() == null ? React.createElement(RepoList, {
+	    return React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
+	      "className": 'ghu-username'
+	    }, this.props.params.username), (this.props.activeRouteHandler() == null ? React.createElement(RepoList, {
 	      "username": this.props.params.username,
 	      "selectRepo": this.selectRepo
 	    }) : this.props.activeRouteHandler({
@@ -214,38 +218,48 @@
 	    })(this));
 	  },
 	  render: function() {
-	    var repo;
-	    return React.createElement(React.DOM.div, null, (this.state.repos != null ? React.createElement(React.DOM.ul, null, (function() {
-	      var _i, _len, _ref, _results;
-	      _ref = this.state.repos;
-	      _results = [];
-	      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-	        repo = _ref[_i];
-	        _results.push(React.createElement(RepoLink, {
-	          "repo": repo,
-	          "selectRepo": this.props.selectRepo,
-	          "key": repo.name
-	        }));
-	      }
-	      return _results;
-	    }).call(this)) : 'Loading...'));
+	    return React.createElement(React.DOM.div, null, (this.state.repos != null ? (function(_this) {
+	      return function() {
+	        var repo, sortedRepos;
+	        sortedRepos = _this.state.repos.slice(0);
+	        sortedRepos.sort(function(a, b) {
+	          return new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime();
+	        });
+	        return React.createElement(React.DOM.ul, {
+	          "className": 'ghu-repo-list'
+	        }, (function() {
+	          var _i, _len, _results;
+	          _results = [];
+	          for (_i = 0, _len = sortedRepos.length; _i < _len; _i++) {
+	            repo = sortedRepos[_i];
+	            _results.push(React.createElement(RepoLink, {
+	              "repo": repo,
+	              "selectRepo": this.props.selectRepo,
+	              "key": repo.name
+	            }));
+	          }
+	          return _results;
+	        }).call(_this));
+	      };
+	    })(this)() : 'Loading...'));
 	  }
 	});
 
 	RepoLink = React.createClass({
 	  displayName: 'RepoLink',
 	  render: function() {
+	    console.log(new Date(this.props.repo.pushed_at).getTime());
 	    return React.createElement(React.DOM.li, {
-	      "key": this.props.repo.id
-	    }, React.createElement(React.DOM.a, {
+	      "key": this.props.repo.id,
+	      "className": 'ghu-repo-link',
 	      "onClick": ((function(_this) {
 	        return function() {
 	          return _this.props.selectRepo(_this.props.repo);
 	        };
 	      })(this))
-	    }, this.props.repo.name), React.createElement(React.DOM.span, {
-	      "className": 'pushedAt'
-	    }, "Last updated: ", moment(this.props.repo.pushed_at).fromNow()));
+	    }, React.createElement(React.DOM.a, null, this.props.repo.name), React.createElement(React.DOM.span, {
+	      "className": 'ghu-last-updated'
+	    }, "last updated ", moment(this.props.repo.pushed_at).fromNow()));
 	  }
 	});
 
@@ -32493,7 +32507,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(272)();
-	exports.push([module.id, "body {\n  background: #eee;\n}\n.ghu-app {\n  background: #fcfcfc;\n  padding: 20px;\n  margin: 30px auto;\n  width: 40em;\n}\n.ghu-app h1 {\n  text-align: center;\n  text-transform: uppercase;\n  font-weight: normal;\n  letter-spacing: 3px;\n}\n", ""]);
+	exports.push([module.id, "body {\n  background: #eee;\n}\n.ghu-app {\n  background: #fcfcfc;\n  margin: 30px auto;\n  width: 40em;\n}\n.ghu-app h1 {\n  text-align: center;\n  text-transform: uppercase;\n  font-weight: normal;\n  letter-spacing: 3px;\n  padding-top: 30px;\n  font-size: 14px;\n}\n", ""]);
 
 /***/ },
 /* 271 */
@@ -32666,7 +32680,39 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(272)();
-	exports.push([module.id, ".ghu-username-chooser input {\n  font-size: 200%;\n}\n", ""]);
+	exports.push([module.id, ".ghu-username-chooser {\n  padding-bottom: 30px;\n}\n.ghu-username-chooser input {\n  font-size: 200%;\n  text-align: center;\n  margin: 0 auto;\n  display: block;\n}\n", ""]);
+
+/***/ },
+/* 275 */,
+/* 276 */,
+/* 277 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(278);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(271)(content);
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		module.hot.accept("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/RepoContainer.less", function() {
+			var newContent = require("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/RepoContainer.less");
+			if(typeof newContent === 'string') newContent = [module.id, newContent, ''];
+			update(newContent);
+		});
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 278 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(272)();
+	exports.push([module.id, "h2.ghu-username {\n  text-align: center;\n  font-size: 200%;\n  margin: 0;\n}\nul.ghu-repo-list {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\nul.ghu-repo-list li.ghu-repo-link {\n  padding: 10px 30px;\n  border-top: 1px solid #eee;\n  cursor: pointer;\n}\nul.ghu-repo-list li.ghu-repo-link .ghu-last-updated {\n  display: block;\n  color: #aaa;\n}\nul.ghu-repo-list li.ghu-repo-link:hover {\n  background: #444;\n  color: white;\n}\n", ""]);
 
 /***/ }
 /******/ ])
