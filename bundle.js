@@ -242,11 +242,13 @@
 	          _results = [];
 	          for (_i = 0, _len = sortedRepos.length; _i < _len; _i++) {
 	            repo = sortedRepos[_i];
-	            _results.push(React.createElement(RepoLink, {
-	              "repo": repo,
-	              "selectRepo": this.props.selectRepo,
-	              "key": repo.name
-	            }));
+	            if (repo.has_pages) {
+	              _results.push(React.createElement(RepoLink, {
+	                "repo": repo,
+	                "selectRepo": this.props.selectRepo,
+	                "key": repo.name
+	              }));
+	            }
 	          }
 	          return _results;
 	        }).call(_this));

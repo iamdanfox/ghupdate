@@ -62,7 +62,7 @@ RepoList = React.createClass
               new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime()
 
             <ul className='ghu-repo-list'>
-            { for repo in sortedRepos
+            { for repo in sortedRepos when repo.has_pages
                 <RepoLink repo={repo} selectRepo={@props.selectRepo} key={repo.name} /> }
             </ul> }
     </div>
