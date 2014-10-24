@@ -38,6 +38,6 @@ EditorView = module.exports = React.createClass
       else if @state.error?
         <span>Error loading file. Please try again in a few minutes.</span>
       else
-        <textarea style={{width:'100%',height:'40em'}}>{@state.html}</textarea> }
+        <textarea style={{width:'100%',height:'40em'}} defaultValue={@state.html} /> }
     </div>
     </div>

@@ -7,37 +7,47 @@ FileChooser = module.exports = React.createClass
 
   propTypes:
     preLoadedRepo: React.PropTypes.shape # optional
-                    owner: React.PropTypes.object.isRequired
-                    commits_url: React.PropTypes.string.isRequired
+                     owner: React.PropTypes.object.isRequired
+                     commits_url: React.PropTypes.string.isRequired
     params: React.PropTypes.shape
               repo: React.PropTypes.string.isRequired
               username: React.PropTypes.string.isRequired
 
   getInitialState: ->
     tree: null
+    loading: true
+    error: false
 
   componentDidMount: ->
-    if @props.preLoadedRepo?
-      initialPromise =
-        success: (continuation) => continuation @props.preLoadedRepo
+    loadRepoPromise = if @props.preLoadedRepo?
+      success: (continuation) => continuation @props.preLoadedRepo
     else
-      initialPromise = qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo
+      qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo
 
-    initialPromise.success (loadedRepo) =>
+    loadRepoPromise.success (loadedRepo) =>
       commitsUrl = loadedRepo.commits_url.replace '{/sha}', '?per_page=1'
       qwest.get(commitsUrl).success (commits) =>
         lastCommit = commits[0]
         treeUrl = lastCommit.commit.tree.url
 
         qwest.get(treeUrl).success (response) =>
-          @setState tree: response.tree
+          @setState
+            loading: false
+            tree: response.tree
+    .error (err) =>
+      @setState
+        loading: false
+        error: true
 
   render: ->
     <div>
-      { if @state.tree?
-          <TreeView tree={@state.tree} />
+      { if @state.loading
+          "Loading..."
         else
-          <span>Loading...</span> }
+          if @state.error
+            "Error loading file list"
+          else
+            <TreeView tree={@state.tree} /> }
     </div>
 
 
@@ -67,7 +77,6 @@ TreeFileView = React.createClass
     item: React.PropTypes.object.isRequired
 
   selectFile: ->
-    console.log 'selectFile', @props.item
     window.location += '/file/'+@props.item.sha
 
   render: ->

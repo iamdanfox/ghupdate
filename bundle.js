@@ -205,20 +205,30 @@
 	  },
 	  getInitialState: function() {
 	    return {
-	      repos: null
+	      repos: null,
+	      loading: true,
+	      error: false
 	    };
 	  },
 	  componentDidMount: function() {
 	    return qwest.get('https://api.github.com/users/' + this.props.username + '/repos').success((function(_this) {
 	      return function(repos) {
 	        return _this.setState({
+	          loading: false,
 	          repos: repos
+	        });
+	      };
+	    })(this)).error((function(_this) {
+	      return function(err) {
+	        return _this.setState({
+	          loading: false,
+	          error: true
 	        });
 	      };
 	    })(this));
 	  },
 	  render: function() {
-	    return React.createElement(React.DOM.div, null, (this.state.repos != null ? (function(_this) {
+	    return React.createElement(React.DOM.div, null, (this.state.loading ? 'Loading...' : this.state.error ? 'Error loading repos, please try again' : (function(_this) {
 	      return function() {
 	        var repo, sortedRepos;
 	        sortedRepos = _this.state.repos.slice(0);
@@ -241,14 +251,13 @@
 	          return _results;
 	        }).call(_this));
 	      };
-	    })(this)() : 'Loading...'));
+	    })(this)()));
 	  }
 	});
 
 	RepoLink = React.createClass({
 	  displayName: 'RepoLink',
 	  render: function() {
-	    console.log(new Date(this.props.repo.pushed_at).getTime());
 	    return React.createElement(React.DOM.li, {
 	      "key": this.props.repo.id,
 	      "className": 'ghu-repo-link',
@@ -288,23 +297,21 @@
 	  },
 	  getInitialState: function() {
 	    return {
-	      tree: null
+	      tree: null,
+	      loading: true,
+	      error: false
 	    };
 	  },
 	  componentDidMount: function() {
-	    var initialPromise;
-	    if (this.props.preLoadedRepo != null) {
-	      initialPromise = {
-	        success: (function(_this) {
-	          return function(continuation) {
-	            return continuation(_this.props.preLoadedRepo);
-	          };
-	        })(this)
-	      };
-	    } else {
-	      initialPromise = qwest.get('https://api.github.com/repos/' + this.props.params.username + '/' + this.props.params.repo);
-	    }
-	    return initialPromise.success((function(_this) {
+	    var loadRepoPromise;
+	    loadRepoPromise = this.props.preLoadedRepo != null ? {
+	      success: (function(_this) {
+	        return function(continuation) {
+	          return continuation(_this.props.preLoadedRepo);
+	        };
+	      })(this)
+	    } : qwest.get('https://api.github.com/repos/' + this.props.params.username + '/' + this.props.params.repo);
+	    return loadRepoPromise.success((function(_this) {
 	      return function(loadedRepo) {
 	        var commitsUrl;
 	        commitsUrl = loadedRepo.commits_url.replace('{/sha}', '?per_page=1');
@@ -314,17 +321,25 @@
 	          treeUrl = lastCommit.commit.tree.url;
 	          return qwest.get(treeUrl).success(function(response) {
 	            return _this.setState({
+	              loading: false,
 	              tree: response.tree
 	            });
 	          });
 	        });
 	      };
+	    })(this)).error((function(_this) {
+	      return function(err) {
+	        return _this.setState({
+	          loading: false,
+	          error: true
+	        });
+	      };
 	    })(this));
 	  },
 	  render: function() {
-	    return React.createElement(React.DOM.div, null, (this.state.tree != null ? React.createElement(TreeView, {
+	    return React.createElement(React.DOM.div, null, (this.state.loading ? "Loading..." : this.state.error ? "Error loading file list" : React.createElement(TreeView, {
 	      "tree": this.state.tree
-	    }) : React.createElement(React.DOM.span, null, "Loading...")));
+	    })));
 	  }
 	});
 
@@ -367,7 +382,6 @@
 	    item: React.PropTypes.object.isRequired
 	  },
 	  selectFile: function() {
-	    console.log('selectFile', this.props.item);
 	    return window.location += '/file/' + this.props.item.sha;
 	  },
 	  render: function() {
@@ -431,8 +445,9 @@
 	      "style": {
 	        width: '100%',
 	        height: '40em'
-	      }
-	    }, this.state.html))));
+	      },
+	      "defaultValue": this.state.html
+	    }))));
 	  }
 	});
 
