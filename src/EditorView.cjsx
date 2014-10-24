@@ -12,23 +12,32 @@ EditorView = module.exports = React.createClass
       sha: React.PropTypes.string.isRequired
 
   getInitialState: ->
+    loading: true
+    error: null
     html: null
 
   componentDidMount: ->
     qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo+'/git/blobs/'+@props.params.sha
       .success (response) =>
         fixedBase64 = response.content.replace /\n/g, ''
-        @setState html: atob(fixedBase64)
+        @setState
+          loading: false
+          html: atob(fixedBase64)
       .error (err) =>
         console.error err
+        @setState
+          loading: false
+          error: err
 
   render: ->
     <div>
     <h2>EditorView</h2>
     <div>
-    { if @state.html?
-        <textarea style={{width:'100%',height:'40em'}}>{@state.html}</textarea>
+    { if @state.loading
+        <span>Loading...</span>
+      else if @state.error?
+        <span>Error loading file. Please try again in a few minutes.</span>
       else
-        <span>Loading...</span> }
+        <textarea style={{width:'100%',height:'40em'}}>{@state.html}</textarea> }
     </div>
     </div>

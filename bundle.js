@@ -23612,6 +23612,8 @@ EditorView = module.exports = React.createClass({
   },
   getInitialState: function() {
     return {
+      loading: true,
+      error: null,
       html: null
     };
   },
@@ -23621,22 +23623,27 @@ EditorView = module.exports = React.createClass({
         var fixedBase64;
         fixedBase64 = response.content.replace(/\n/g, '');
         return _this.setState({
+          loading: false,
           html: atob(fixedBase64)
         });
       };
     })(this)).error((function(_this) {
       return function(err) {
-        return console.error(err);
+        console.error(err);
+        return _this.setState({
+          loading: false,
+          error: err
+        });
       };
     })(this));
   },
   render: function() {
-    return React.DOM.div(null, React.DOM.h2(null, "EditorView"), React.DOM.div(null, (this.state.html != null ? React.DOM.textarea({
+    return React.DOM.div(null, React.DOM.h2(null, "EditorView"), React.DOM.div(null, (this.state.loading ? React.DOM.span(null, "Loading...") : this.state.error != null ? React.DOM.span(null, "Error loading file. Please try again in a few minutes.") : React.DOM.textarea({
       "style": {
         width: '100%',
         height: '40em'
       }
-    }, this.state.html) : React.DOM.span(null, "Loading..."))));
+    }, this.state.html))));
   }
 });
 
