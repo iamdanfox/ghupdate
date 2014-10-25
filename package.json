@@ -1,19 +1,8 @@
 {
-  "name": "ghupdate",
+  "name": "ghupdate-heroku",
   "version": "0.1.0",
   "dependencies": {
-    "moment": "~2.8.1",
-    "react": "^0.11.0",
-    "react-router": "~0.5.2"
   },
   "devDependencies": {
-    "cjsx-loader": "^0.3.0",
-    "coffee-loader": "^0.7.2",
-    "coffee-script": "^1.8.0",
-    "css-loader": "^0.9.0",
-    "less": "^1.7.5",
-    "less-loader": "^0.7.7",
-    "style-loader": "^0.8.1",
-    "webpack": "^1.4.4"
   }
 }
