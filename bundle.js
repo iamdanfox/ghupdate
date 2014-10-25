@@ -220,6 +220,7 @@
 	      };
 	    })(this)).error((function(_this) {
 	      return function(err) {
+	        console.error(err);
 	        return _this.setState({
 	          loading: false,
 	          error: true
@@ -230,28 +231,22 @@
 	  render: function() {
 	    return React.createElement(React.DOM.div, null, (this.state.loading ? 'Loading...' : this.state.error ? 'Error loading repos, please try again' : (function(_this) {
 	      return function() {
-	        var repo, sortedRepos;
+	        var sortedRepos;
 	        sortedRepos = _this.state.repos.slice(0);
 	        sortedRepos.sort(function(a, b) {
 	          return new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime();
 	        });
 	        return React.createElement(React.DOM.ul, {
 	          "className": 'ghu-repo-list'
-	        }, (function() {
-	          var _i, _len, _results;
-	          _results = [];
-	          for (_i = 0, _len = sortedRepos.length; _i < _len; _i++) {
-	            repo = sortedRepos[_i];
-	            if (repo.has_pages) {
-	              _results.push(React.createElement(RepoLink, {
-	                "repo": repo,
-	                "selectRepo": this.props.selectRepo,
-	                "key": repo.name
-	              }));
-	            }
-	          }
-	          return _results;
-	        }).call(_this));
+	        }, sortedRepos.filter(function(repo) {
+	          return repo.has_pages;
+	        }).map(function(repo) {
+	          return React.createElement(RepoLink, {
+	            "repo": repo,
+	            "selectRepo": _this.props.selectRepo,
+	            "key": repo.name
+	          });
+	        }));
 	      };
 	    })(this)()));
 	  }

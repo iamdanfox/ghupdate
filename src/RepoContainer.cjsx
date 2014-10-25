@@ -45,6 +45,7 @@ RepoList = React.createClass
           loading: false
           repos: repos
       .error (err) =>
+        console.error err
         @setState
           loading: false
           error: true
@@ -62,8 +63,9 @@ RepoList = React.createClass
               new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime()
 
             <ul className='ghu-repo-list'>
-            { for repo in sortedRepos when repo.has_pages
-                <RepoLink repo={repo} selectRepo={@props.selectRepo} key={repo.name} /> }
+            { sortedRepos
+                .filter (repo) -> repo.has_pages
+                .map (repo) => <RepoLink repo={repo} selectRepo={@props.selectRepo} key={repo.name} /> }
             </ul> }
     </div>
 
