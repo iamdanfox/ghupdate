@@ -21,7 +21,9 @@ app.post('/login/oauth/access_token', function(request, userResponse) {
       code: code
     })
     .end(function(githubResponse){
-      userResponse.json(githubResponse.body);
+      userResponse
+        .set('Access-Control-Allow-Origin', '*')
+        .json(githubResponse.body);
     });
 });
 
