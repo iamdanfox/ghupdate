@@ -1,6 +1,8 @@
 React = require 'react'
 qwest = require '../lib/qwest.js'
 Loading = require './Loading.cjsx'
+OAuth = require './OAuth.coffee'
+
 
 FileChooser = module.exports = React.createClass
   displayName: 'FileChooser'
@@ -22,7 +24,7 @@ FileChooser = module.exports = React.createClass
     loadRepoPromise = if @props.preLoadedRepo?
       success: (continuation) => continuation @props.preLoadedRepo
     else
-      qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo
+      qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo + OAuth.queryString()
 
     loadRepoPromise.success (loadedRepo) =>
       commitsUrl = loadedRepo.commits_url.replace '{/sha}', '?per_page=1'

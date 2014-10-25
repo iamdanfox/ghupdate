@@ -35,6 +35,12 @@ module.exports = OAuth = {
   getAccessToken: ->
     accessToken
 
+  queryString: ->
+    if OAuth.isLoggedIn()
+      '?access_token=' + accessToken
+    else
+      ''
+
   logInIfPossible: (callback)->
     if hasQueryCode()
       getAccessToken(callback)

@@ -1,6 +1,7 @@
 React = require 'react'
 qwest = require '../lib/qwest.js'
 Loading = require './Loading.cjsx'
+OAuth = require './OAuth.coffee'
 
 
 EditorView = module.exports = React.createClass
@@ -18,7 +19,7 @@ EditorView = module.exports = React.createClass
     html: null
 
   componentDidMount: ->
-    qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo+'/git/blobs/'+@props.params.sha
+    qwest.get 'https://api.github.com/repos/'+@props.params.username+'/'+@props.params.repo+'/git/blobs/'+@props.params.sha + OAuth.queryString()
       .success (response) =>
         fixedBase64 = response.content.replace /\n/g, ''
         @setState

@@ -3,6 +3,7 @@ React = require 'react'
 qwest = require '../lib/qwest.js'
 moment = require 'moment'
 Loading = require './Loading.cjsx'
+OAuth = require './OAuth.coffee'
 
 
 RepoContainer = module.exports = React.createClass
@@ -40,7 +41,7 @@ RepoLoadingList = React.createClass
 
   componentDidMount: ->
     qwest
-      .get('https://api.github.com/users/'+@props.username+'/repos')
+      .get('https://api.github.com/users/'+@props.username+'/repos' + OAuth.queryString())
       .success (repos) =>
         @setState
           loading: false
@@ -53,7 +54,7 @@ RepoLoadingList = React.createClass
 
   render: ->
     <Loading loading={@state.loading} error={@state.error} errorMessage='Error loading repos, please try again'>
-      <RepoList repos={@state.repos} />
+      <RepoList repos={@state.repos} selectRepo={@props.selectRepo} />
     </Loading>
 
 
@@ -62,6 +63,7 @@ RepoList = React.createClass
 
   propTypes:
     repos: React.PropTypes.array.isRequired
+    selectRepo: React.PropTypes.func.isRequired
 
   render: ->
     sortedRepos = @props.repos.slice 0
