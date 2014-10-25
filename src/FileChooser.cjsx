@@ -1,6 +1,6 @@
 React = require 'react'
 qwest = require '../lib/qwest.js'
-
+Spinner = require './Spinner.cjsx'
 
 FileChooser = module.exports = React.createClass
   displayName: 'FileChooser'
@@ -42,7 +42,7 @@ FileChooser = module.exports = React.createClass
   render: ->
     <div>
       { if @state.loading
-          "Loading..."
+          <Spinner />
         else
           if @state.error
             "Error loading file list"

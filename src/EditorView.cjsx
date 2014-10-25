@@ -1,5 +1,6 @@
 React = require 'react'
 qwest = require '../lib/qwest.js'
+Spinner = require './Spinner.cjsx'
 
 
 EditorView = module.exports = React.createClass
@@ -34,7 +35,7 @@ EditorView = module.exports = React.createClass
     <h2>EditorView</h2>
     <div>
     { if @state.loading
-        <span>Loading...</span>
+        <Spinner />
       else if @state.error?
         <span>Error loading file. Please try again in a few minutes.</span>
       else

@@ -12,6 +12,6 @@ UsernameChooser = module.exports = React.createClass
   render: ->
     <div className='ghu-username-chooser'>
       <form onSubmit={@selectUsername}>
-      <input type='text' ref='username' placeholder='Your GitHub username' />
+        <input type='text' ref='username' placeholder='Your GitHub username' autoFocus />
       </form>
     </div>

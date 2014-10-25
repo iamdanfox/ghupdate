@@ -2,6 +2,7 @@ require './RepoContainer.less'
 React = require 'react'
 qwest = require '../lib/qwest.js'
 moment = require 'moment'
+Spinner = require './Spinner.cjsx'
 
 
 RepoContainer = module.exports = React.createClass
@@ -53,7 +54,7 @@ RepoList = React.createClass
   render: ->
     <div>
       { if @state.loading
-          'Loading...'
+          <Spinner />
         else
           if @state.error
             'Error loading repos, please try again'
