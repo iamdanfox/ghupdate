@@ -2,7 +2,7 @@
   "name": "ghupdate-heroku",
   "version": "0.1.0",
   "dependencies": {
-  },
-  "devDependencies": {
+    "express": "^4.10.0",
+    "superagent": "^0.20.0"
   }
 }
