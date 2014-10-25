@@ -1,6 +1,6 @@
 React = require 'react'
 qwest = require '../lib/qwest.js'
-Spinner = require './Spinner.cjsx'
+Loading = require './Loading.cjsx'
 
 
 EditorView = module.exports = React.createClass
@@ -34,11 +34,8 @@ EditorView = module.exports = React.createClass
     <div>
     <h2>EditorView</h2>
     <div>
-    { if @state.loading
-        <Spinner />
-      else if @state.error?
-        <span>Error loading file. Please try again in a few minutes.</span>
-      else
-        <textarea style={{width:'100%',height:'40em'}} defaultValue={@state.html} /> }
+    <Loading loading={@state.loading} error={@state.error} errorMessage="Error loading file. Please try again in a few minutes.">
+      <textarea style={{width:'100%',height:'40em'}} defaultValue={@state.html} />
+    </Loading>
     </div>
     </div>

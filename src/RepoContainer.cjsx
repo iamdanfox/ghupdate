@@ -2,7 +2,7 @@ require './RepoContainer.less'
 React = require 'react'
 qwest = require '../lib/qwest.js'
 moment = require 'moment'
-Spinner = require './Spinner.cjsx'
+Loading = require './Loading.cjsx'
 
 
 RepoContainer = module.exports = React.createClass
@@ -19,15 +19,15 @@ RepoContainer = module.exports = React.createClass
     <div>
       <h2 className='ghu-username'>{@props.params.username}</h2>
       { if not @props.activeRouteHandler()?
-          <RepoList username={@props.params.username} selectRepo={@selectRepo} />
+          <RepoLoadingList username={@props.params.username} selectRepo={@selectRepo} />
         else
           @props.activeRouteHandler
             preLoadedRepo: @state.loadedRepo }
     </div>
 
 
-RepoList = React.createClass
-  displayName: 'RepoList'
+RepoLoadingList = React.createClass
+  displayName: 'RepoLoadingList'
 
   propTypes:
     username: React.PropTypes.string.isRequired
@@ -52,23 +52,27 @@ RepoList = React.createClass
           error: true
 
   render: ->
-    <div>
-      { if @state.loading
-          <Spinner />
-        else
-          if @state.error
-            'Error loading repos, please try again'
-          else do =>
-            sortedRepos = @state.repos.slice 0
-            sortedRepos.sort (a,b) ->
-              new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime()
+    <Loading loading={@state.loading} error={@state.error} errorMessage='Error loading repos, please try again'>
+      <RepoList repos={@state.repos} />
+    </Loading>
 
-            <ul className='ghu-repo-list'>
-            { sortedRepos
-                .filter (repo) -> repo.has_pages
-                .map (repo) => <RepoLink repo={repo} selectRepo={@props.selectRepo} key={repo.name} /> }
-            </ul> }
-    </div>
+
+RepoList = React.createClass
+  displayName: 'RepoList'
+
+  propTypes:
+    repos: React.PropTypes.array.isRequired
+
+  render: ->
+    sortedRepos = @props.repos.slice 0
+    sortedRepos.sort (a,b) ->
+      new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime()
+
+    <ul className='ghu-repo-list'>
+    { sortedRepos
+        .filter (repo) -> repo.has_pages
+        .map (repo) => <RepoLink repo={repo} selectRepo={@props.selectRepo} key={repo.name} /> }
+    </ul>
 
 
 RepoLink = React.createClass

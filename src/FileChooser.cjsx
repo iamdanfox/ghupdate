@@ -1,6 +1,6 @@
 React = require 'react'
 qwest = require '../lib/qwest.js'
-Spinner = require './Spinner.cjsx'
+Loading = require './Loading.cjsx'
 
 FileChooser = module.exports = React.createClass
   displayName: 'FileChooser'
@@ -40,15 +40,9 @@ FileChooser = module.exports = React.createClass
         error: true
 
   render: ->
-    <div>
-      { if @state.loading
-          <Spinner />
-        else
-          if @state.error
-            "Error loading file list"
-          else
-            <TreeView tree={@state.tree} /> }
-    </div>
+    <Loading loading={@state.loading} error={@state.error} errorMessage="Error loading file list">
+      <TreeView tree={@state.tree} />
+    </Loading>
 
 
 TreeView = React.createClass
@@ -61,11 +55,9 @@ TreeView = React.createClass
     <div className="treeView">
     <p>Choose a file</p>
     <ul>
-      { for item in @props.tree
-          if item.type is 'tree'
-            <li className='tree' key={item.path}>{item.path}</li>
-          else if /\.html/.test item.path
-            <TreeFileView item={item} /> }
+      { @props.tree
+          .filter (item) -> /\.html$/.test item.path
+          .map (item) => <TreeFileView item={item} /> }
     </ul>
     </div>
 
