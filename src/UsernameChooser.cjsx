@@ -21,5 +21,6 @@ UsernameChooser = module.exports = React.createClass
       <form onSubmit={@selectUsername}>
         <input type='text' ref='username' placeholder='Your GitHub username' autoFocus />
       </form>
-      or <button onClick={@redirectToOAuth}>Authorize with GitHub</button>
+      <p>or</p>
+      <button onClick={@redirectToOAuth}>Log in with GitHub</button>
     </div>
