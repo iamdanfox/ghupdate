@@ -29,6 +29,8 @@ userReposStore = Reflux.createStore
   loadReposIfNecessary: ->
     newUsername = userStore.getUsername()
     if _cachedReposForUsername isnt newUsername
+      _reposLoading = true
+      @trigger()
       qwest
         .get("https://api.github.com/users/#{newUsername}/repos")
         .success (repos) ->
