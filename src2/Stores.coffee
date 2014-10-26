@@ -54,6 +54,19 @@ userReposStore = Reflux.createStore
 
 
 
+_selectedRepoName = null
+repoStore = Reflux.createStore
+  init: ->
+    @listenTo Actions.selectRepo, @selectRepo
+
+  selectRepo: (repoName) ->
+    _selectedRepoName = repoName
+    @trigger()
+
+  getSelectedRepoName: ->
+    _selectedRepoName
+
+
 
 
 
@@ -62,5 +75,5 @@ module.exports = Stores =
   userReposStore: userReposStore
 
 
-userStore.listen ->
-  console.log 'userStore', userStore.getUsername()
+repoStore.listen ->
+  console.log 'repoStore', repoStore.getSelectedRepoName()

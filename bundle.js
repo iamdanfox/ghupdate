@@ -110,7 +110,7 @@
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, Reflux, Stores, qwest, userReposStore, userStore, _cachedReposForUsername, _repos, _reposLoading, _reposLoadingError, _username;
+	var Actions, Reflux, Stores, qwest, repoStore, userReposStore, userStore, _cachedReposForUsername, _repos, _reposLoading, _reposLoadingError, _selectedRepoName, _username;
 
 	Reflux = __webpack_require__(8);
 
@@ -176,13 +176,28 @@
 	  }
 	});
 
+	_selectedRepoName = null;
+
+	repoStore = Reflux.createStore({
+	  init: function() {
+	    return this.listenTo(Actions.selectRepo, this.selectRepo);
+	  },
+	  selectRepo: function(repoName) {
+	    _selectedRepoName = repoName;
+	    return this.trigger();
+	  },
+	  getSelectedRepoName: function() {
+	    return _selectedRepoName;
+	  }
+	});
+
 	module.exports = Stores = {
 	  userStore: userStore,
 	  userReposStore: userReposStore
 	};
 
-	userStore.listen(function() {
-	  return console.log('userStore', userStore.getUsername());
+	repoStore.listen(function() {
+	  return console.log('repoStore', repoStore.getSelectedRepoName());
 	});
 
 
@@ -483,7 +498,7 @@
 
 	Reflux = __webpack_require__(8);
 
-	module.exports = Actions = Reflux.createActions(['setUsername']);
+	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo']);
 
 
 /***/ },
@@ -20621,7 +20636,7 @@
 /* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Loading, React, Reflux, RepoChooser, RepoLink, RepoList, Stores, moment;
+	var Actions, Loading, React, Reflux, RepoChooser, RepoLink, RepoList, Stores, moment;
 
 	__webpack_require__(228);
 
@@ -20634,6 +20649,8 @@
 	Reflux = __webpack_require__(8);
 
 	Stores = __webpack_require__(3);
+
+	Actions = __webpack_require__(9);
 
 	module.exports = RepoChooser = React.createClass({
 	  displayName: 'RepoChooser',
@@ -20668,9 +20685,6 @@
 	  propTypes: {
 	    repos: React.PropTypes.array.isRequired
 	  },
-	  selectRepo: function(repo) {
-	    return console.log('select repo');
-	  },
 	  render: function() {
 	    var sortedRepos;
 	    sortedRepos = this.props.repos.slice(0);
@@ -20685,7 +20699,6 @@
 	      return function(repo) {
 	        return React.createElement(RepoLink, {
 	          "repo": repo,
-	          "selectRepo": _this.selectRepo,
 	          "key": repo.name
 	        });
 	      };
@@ -20695,15 +20708,14 @@
 
 	RepoLink = React.createClass({
 	  displayName: 'RepoLink',
+	  selectRepo: function() {
+	    return Actions.selectRepo(this.props.repo.name);
+	  },
 	  render: function() {
 	    return React.createElement(React.DOM.li, {
 	      "key": this.props.repo.id,
 	      "className": 'ghu-repo-link',
-	      "onClick": ((function(_this) {
-	        return function() {
-	          return _this.props.selectRepo(_this.props.repo);
-	        };
-	      })(this))
+	      "onClick": this.selectRepo
 	    }, React.createElement(React.DOM.a, null, this.props.repo.name), React.createElement(React.DOM.span, {
 	      "className": 'ghu-last-updated'
 	    }, "last updated ", moment(this.props.repo.pushed_at).fromNow()));

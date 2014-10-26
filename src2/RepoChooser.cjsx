@@ -4,6 +4,7 @@ moment = require 'moment'
 Loading = require '../src/Loading.cjsx'
 Reflux = require 'reflux'
 Stores = require './Stores.coffee'
+Actions = require './Actions.coffee'
 
 
 module.exports = RepoChooser = React.createClass
@@ -35,9 +36,6 @@ RepoList = React.createClass
   propTypes:
     repos: React.PropTypes.array.isRequired
 
-  selectRepo: (repo) ->
-    console.log 'select repo'
-
   render: ->
     sortedRepos = @props.repos.slice 0
     sortedRepos.sort (a,b) ->
@@ -46,15 +44,18 @@ RepoList = React.createClass
     <ul className='ghu-repo-list'>
     { sortedRepos
         .filter (repo) -> repo.has_pages
-        .map (repo) => <RepoLink repo={repo} selectRepo={@selectRepo} key={repo.name} /> }
+        .map (repo) => <RepoLink repo={repo} key={repo.name} /> }
     </ul>
 
 
 RepoLink = React.createClass
   displayName: 'RepoLink'
 
+  selectRepo: ->
+    Actions.selectRepo @props.repo.name
+
   render: ->
-    <li key={@props.repo.id} className='ghu-repo-link' onClick={=> @props.selectRepo @props.repo}>
+    <li key={@props.repo.id} className='ghu-repo-link' onClick={@selectRepo}>
       <a>{@props.repo.name}</a>
       <span className='ghu-last-updated'>last updated { moment(@props.repo.pushed_at).fromNow() }</span>
     </li>

@@ -5,6 +5,7 @@ Stores = require './Stores.coffee'
 UsernameChooser = require './UsernameChooser.cjsx'
 RepoChooser = require './RepoChooser.cjsx'
 
+
 App = module.exports = React.createClass
   displayName: 'App'
   mixins: [Reflux.ListenerMixin]
