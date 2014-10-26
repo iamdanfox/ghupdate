@@ -73,6 +73,7 @@ repoStore = Reflux.createStore
 module.exports = Stores =
   userStore: userStore
   userReposStore: userReposStore
+  repoStore: repoStore
 
 
 repoStore.listen ->

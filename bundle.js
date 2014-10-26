@@ -76,21 +76,30 @@
 	  mixins: [Reflux.ListenerMixin],
 	  getInitialState: function() {
 	    return {
-	      username: null
+	      username: null,
+	      repoName: null
 	    };
 	  },
 	  componentDidMount: function() {
-	    return this.listenTo(Stores.userStore, this.handleUserChange);
-	  },
-	  handleUserChange: function() {
-	    return this.setState({
-	      username: Stores.userStore.getUsername()
-	    });
+	    this.listenTo(Stores.userStore, (function(_this) {
+	      return function() {
+	        return _this.setState({
+	          username: Stores.userStore.getUsername()
+	        });
+	      };
+	    })(this));
+	    return this.listenTo(Stores.repoStore, (function(_this) {
+	      return function() {
+	        return _this.setState({
+	          repoName: Stores.repoStore.getSelectedRepoName()
+	        });
+	      };
+	    })(this));
 	  },
 	  render: function() {
 	    return React.createElement(React.DOM.div, {
 	      "className": "ghu-app"
-	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username != null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
+	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username != null ? this.state.repoName != null ? React.createElement(React.DOM.span, null, "Choose a file") : React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
 	    }, this.state.username), React.createElement(RepoChooser, {
 	      "username": this.state.username
@@ -193,7 +202,8 @@
 
 	module.exports = Stores = {
 	  userStore: userStore,
-	  userReposStore: userReposStore
+	  userReposStore: userReposStore,
+	  repoStore: repoStore
 	};
 
 	repoStore.listen(function() {
