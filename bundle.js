@@ -119,7 +119,7 @@
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, Reflux, Stores, qwest, repoStore, userReposStore, userStore, _cachedReposForUsername, _repos, _reposLoading, _reposLoadingError, _selectedRepoName, _username;
+	var Actions, Reflux, Stores, qwest, repoStore, repoTreeStore, userReposStore, userStore, _cachedReposForUsername, _cachedTreeForRepo, _repos, _reposLoading, _reposLoadingError, _selectedRepoName, _tree, _treeLoading, _treeLoadingError, _username;
 
 	Reflux = __webpack_require__(8);
 
@@ -159,12 +159,15 @@
 	    newUsername = userStore.getUsername();
 	    if (_cachedReposForUsername !== newUsername) {
 	      _reposLoading = true;
+	      _reposLoadingError = false;
+	      _repos = null;
 	      this.trigger();
 	      return qwest.get("https://api.github.com/users/" + newUsername + "/repos").success(function(repos) {
 	        _cachedReposForUsername = newUsername;
 	        _repos = repos;
 	        return _reposLoadingError = false;
-	      }).error(function() {
+	      }).error(function(err) {
+	        console.error(err);
 	        return _reposLoadingError = true;
 	      }).complete((function(_this) {
 	        return function() {
@@ -200,15 +203,62 @@
 	  }
 	});
 
+	_cachedTreeForRepo = null;
+
+	_tree = null;
+
+	_treeLoading = false;
+
+	_treeLoadingError = false;
+
+	repoTreeStore = Reflux.createStore({
+	  init: function() {
+	    return this.listenTo(repoStore, this.loadTreeIfNecessary);
+	  },
+	  loadTreeIfNecessary: function() {
+	    var selectedRepoName;
+	    selectedRepoName = repoStore.getSelectedRepoName();
+	    if (_cachedTreeForRepo !== selectedRepoName) {
+	      _tree = null;
+	      _treeLoading = true;
+	      _treeLoadingError = false;
+	      return qwest.get("https://api.github.com/repos/" + (userStore.getUsername()) + "/" + selectedRepoName + "/branches/gh-pages").success((function(_this) {
+	        return function(branchObject) {
+	          return qwest.get(branchObject.commit.commit.tree.url).success(function(response) {
+	            _cachedTreeForRepo = selectedRepoName;
+	            _treeLoading = false;
+	            _tree = response.tree;
+	            console.log('qwest success', _tree);
+	            return _this.trigger();
+	          });
+	        };
+	      })(this)).error((function(_this) {
+	        return function(err) {
+	          console.error(err);
+	          _treeLoadingError = true;
+	          _treeLoading = false;
+	          return _this.trigger();
+	        };
+	      })(this));
+	    }
+	  },
+	  isLoading: function() {
+	    return _treeLoading;
+	  },
+	  hasError: function() {
+	    return _treeLoadingError;
+	  },
+	  getTree: function() {
+	    return _tree;
+	  }
+	});
+
 	module.exports = Stores = {
 	  userStore: userStore,
 	  userReposStore: userReposStore,
-	  repoStore: repoStore
+	  repoStore: repoStore,
+	  repoTreeStore: repoTreeStore
 	};
-
-	repoStore.listen(function() {
-	  return console.log('repoStore', repoStore.getSelectedRepoName());
-	});
 
 	userReposStore.listen(function() {
 	  var _ref;

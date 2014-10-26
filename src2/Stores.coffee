@@ -30,6 +30,8 @@ userReposStore = Reflux.createStore
     newUsername = userStore.getUsername()
     if _cachedReposForUsername isnt newUsername
       _reposLoading = true
+      _reposLoadingError = false
+      _repos = null
       @trigger()
       qwest
         .get("https://api.github.com/users/#{newUsername}/repos")
@@ -37,7 +39,8 @@ userReposStore = Reflux.createStore
           _cachedReposForUsername = newUsername
           _repos = repos
           _reposLoadingError = false
-        .error ->
+        .error (err) ->
+          console.error err
           _reposLoadingError = true
         .complete =>
           _reposLoading = false
@@ -69,20 +72,68 @@ repoStore = Reflux.createStore
 
 
 
+_cachedTreeForRepo = null
+_tree = null
+_treeLoading = false
+_treeLoadingError = false
+
+repoTreeStore = Reflux.createStore
+  init: ->
+    @listenTo repoStore, @loadTreeIfNecessary
+
+  loadTreeIfNecessary: ->
+    selectedRepoName = repoStore.getSelectedRepoName()
+    if _cachedTreeForRepo isnt selectedRepoName
+
+      _tree = null
+      _treeLoading = true
+      _treeLoadingError = false
+      qwest
+        .get("https://api.github.com/repos/#{userStore.getUsername()}/#{selectedRepoName}/branches/gh-pages")
+        .success (branchObject) =>
+          qwest
+            .get(branchObject.commit.commit.tree.url)
+            .success (response) =>
+              _cachedTreeForRepo = selectedRepoName
+              _treeLoading = false
+              _tree = response.tree
+              console.log 'qwest success', _tree
+              @trigger()
+        .error (err) =>
+          console.error err
+          _treeLoadingError = true
+          _treeLoading = false
+          @trigger()
+
+  isLoading: ->
+    _treeLoading
+
+  hasError: ->
+    _treeLoadingError
+
+  getTree: ->
+    _tree
+
+
+
+
+
 
 module.exports = Stores =
   userStore: userStore
   userReposStore: userReposStore
   repoStore: repoStore
+  repoTreeStore: repoTreeStore
 
 
-repoStore.listen ->
-  console.log 'repoStore', repoStore.getSelectedRepoName()
+# repoTreeStore.listen ->
+#   console.log 'repoTreeStore', repoTreeStore.getTree()
 
 
 
 # SHORTCUT CODE
 # TODO: move this somewhere else
+# TODO: shortcut if only one file
 userReposStore.listen ->
   if userReposStore.getRepos()?.length is 1
     Actions.selectRepo userReposStore.getRepos()[0]
