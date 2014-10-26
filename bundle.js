@@ -210,6 +210,13 @@
 	  return console.log('repoStore', repoStore.getSelectedRepoName());
 	});
 
+	userReposStore.listen(function() {
+	  var _ref;
+	  if (((_ref = userReposStore.getRepos()) != null ? _ref.length : void 0) === 1) {
+	    return Actions.selectRepo(userReposStore.getRepos()[0]);
+	  }
+	});
+
 
 /***/ },
 /* 4 */

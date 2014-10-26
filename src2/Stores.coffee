@@ -78,3 +78,11 @@ module.exports = Stores =
 
 repoStore.listen ->
   console.log 'repoStore', repoStore.getSelectedRepoName()
+
+
+
+# SHORTCUT CODE
+# TODO: move this somewhere else
+userReposStore.listen ->
+  if userReposStore.getRepos()?.length is 1
+    Actions.selectRepo userReposStore.getRepos()[0]
