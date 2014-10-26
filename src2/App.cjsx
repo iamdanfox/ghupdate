@@ -1,7 +1,7 @@
 require '../src/App.less'
 React = require 'react'
 Reflux = require 'reflux'
-UserStore = require './UserStore.coffee'
+Stores = require './Stores.coffee'
 UsernameChooser = require './UsernameChooser.cjsx'
 
 
@@ -13,7 +13,7 @@ App = module.exports = React.createClass
     username: null
 
   componentDidMount: ->
-    @listenTo UserStore, @handleUserChange
+    @listenTo Stores.userStore, @handleUserChange
 
   handleUserChange: (newUsername) ->
     @setState
