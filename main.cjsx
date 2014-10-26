@@ -1,5 +1,4 @@
 React = require 'react'
-Router = require './src/Router.cjsx'
-qwest = require './lib/qwest.js'
+App = require './src2/App.cjsx'
 
-React.renderComponent <Router />, document.getElementsByTagName('body')[0]
+React.renderComponent <App />, document.getElementsByTagName('body')[0]
