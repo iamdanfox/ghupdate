@@ -15,9 +15,9 @@ App = module.exports = React.createClass
   componentDidMount: ->
     @listenTo Stores.userStore, @handleUserChange
 
-  handleUserChange: (newUsername) ->
+  handleUserChange: ->
     @setState
-      username: newUsername
+      username: Stores.userStore.getUsername()
 
   render: ->
     <div className="ghu-app">

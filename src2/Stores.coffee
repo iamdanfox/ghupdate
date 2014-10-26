@@ -3,18 +3,35 @@ Actions = require './Actions.coffee'
 
 
 _username = null
+userStore = Reflux.createStore
+  init: ->
+    @listenTo Actions.setUsername, @setUsername
+
+  setUsername: (newUsername) ->
+    _username = newUsername
+    @trigger()
+
+  getUsername: ->
+    return _username
+
+
+
+
+
+userReposStore = Reflux.createStore
+  init: ->
+    @listenTo userStore, @loadReposIfNecessary
+
+  loadReposIfNecessary: ->
+    console.log 'loadReposIfNecessary'
+
+
+
 
 module.exports = Stores =
-
-  userStore: Reflux.createStore
-    init: ->
-      @listenTo Actions.setUsername, @setUsername
-
-    setUsername: (newUsername) ->
-      _username = newUsername
-      @trigger _username
+  userStore: userStore
+  userReposStore: userReposStore
 
 
-
-Stores.userStore.listen (x) ->
-  console.log 'userStore', x
+userStore.listen ->
+  console.log 'userStore', userStore.getUsername()
