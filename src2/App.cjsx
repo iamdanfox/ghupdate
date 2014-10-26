@@ -4,6 +4,7 @@ Reflux = require 'reflux'
 Stores = require './Stores.coffee'
 UsernameChooser = require './UsernameChooser.cjsx'
 RepoChooser = require './RepoChooser.cjsx'
+FileChooser = require './FileChooser.cjsx'
 
 
 App = module.exports = React.createClass
@@ -25,7 +26,10 @@ App = module.exports = React.createClass
       <h1>GH Update</h1>
       { if @state.username?
           if @state.repoName?
-            <span>Choose a file</span>
+            <div>
+              <h2 className='ghu-username'>{@state.username}/{@state.repoName}</h2>
+              <FileChooser />
+            </div>
           else
             <div>
               <h2 className='ghu-username'>{@state.username}</h2>
