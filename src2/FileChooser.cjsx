@@ -19,11 +19,11 @@ FileChooser = module.exports = React.createClass
     @setState
       loading: Stores.repoTreeStore.isLoading()
       error: Stores.repoTreeStore.hasError()
-      tree: Stores.repoTreeStore.getTree()
+      htmlFiles: Stores.repoTreeStore.getHTMLFiles()
 
   render: ->
     <Loading loading={@state.loading} error={@state.error} errorMessage="Error loading file list">
-      <TreeView tree={@state.tree} />
+      <TreeView htmlFiles={@state.htmlFiles} />
     </Loading>
 
 
@@ -31,13 +31,11 @@ TreeView = React.createClass
   displayName: 'TreeView'
 
   propTypes:
-    tree: React.PropTypes.array.isRequired
+    htmlFiles: React.PropTypes.array.isRequired
 
   render: ->
     <ul className='ghu-file-chooser'>
-      { @props.tree
-          .filter (item) -> /\.html$/.test item.path
-          .map (item) => <TreeFileView item={item} /> }
+      { <TreeFileView item={item} /> for item in @props.htmlFiles }
     </ul>
 
 
@@ -48,7 +46,7 @@ TreeFileView = React.createClass
     item: React.PropTypes.object.isRequired
 
   selectFile: ->
-    console.log 'selectFile', @props.item
+    Actions.selectFile @props.item.path
 
   render: ->
     <li className='file' key={@props.item.path} onClick={@selectFile}>{@props.item.path}</li>

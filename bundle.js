@@ -79,7 +79,8 @@
 	  getInitialState: function() {
 	    return {
 	      username: null,
-	      repoName: null
+	      repoName: null,
+	      file: null
 	    };
 	  },
 	  componentDidMount: function() {
@@ -90,10 +91,17 @@
 	        });
 	      };
 	    })(this));
-	    return this.listenTo(Stores.repoStore, (function(_this) {
+	    this.listenTo(Stores.repoStore, (function(_this) {
 	      return function() {
 	        return _this.setState({
 	          repoName: Stores.repoStore.getSelectedRepoName()
+	        });
+	      };
+	    })(this));
+	    return this.listenTo(Stores.fileStore, (function(_this) {
+	      return function() {
+	        return _this.setState({
+	          file: Stores.fileStore.getSelectedFile()
 	        });
 	      };
 	    })(this));
@@ -101,7 +109,9 @@
 	  render: function() {
 	    return React.createElement(React.DOM.div, {
 	      "className": "ghu-app"
-	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username != null ? this.state.repoName != null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
+	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username != null ? this.state.repoName != null ? this.state.file != null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
+	      "className": 'ghu-username'
+	    }, this.state.username, "\x2F", this.state.repoName, "\x2F", this.state.file), React.createElement(React.DOM.span, null, "EDITOR")) : React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
 	    }, this.state.username, "\x2F", this.state.repoName), React.createElement(FileChooser, null)) : React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
@@ -116,7 +126,7 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, Reflux, Stores, qwest, repoStore, repoTreeStore, userReposStore, userStore, _cachedReposForUsername, _cachedTreeForRepo, _repos, _reposLoading, _reposLoadingError, _selectedRepoName, _tree, _treeLoading, _treeLoadingError, _username;
+	var Actions, Reflux, Stores, fileStore, qwest, repoStore, repoTreeStore, userReposStore, userStore, _cachedReposForUsername, _cachedTreeForRepo, _repos, _reposLoading, _reposLoadingError, _selectedFile, _selectedRepoName, _tree, _treeLoading, _treeLoadingError, _username;
 
 	Reflux = __webpack_require__(9);
 
@@ -225,7 +235,6 @@
 	            _cachedTreeForRepo = selectedRepoName;
 	            _treeLoading = false;
 	            _tree = response.tree;
-	            console.log('qwest success', _tree);
 	            return _this.trigger();
 	          });
 	        };
@@ -247,6 +256,26 @@
 	  },
 	  getTree: function() {
 	    return _tree;
+	  },
+	  getHTMLFiles: function() {
+	    return _tree != null ? _tree.filter(function(item) {
+	      return /\.html$/.test(item.path);
+	    }) : void 0;
+	  }
+	});
+
+	_selectedFile = null;
+
+	fileStore = Reflux.createStore({
+	  init: function() {
+	    return this.listenTo(Actions.selectFile, this.selectFile);
+	  },
+	  selectFile: function(filePath) {
+	    _selectedFile = filePath;
+	    return this.trigger();
+	  },
+	  getSelectedFile: function() {
+	    return _selectedFile;
 	  }
 	});
 
@@ -254,13 +283,21 @@
 	  userStore: userStore,
 	  userReposStore: userReposStore,
 	  repoStore: repoStore,
-	  repoTreeStore: repoTreeStore
+	  repoTreeStore: repoTreeStore,
+	  fileStore: fileStore
 	};
 
 	userReposStore.listen(function() {
 	  var _ref;
 	  if (((_ref = userReposStore.getRepos()) != null ? _ref.length : void 0) === 1) {
 	    return Actions.selectRepo(userReposStore.getRepos()[0]);
+	  }
+	});
+
+	repoTreeStore.listen(function() {
+	  var _ref;
+	  if (((_ref = repoTreeStore.getHTMLFiles()) != null ? _ref.length : void 0) === 1) {
+	    return Actions.selectFile(repoTreeStore.getHTMLFiles()[0].path);
 	  }
 	});
 
@@ -418,7 +455,7 @@
 	    return this.setState({
 	      loading: Stores.repoTreeStore.isLoading(),
 	      error: Stores.repoTreeStore.hasError(),
-	      tree: Stores.repoTreeStore.getTree()
+	      htmlFiles: Stores.repoTreeStore.getHTMLFiles()
 	    });
 	  },
 	  render: function() {
@@ -427,7 +464,7 @@
 	      "error": this.state.error,
 	      "errorMessage": "Error loading file list"
 	    }, React.createElement(TreeView, {
-	      "tree": this.state.tree
+	      "htmlFiles": this.state.htmlFiles
 	    }));
 	  }
 	});
@@ -435,20 +472,24 @@
 	TreeView = React.createClass({
 	  displayName: 'TreeView',
 	  propTypes: {
-	    tree: React.PropTypes.array.isRequired
+	    htmlFiles: React.PropTypes.array.isRequired
 	  },
 	  render: function() {
+	    var item;
 	    return React.createElement(React.DOM.ul, {
 	      "className": 'ghu-file-chooser'
-	    }, this.props.tree.filter(function(item) {
-	      return /\.html$/.test(item.path);
-	    }).map((function(_this) {
-	      return function(item) {
-	        return React.createElement(TreeFileView, {
+	    }, (function() {
+	      var _i, _len, _ref, _results;
+	      _ref = this.props.htmlFiles;
+	      _results = [];
+	      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	        item = _ref[_i];
+	        _results.push(React.createElement(TreeFileView, {
 	          "item": item
-	        });
-	      };
-	    })(this)));
+	        }));
+	      }
+	      return _results;
+	    }).call(this));
 	  }
 	});
 
@@ -458,7 +499,7 @@
 	    item: React.PropTypes.object.isRequired
 	  },
 	  selectFile: function() {
-	    return console.log('selectFile', this.props.item);
+	    return Actions.selectFile(this.props.item.path);
 	  },
 	  render: function() {
 	    return React.createElement(React.DOM.li, {
@@ -485,7 +526,7 @@
 
 	Reflux = __webpack_require__(9);
 
-	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo']);
+	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo', 'selectFile']);
 
 
 /***/ },

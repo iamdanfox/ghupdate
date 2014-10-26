@@ -14,22 +14,31 @@ App = module.exports = React.createClass
   getInitialState: ->
     username: null
     repoName: null
+    file: null
 
   componentDidMount: ->
     @listenTo Stores.userStore, =>
       @setState username: Stores.userStore.getUsername()
     @listenTo Stores.repoStore, =>
       @setState repoName: Stores.repoStore.getSelectedRepoName()
+    @listenTo Stores.fileStore, =>
+      @setState file: Stores.fileStore.getSelectedFile()
 
   render: ->
     <div className="ghu-app">
       <h1>GH Update</h1>
       { if @state.username?
           if @state.repoName?
-            <div>
-              <h2 className='ghu-username'>{@state.username}/{@state.repoName}</h2>
-              <FileChooser />
-            </div>
+            if @state.file?
+              <div>
+                <h2 className='ghu-username'>{@state.username}/{@state.repoName}/{@state.file}</h2>
+                <span>EDITOR</span>
+              </div>
+            else
+              <div>
+                <h2 className='ghu-username'>{@state.username}/{@state.repoName}</h2>
+                <FileChooser />
+              </div>
           else
             <div>
               <h2 className='ghu-username'>{@state.username}</h2>

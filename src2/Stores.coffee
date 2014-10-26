@@ -97,7 +97,6 @@ repoTreeStore = Reflux.createStore
               _cachedTreeForRepo = selectedRepoName
               _treeLoading = false
               _tree = response.tree
-              console.log 'qwest success', _tree
               @trigger()
         .error (err) =>
           console.error err
@@ -114,7 +113,23 @@ repoTreeStore = Reflux.createStore
   getTree: ->
     _tree
 
+  getHTMLFiles: ->
+    _tree?.filter (item) -> /\.html$/.test item.path
 
+
+
+
+_selectedFile = null
+fileStore = Reflux.createStore
+  init: ->
+    @listenTo Actions.selectFile, @selectFile
+
+  selectFile: (filePath) ->
+    _selectedFile = filePath
+    @trigger()
+
+  getSelectedFile: ->
+    _selectedFile
 
 
 
@@ -124,16 +139,17 @@ module.exports = Stores =
   userReposStore: userReposStore
   repoStore: repoStore
   repoTreeStore: repoTreeStore
+  fileStore: fileStore
 
-
-# repoTreeStore.listen ->
-#   console.log 'repoTreeStore', repoTreeStore.getTree()
 
 
 
 # SHORTCUT CODE
 # TODO: move this somewhere else
-# TODO: shortcut if only one file
 userReposStore.listen ->
   if userReposStore.getRepos()?.length is 1
-    Actions.selectRepo userReposStore.getRepos()[0]
+    Actions.selectRepo userReposStore.getRepos()[0] # TODO: doesn't this need a `.name`
+
+repoTreeStore.listen ->
+  if repoTreeStore.getHTMLFiles()?.length is 1
+    Actions.selectFile repoTreeStore.getHTMLFiles()[0].path
