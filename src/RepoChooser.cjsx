@@ -44,7 +44,7 @@ RepoList = React.createClass
     <ul className='ghu-repo-list'>
     { sortedRepos
         .filter (repo) -> repo.has_pages
-        .map (repo) => <RepoLink repo={repo} key={repo.name} /> }
+        .map (repo) -> <RepoLink repo={repo} key={repo.name} /> }
     </ul>
 
 
