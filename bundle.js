@@ -164,16 +164,32 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, React, UsernameChooser;
+	var Actions, React, Reflux, Stores, UsernameChooser;
 
 	__webpack_require__(12);
 
 	React = __webpack_require__(2);
 
+	Reflux = __webpack_require__(10);
+
 	Actions = __webpack_require__(11);
+
+	Stores = __webpack_require__(3);
 
 	UsernameChooser = module.exports = React.createClass({
 	  displayName: 'UsernameChooser',
+	  mixins: [Reflux.ListenerMixin],
+	  componentWillMount: function() {
+	    this.syncToStore();
+	    return this.listenTo(Stores.userStore, this.syncToStore);
+	  },
+	  syncToStore: function() {
+	    return this.setState({
+	      loggedIn: Stores.userStore.isLoggedIn(),
+	      accessTokenLoading: Stores.userStore.getAccessTokenLoading(),
+	      accessTokenError: Stores.userStore.getAccessTokenError()
+	    });
+	  },
 	  selectUsername: function(e) {
 	    e.preventDefault();
 	    return Actions.setUsername(this.refs.username.state.value);
@@ -191,9 +207,16 @@
 	      "ref": 'username',
 	      "placeholder": 'Your GitHub username',
 	      "autoFocus": true
-	    })), React.createElement(React.DOM.p, null, "or"), React.createElement(React.DOM.button, {
+	    })), React.createElement(React.DOM.p, null, "or"), (this.state.loggedIn ? React.createElement(React.DOM.button, {
+	      "disabled": true
+	    }, "Logged in") : this.state.accessTokenLoading ? React.createElement(React.DOM.button, {
+	      "disabled": true
+	    }, "Logging in...") : this.state.accessTokenError != null ? React.createElement(React.DOM.p, null, "Error logging in. ", React.createElement(React.DOM.a, {
+	      "href": "#",
 	      "onClick": this.redirectToOAuth
-	    }, "Log in with GitHub"));
+	    }, "try again")) : React.createElement(React.DOM.button, {
+	      "onClick": this.redirectToOAuth
+	    }, "Log in with GitHub")));
 	  }
 	});
 
@@ -948,11 +971,16 @@
 	  },
 	  getUsername: function() {
 	    return _username;
+	  },
+	  isLoggedIn: function() {
+	    return _accessToken != null;
+	  },
+	  getAccessTokenLoading: function() {
+	    return _accessTokenLoading;
+	  },
+	  getAccessTokenError: function() {
+	    return _accessTokenError;
 	  }
-	});
-
-	UserStore.listen(function() {
-	  return console.log('UserStore', _accessToken, _accessTokenLoading, _accessTokenError);
 	});
 
 	getParameterByName = function(name) {

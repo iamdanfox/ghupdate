@@ -1,10 +1,23 @@
 require '../src/UsernameChooser.less'
 React = require 'react'
+Reflux = require 'reflux'
 Actions = require './Actions.coffee'
+Stores = require './Stores.coffee'
 
 
 UsernameChooser = module.exports = React.createClass
   displayName: 'UsernameChooser'
+  mixins: [Reflux.ListenerMixin]
+
+  componentWillMount: ->
+    @syncToStore()
+    @listenTo Stores.userStore, @syncToStore
+
+  syncToStore: ->
+    @setState
+      loggedIn: Stores.userStore.isLoggedIn()
+      accessTokenLoading: Stores.userStore.getAccessTokenLoading()
+      accessTokenError: Stores.userStore.getAccessTokenError()
 
   selectUsername: (e) ->
     e.preventDefault()
@@ -23,5 +36,14 @@ UsernameChooser = module.exports = React.createClass
         <input type='text' ref='username' placeholder='Your GitHub username' autoFocus />
       </form>
       <p>or</p>
-      <button onClick={@redirectToOAuth}>Log in with GitHub</button>
+      { if @state.loggedIn
+          <button disabled>Logged in</button>
+        else
+          if @state.accessTokenLoading
+            <button disabled>Logging in...</button>
+          else
+            if @state.accessTokenError?
+              <p>Error logging in. <a href="#" onClick={@redirectToOAuth}>try again</a></p>
+            else
+              <button onClick={@redirectToOAuth}>Log in with GitHub</button> }
     </div>

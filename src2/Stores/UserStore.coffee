@@ -3,7 +3,6 @@ Actions = require '../Actions.coffee'
 qwest = require '../../lib/qwest.js'
 
 
-
 _username = null
 _accessToken = null
 _accessTokenLoading = false
@@ -41,9 +40,15 @@ module.exports = UserStore = Reflux.createStore
   getUsername: ->
     return _username
 
+  isLoggedIn: ->
+    _accessToken?
 
-UserStore.listen ->
-  console.log 'UserStore', _accessToken, _accessTokenLoading, _accessTokenError
+  getAccessTokenLoading: ->
+    return _accessTokenLoading
+
+  getAccessTokenError: ->
+    return _accessTokenError
+
 
 
 getParameterByName = (name) ->
