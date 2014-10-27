@@ -211,7 +211,7 @@
 	      "disabled": true
 	    }, "Logged in") : this.state.accessTokenLoading ? React.createElement(React.DOM.button, {
 	      "disabled": true
-	    }, "Logging in...") : this.state.accessTokenError != null ? React.createElement(React.DOM.p, null, "Error logging in. ", React.createElement(React.DOM.a, {
+	    }, "Logging in...") : this.state.accessTokenError ? React.createElement(React.DOM.p, null, "Error logging in. ", React.createElement(React.DOM.a, {
 	      "href": "#",
 	      "onClick": this.redirectToOAuth
 	    }, "try again")) : React.createElement(React.DOM.button, {

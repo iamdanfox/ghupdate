@@ -42,7 +42,7 @@ UsernameChooser = module.exports = React.createClass
           if @state.accessTokenLoading
             <button disabled>Logging in...</button>
           else
-            if @state.accessTokenError?
+            if @state.accessTokenError
               <p>Error logging in. <a href="#" onClick={@redirectToOAuth}>try again</a></p>
             else
               <button onClick={@redirectToOAuth}>Log in with GitHub</button> }
