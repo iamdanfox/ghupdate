@@ -1,4 +1,4 @@
-require '../src/UsernameChooser.less'
+require './UsernameChooser.less'
 React = require 'react'
 Reflux = require 'reflux'
 Actions = require './Actions.coffee'

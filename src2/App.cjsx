@@ -1,4 +1,4 @@
-require '../src/App.less'
+require './App.less'
 React = require 'react'
 Reflux = require 'reflux'
 Stores = require './Stores.coffee'

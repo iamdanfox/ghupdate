@@ -1,6 +1,6 @@
 require './FileChooser.less'
 React = require 'react'
-Loading = require '../src/Loading.cjsx'
+Loading = require './Loading.cjsx'
 Reflux = require 'reflux'
 Stores = require './Stores.coffee'
 Actions = require './Actions.coffee'
