@@ -21,7 +21,7 @@ module.exports = RepoTreeStore = Reflux.createStore
       _treeLoading = true
       _treeLoadingError = false
       qwest
-        .get("https://api.github.com/repos/#{userStore.getUsername()}/#{selectedRepoName}/branches/gh-pages")
+        .get("https://api.github.com/repos/#{userStore.getUsername()}/#{selectedRepoName}/branches/gh-pages"+userStore.queryString())
         .success (branchObject) =>
           qwest
             .get(branchObject.commit.commit.tree.url)

@@ -20,7 +20,7 @@ module.exports = UserReposStore = Reflux.createStore
       _repos = null
       @trigger()
       qwest
-        .get("https://api.github.com/users/#{newUsername}/repos")
+        .get("https://api.github.com/users/#{newUsername}/repos"+userStore.queryString())
         .success (repos) ->
           _cachedReposForUsername = newUsername
           _repos = repos

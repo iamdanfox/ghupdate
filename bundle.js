@@ -980,6 +980,13 @@
 	  },
 	  getAccessTokenError: function() {
 	    return _accessTokenError;
+	  },
+	  queryString: function() {
+	    if (_accessToken != null) {
+	      return '?access_token=' + _accessToken;
+	    } else {
+	      return '';
+	    }
 	  }
 	});
 
@@ -1034,7 +1041,7 @@
 	      _reposLoadingError = false;
 	      _repos = null;
 	      this.trigger();
-	      return qwest.get("https://api.github.com/users/" + newUsername + "/repos").success(function(repos) {
+	      return qwest.get(("https://api.github.com/users/" + newUsername + "/repos") + userStore.queryString()).success(function(repos) {
 	        _cachedReposForUsername = newUsername;
 	        _repos = repos;
 	        return _reposLoadingError = false;
@@ -1120,7 +1127,7 @@
 	      _tree = null;
 	      _treeLoading = true;
 	      _treeLoadingError = false;
-	      return qwest.get("https://api.github.com/repos/" + (userStore.getUsername()) + "/" + selectedRepoName + "/branches/gh-pages").success((function(_this) {
+	      return qwest.get(("https://api.github.com/repos/" + (userStore.getUsername()) + "/" + selectedRepoName + "/branches/gh-pages") + userStore.queryString()).success((function(_this) {
 	        return function(branchObject) {
 	          return qwest.get(branchObject.commit.commit.tree.url).success(function(response) {
 	            _cachedTreeForRepo = selectedRepoName;
