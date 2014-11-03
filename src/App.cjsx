@@ -6,6 +6,8 @@ UsernameChooser = require './UsernameChooser.cjsx'
 RepoChooser = require './RepoChooser.cjsx'
 FileChooser = require './FileChooser.cjsx'
 Editor = require './Editor.cjsx'
+LogInButton = require './LogInButton.cjsx'
+
 
 App = module.exports = React.createClass
   displayName: 'App'
@@ -27,23 +29,29 @@ App = module.exports = React.createClass
   render: ->
     <div className="ghu-app">
       <h1>GH Update</h1>
-      { if @state.username?
-          if @state.repoName?
-            if @state.file?
-              <div>
-                <h2 className='ghu-username'>{@state.username}/{@state.repoName}/{@state.file}</h2>
-                <Editor />
-              </div>
-            else
-              <div>
-                <h2 className='ghu-username'>{@state.username}/{@state.repoName}</h2>
-                <FileChooser />
-              </div>
-          else
+      { unless @state.username?
+          <UsernameChooser />
+        else
+          unless @state.repoName?
             <div>
               <h2 className='ghu-username'>{@state.username}</h2>
               <RepoChooser username={@state.username} />
             </div>
-        else
-          <UsernameChooser /> }
+          else
+            unless @state.file?
+              <div>
+                <h2 className='ghu-username'>{@state.username}/{@state.repoName}</h2>
+                <FileChooser />
+              </div>
+            else
+              <div>
+                <h2 className='ghu-username'>{@state.username}/{@state.repoName}/{@state.file}</h2>
+                { unless Stores.userStore.isLoggedIn()
+                    <div>
+                      Please log in
+                      <LogInButton />
+                    </div>
+                  else
+                    <Editor /> }
+              </div> }
     </div>
