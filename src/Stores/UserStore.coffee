@@ -2,7 +2,6 @@ require('es6-promise').polyfill()
 require 'fetch'
 Reflux = require 'reflux'
 Actions = require '../Actions.coffee'
-qwest = require '../../lib/qwest.js'
 Github = require 'github-api'
 
 
@@ -11,6 +10,7 @@ _accessToken = null
 _accessTokenLoading = false
 _accessTokenError = false
 _github = null
+
 module.exports = UserStore = Reflux.createStore
   init: ->
     @listenTo Actions.setUsername, @setUsername
@@ -39,22 +39,6 @@ module.exports = UserStore = Reflux.createStore
         .then =>
           _accessTokenLoading = false
           @trigger()
-
-      # qwest
-      #   .post('https://ghupdate.herokuapp.com/login/oauth/access_token?code='+code, {})
-      #   .success (response) ->
-      #     if response.access_token?
-      #       _accessToken = response.access_token
-      #       @_connectToGithub()
-      #     else
-      #       console.error response
-      #       _accessTokenError = true
-      #   .error (error) ->
-      #     _accessTokenError = true
-      #     console.error error
-      #   .complete =>
-      #     _accessTokenLoading = false
-      #     @trigger()
 
   _connectToGithub: ->
     _github = new Github
