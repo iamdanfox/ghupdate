@@ -868,6 +868,10 @@
 
 	var Actions, Github, Reflux, UserStore, code, getParameterByName, qwest, _accessToken, _accessTokenError, _accessTokenLoading, _github, _username;
 
+	__webpack_require__(259).polyfill();
+
+	__webpack_require__(211);
+
 	Reflux = __webpack_require__(21);
 
 	Actions = __webpack_require__(9);
@@ -900,18 +904,20 @@
 	      _accessTokenLoading = true;
 	      _accessTokenError = false;
 	      this.trigger();
-	      return qwest.post('https://ghupdate.herokuapp.com/login/oauth/access_token?code=' + code, {}).success(function(response) {
-	        if (response.access_token != null) {
-	          _accessToken = response.access_token;
-	          return this._connectToGithub();
+	      return fetch('https://ghupdate.herokuapp.com/login/oauth/access_token?code=' + code, {
+	        method: 'post'
+	      }).then(function(response) {
+	        return response.json();
+	      }).then(function(json) {
+	        if (json.access_token != null) {
+	          return _accessToken = json.access_token;
 	        } else {
-	          console.error(response);
-	          return _accessTokenError = true;
+	          return Promise.reject(json);
 	        }
-	      }).error(function(error) {
-	        _accessTokenError = true;
-	        return console.error(error);
-	      }).complete((function(_this) {
+	      }).then(this._connectToGithub)["catch"](function(error) {
+	        console.error(error);
+	        return _accessTokenError = true;
+	      }).then((function(_this) {
 	        return function() {
 	          _accessTokenLoading = false;
 	          return _this.trigger();
