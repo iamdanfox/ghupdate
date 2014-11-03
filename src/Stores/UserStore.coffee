@@ -49,9 +49,16 @@ module.exports = UserStore = Reflux.createStore
   getAccessTokenError: ->
     return _accessTokenError
 
+  getAccessToken: ->
+    return _accessToken
+
   queryString: ->
     if _accessToken? then '?access_token=' + _accessToken else ''
 
+
+#debug
+UserStore.listen ->
+  console.debug 'debug UserStore', UserStore.getUsername(), UserStore.getAccessToken()
 
 
 getParameterByName = (name) ->
