@@ -5,7 +5,7 @@ Stores = require './Stores.coffee'
 UsernameChooser = require './UsernameChooser.cjsx'
 RepoChooser = require './RepoChooser.cjsx'
 FileChooser = require './FileChooser.cjsx'
-
+Editor = require './Editor.cjsx'
 
 App = module.exports = React.createClass
   displayName: 'App'
@@ -32,7 +32,7 @@ App = module.exports = React.createClass
             if @state.file?
               <div>
                 <h2 className='ghu-username'>{@state.username}/{@state.repoName}/{@state.file}</h2>
-                <span>EDITOR</span>
+                <Editor />
               </div>
             else
               <div>
