@@ -22,7 +22,8 @@ LogInButton = module.exports = React.createClass
     window.location = "https://github.com/login/oauth/authorize" +
       "?client_id=138c264183219a2ac2c9" +
       "&amp;scope=repo" +
-      "&amp;redirect_uri=http://iamdanfox.github.io/ghupdate/"
+      "&amp;redirect_uri=http://iamdanfox.github.io/ghupdate/" +
+      "&amp;state=helloworld"
 
   render: ->
     if @state.loggedIn

@@ -892,15 +892,15 @@
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Reflux, RepoTreeStore, qwest, repoStore, userStore, _cachedTreeForRepo, _tree, _treeLoading, _treeLoadingError;
+	var Reflux, RepoTreeStore, apiModule, repoStore, userStore, _cachedTreeForRepo, _tree, _treeLoading, _treeLoadingError;
 
 	Reflux = __webpack_require__(20);
-
-	qwest = __webpack_require__(43);
 
 	userStore = __webpack_require__(21);
 
 	repoStore = __webpack_require__(23);
+
+	apiModule = __webpack_require__(314);
 
 	_cachedTreeForRepo = null;
 
@@ -915,47 +915,25 @@
 	    return this.listenTo(repoStore, this.loadTreeIfNecessary);
 	  },
 	  loadTreeIfNecessary: function() {
-	    var github, repo, selectedRepoName;
+	    var selectedRepoName;
 	    selectedRepoName = repoStore.getSelectedRepoName();
 	    if (_cachedTreeForRepo !== selectedRepoName) {
 	      _tree = null;
 	      _treeLoading = true;
 	      _treeLoadingError = false;
-	      github = userStore.getGithub();
-	      if (github != null) {
-	        repo = github.getRepo(userStore.getUsername(), selectedRepoName);
-	        return repo.getTree('gh-pages', (function(_this) {
-	          return function(err, tree) {
-	            _treeLoading = false;
-	            if (err != null) {
-	              console.error(err);
-	              return _treeLoadingError = true;
-	            } else {
-	              _cachedTreeForRepo = selectedRepoName;
-	              _tree = tree;
-	              return _this.trigger();
-	            }
-	          };
-	        })(this));
-	      } else {
-	        return qwest.get(("https://api.github.com/repos/" + (userStore.getUsername()) + "/" + selectedRepoName + "/branches/gh-pages") + userStore.queryString()).success((function(_this) {
-	          return function(branchObject) {
-	            return qwest.get(branchObject.commit.commit.tree.url).success(function(response) {
-	              _cachedTreeForRepo = selectedRepoName;
-	              _treeLoading = false;
-	              _tree = response.tree;
-	              return _this.trigger();
-	            });
-	          };
-	        })(this)).error((function(_this) {
-	          return function(err) {
+	      return apiModule.getGHPagesTree(userStore.getUsername(), selectedRepoName, (function(_this) {
+	        return function(err, tree) {
+	          _treeLoading = false;
+	          if (err != null) {
 	            console.error(err);
-	            _treeLoadingError = true;
-	            _treeLoading = false;
+	            return _treeLoadingError = true;
+	          } else {
+	            _cachedTreeForRepo = selectedRepoName;
+	            _tree = tree;
 	            return _this.trigger();
-	          };
-	        })(this));
-	      }
+	          }
+	        };
+	      })(this));
 	    }
 	  },
 	  isLoading: function() {
@@ -36275,7 +36253,7 @@
 	    });
 	  },
 	  redirectToOAuth: function() {
-	    return window.location = "https://github.com/login/oauth/authorize" + "?client_id=138c264183219a2ac2c9" + "&amp;scope=repo" + "&amp;redirect_uri=http://iamdanfox.github.io/ghupdate/";
+	    return window.location = "https://github.com/login/oauth/authorize" + "?client_id=138c264183219a2ac2c9" + "&amp;scope=repo" + "&amp;redirect_uri=http://iamdanfox.github.io/ghupdate/" + "&amp;state=helloworld";
 	  },
 	  render: function() {
 	    if (this.state.loggedIn) {
@@ -36302,6 +36280,40 @@
 	    }
 	  }
 	});
+
+
+/***/ },
+/* 314 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ApiModule, qwest, userStore;
+
+	qwest = __webpack_require__(43);
+
+	userStore = __webpack_require__(21);
+
+	module.exports = ApiModule = {
+	  getGHPagesTree: function(username, repo, callback) {
+	    var github;
+	    github = userStore.getGithub();
+	    if (github != null) {
+	      repo = github.getRepo(username, repo);
+	      return repo.getTree('gh-pages', function(err, tree) {
+	        return callback(err, tree);
+	      });
+	    } else {
+	      return qwest.get("https://api.github.com/repos/" + username + "/" + repo + "/branches/gh-pages").success((function(_this) {
+	        return function(branchObject) {
+	          return qwest.get(branchObject.commit.commit.tree.url).success(function(response) {
+	            return callback(null, response.tree);
+	          });
+	        };
+	      })(this)).error(function(err) {
+	        return callback(err, null);
+	      });
+	    }
+	  }
+	};
 
 
 /***/ }
