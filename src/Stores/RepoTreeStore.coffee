@@ -1,3 +1,4 @@
+require('es6-promise').polyfill()
 Reflux = require 'reflux'
 userStore = require './UserStore.coffee'
 repoStore = require './RepoStore.coffee'
@@ -20,15 +21,17 @@ module.exports = RepoTreeStore = Reflux.createStore
       _tree = null
       _treeLoading = true
       _treeLoadingError = false
+      @trigger()
 
-      apiModule.getGHPagesTree userStore.getUsername(), selectedRepoName, (err, tree) =>
-        _treeLoading = false
-        if err?
-          console.error err
-          _treeLoadingError = true
-        else
+      apiModule.getGHPagesTree userStore.getUsername(), selectedRepoName
+        .then (tree) ->
           _cachedTreeForRepo = selectedRepoName
           _tree = tree
+        .catch (err) ->
+          console.error err
+          _treeLoadingError = true
+        .then =>
+          _treeLoading = false
           @trigger()
 
   isLoading: ->

@@ -4,7 +4,7 @@ userStore = require './Stores/UserStore.coffee'
 
 
 module.exports = ApiModule =
-  getGHPagesTree: (username, repo, callback) -> # callback :: (error, tree) ->
+  getGHPagesTree: (username, repo) -> # return a promise
 
     github = userStore.getGithub()
     if github?
@@ -15,5 +15,4 @@ module.exports = ApiModule =
         .then (response) -> response.json()
         .then (branchObject) -> fetch branchObject.commit.commit.tree.url
         .then (response) -> response.json()
-        .then (json) -> callback null, json.tree
-        .catch (error) -> callback error, null
+        .then (json) -> json.tree

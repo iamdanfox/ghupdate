@@ -1072,6 +1072,8 @@
 
 	var Reflux, RepoTreeStore, apiModule, repoStore, userStore, _cachedTreeForRepo, _tree, _treeLoading, _treeLoadingError;
 
+	__webpack_require__(259).polyfill();
+
 	Reflux = __webpack_require__(21);
 
 	userStore = __webpack_require__(23);
@@ -1099,17 +1101,17 @@
 	      _tree = null;
 	      _treeLoading = true;
 	      _treeLoadingError = false;
-	      return apiModule.getGHPagesTree(userStore.getUsername(), selectedRepoName, (function(_this) {
-	        return function(err, tree) {
+	      this.trigger();
+	      return apiModule.getGHPagesTree(userStore.getUsername(), selectedRepoName).then(function(tree) {
+	        _cachedTreeForRepo = selectedRepoName;
+	        return _tree = tree;
+	      })["catch"](function(err) {
+	        console.error(err);
+	        return _treeLoadingError = true;
+	      }).then((function(_this) {
+	        return function() {
 	          _treeLoading = false;
-	          if (err != null) {
-	            console.error(err);
-	            return _treeLoadingError = true;
-	          } else {
-	            _cachedTreeForRepo = selectedRepoName;
-	            _tree = tree;
-	            return _this.trigger();
-	          }
+	          return _this.trigger();
 	        };
 	      })(this));
 	    }
@@ -4891,7 +4893,7 @@
 	userStore = __webpack_require__(23);
 
 	module.exports = ApiModule = {
-	  getGHPagesTree: function(username, repo, callback) {
+	  getGHPagesTree: function(username, repo) {
 	    var github;
 	    github = userStore.getGithub();
 	    if (github != null) {
@@ -4907,9 +4909,7 @@
 	      }).then(function(response) {
 	        return response.json();
 	      }).then(function(json) {
-	        return callback(null, json.tree);
-	      })["catch"](function(error) {
-	        return callback(error, null);
+	        return json.tree;
 	      });
 	    }
 	  }
