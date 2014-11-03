@@ -1,6 +1,6 @@
 require './RepoChooser.less'
 React = require 'react'
-moment = require 'moment'
+timeago = require 'timeago'
 Loading = require './Loading.cjsx'
 Reflux = require 'reflux'
 Stores = require './Stores.coffee'
@@ -57,5 +57,5 @@ RepoLink = React.createClass
   render: ->
     <li key={@props.repo.id} className='ghu-repo-link' onClick={@selectRepo}>
       <a>{@props.repo.name}</a>
-      <span className='ghu-last-updated'>last updated { moment(@props.repo.pushed_at).fromNow() }</span>
+      <span className='ghu-last-updated'>last updated {timeago @props.repo.pushed_at}</span>
     </li>
