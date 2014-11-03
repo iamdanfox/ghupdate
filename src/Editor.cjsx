@@ -1,6 +1,7 @@
 Reflux = require 'reflux'
 React = require 'react'
 Loading = require './Loading.cjsx'
+Actions = require './Actions.coffee'
 {fileStore, fileContentsStore} = require './Stores.coffee'
 
 
@@ -22,13 +23,14 @@ module.exports = Editor = React.createClass
       error: fileContentsStore.hasError()
 
   handleSave: ->
-    # TODO: trigger some kind of commit action
-    console.log 'Save not implemented yet'
+    Actions.saveFile
+      contents: @refs.editor.getDOMNode().value
+      commitMessage: '[ghupdate commit]'
 
   render: ->
     <Loading loading={@state.loading} error={@state.error} errorMessage='Error loading file, please try again'>
       <div className='ghu-editor'>
-        <textarea defaultValue={@state.contents} />
+        <textarea defaultValue={@state.contents} ref='editor' />
         <button onClick={@handleSave}>Save</button>
       </div>
     </Loading>

@@ -330,13 +330,15 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Editor, Loading, React, Reflux, fileContentsStore, fileStore, _ref;
+	var Actions, Editor, Loading, React, Reflux, fileContentsStore, fileStore, _ref;
 
 	Reflux = __webpack_require__(27);
 
 	React = __webpack_require__(8);
 
 	Loading = __webpack_require__(10);
+
+	Actions = __webpack_require__(9);
 
 	_ref = __webpack_require__(2), fileStore = _ref.fileStore, fileContentsStore = _ref.fileContentsStore;
 
@@ -358,7 +360,10 @@
 	    });
 	  },
 	  handleSave: function() {
-	    return console.log('Save not implemented yet');
+	    return Actions.saveFile({
+	      contents: this.refs.editor.getDOMNode().value,
+	      commitMessage: '[ghupdate commit]'
+	    });
 	  },
 	  render: function() {
 	    return React.createElement(Loading, {
@@ -368,7 +373,8 @@
 	    }, React.createElement(React.DOM.div, {
 	      "className": 'ghu-editor'
 	    }, React.createElement(React.DOM.textarea, {
-	      "defaultValue": this.state.contents
+	      "defaultValue": this.state.contents,
+	      "ref": 'editor'
 	    }), React.createElement(React.DOM.button, {
 	      "onClick": this.handleSave
 	    }, "Save")));
@@ -481,7 +487,7 @@
 
 	Reflux = __webpack_require__(27);
 
-	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo', 'selectFile', 'getAccessTokenForCode']);
+	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo', 'selectFile', 'getAccessTokenForCode', 'saveFile']);
 
 
 /***/ },
@@ -976,7 +982,7 @@
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var FileContentsStore, Reflux, apiModule, fileStore, _cachedContentsForFile, _contents, _contentsLoading, _contentsLoadingError;
+	var Actions, FileContentsStore, Reflux, apiModule, fileStore, _cachedContentsForFile, _contents, _contentsLoading, _contentsLoadingError;
 
 	__webpack_require__(131).polyfill();
 
@@ -985,6 +991,8 @@
 	fileStore = __webpack_require__(25);
 
 	apiModule = __webpack_require__(34);
+
+	Actions = __webpack_require__(9);
 
 	_cachedContentsForFile = null;
 
@@ -996,7 +1004,18 @@
 
 	module.exports = FileContentsStore = Reflux.createStore({
 	  init: function() {
-	    return this.listenTo(fileStore, this.loadFileIfNecessary);
+	    this.listenTo(fileStore, this.loadFileIfNecessary);
+	    return this.listenTo(Actions.saveFile, this.saveFile);
+	  },
+	  saveFile: function(_arg) {
+	    var commitMessage, contents;
+	    contents = _arg.contents, commitMessage = _arg.commitMessage;
+	    return apiModule.writeFileContents({
+	      contents: contents,
+	      commitMessage: commitMessage
+	    }).then(function() {
+	      return console.log('writeFileContents succeeded');
+	    });
 	  },
 	  loadFileIfNecessary: function() {
 	    var selectedFileName;
@@ -1006,7 +1025,7 @@
 	      _contentsLoading = true;
 	      _contentsLoadingError = false;
 	      this.trigger();
-	      return apiModule.getFileContents(selectedFileName).then(function(contents) {
+	      return apiModule.getFileContents().then(function(contents) {
 	        _cachedContentsForFile = selectedFileName;
 	        return _contents = contents;
 	      })["catch"](function(error) {
@@ -1552,7 +1571,7 @@
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ApiModule, repoStore, userStore, _promisify;
+	var ApiModule, fileStore, repoStore, userStore, _promisify;
 
 	__webpack_require__(131).polyfill();
 
@@ -1561,6 +1580,8 @@
 	userStore = __webpack_require__(21);
 
 	repoStore = __webpack_require__(23);
+
+	fileStore = __webpack_require__(25);
 
 	_promisify = function(resolve, reject) {
 	  return function(errorValue, successValue) {
@@ -1573,9 +1594,24 @@
 	};
 
 	module.exports = ApiModule = {
-	  getFileContents: function(pathToFile) {
-	    var github, repo, username;
-	    console.log('getFileContents', pathToFile);
+	  writeFileContents: function(_arg) {
+	    var commitMessage, contents, github, pathToFile, repo, username;
+	    contents = _arg.contents, commitMessage = _arg.commitMessage;
+	    pathToFile = fileStore.getSelectedFile();
+	    username = userStore.getUsername();
+	    repo = repoStore.getSelectedRepoName();
+	    github = userStore.getGithub();
+	    if (github != null) {
+	      return new Promise(function(resolve, reject) {
+	        return github.getRepo(username, repo).write('gh-pages', pathToFile, contents, commitMessage, _promisify(resolve, reject));
+	      });
+	    } else {
+	      return Promise.reject('Must authorize before trying to write file contents');
+	    }
+	  },
+	  getFileContents: function() {
+	    var github, pathToFile, repo, username;
+	    pathToFile = fileStore.getSelectedFile();
 	    username = userStore.getUsername();
 	    repo = repoStore.getSelectedRepoName();
 	    github = userStore.getGithub();

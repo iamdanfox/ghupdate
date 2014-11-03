@@ -2,6 +2,7 @@ require('es6-promise').polyfill()
 require 'fetch'
 userStore = require './Stores/UserStore.coffee'
 repoStore = require './Stores/RepoStore.coffee'
+fileStore = require './Stores/FileStore.coffee'
 
 
 # curried shorthand for fixing the callbacks that github.js needs
@@ -11,8 +12,22 @@ _promisify = (resolve, reject) -> (errorValue, successValue) ->
 
 module.exports = ApiModule =
 
-  getFileContents: (pathToFile) ->
-    console.log 'getFileContents', pathToFile
+  writeFileContents: ({contents, commitMessage}) ->
+    pathToFile = fileStore.getSelectedFile()
+    username = userStore.getUsername()
+    repo = repoStore.getSelectedRepoName()
+    github = userStore.getGithub()
+
+    if github?
+      return new Promise (resolve, reject) ->
+        github
+          .getRepo username, repo
+          .write 'gh-pages', pathToFile, contents, commitMessage, _promisify(resolve, reject)
+    else
+      Promise.reject 'Must authorize before trying to write file contents'
+
+  getFileContents: ->
+    pathToFile = fileStore.getSelectedFile()
     username = userStore.getUsername()
     repo = repoStore.getSelectedRepoName()
     github = userStore.getGithub()

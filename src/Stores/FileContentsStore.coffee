@@ -2,6 +2,7 @@ require('es6-promise').polyfill()
 Reflux = require 'reflux'
 fileStore = require './FileStore.coffee'
 apiModule = require '../ApiModule.coffee'
+Actions = require '../Actions.coffee'
 
 
 _cachedContentsForFile = null
@@ -12,6 +13,12 @@ _contentsLoadingError = false
 module.exports = FileContentsStore = Reflux.createStore
   init: ->
     @listenTo fileStore, @loadFileIfNecessary
+    @listenTo Actions.saveFile, @saveFile
+
+  saveFile: ({contents, commitMessage}) ->
+    apiModule.writeFileContents {contents, commitMessage}
+      .then ->
+        console.log 'writeFileContents succeeded'
 
   loadFileIfNecessary: ->
     selectedFileName = fileStore.getSelectedFile()
@@ -22,7 +29,7 @@ module.exports = FileContentsStore = Reflux.createStore
       _contentsLoadingError = false
       @trigger()
 
-      apiModule.getFileContents selectedFileName
+      apiModule.getFileContents()
         .then (contents) ->
           _cachedContentsForFile = selectedFileName
           _contents = contents
