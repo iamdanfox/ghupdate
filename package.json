@@ -2,11 +2,13 @@
   "name": "ghupdate",
   "version": "0.1.0",
   "dependencies": {
+    "es6-promise": "^2.0.0",
+    "fetch": "git://github.com/github/fetch",
+    "github-api": "michael/github",
     "moment": "~2.8.1",
     "react": "^0.11.0",
     "react-spinkit": "^0.5.0",
-    "reflux": "^0.1.13",
-    "github-api": "michael/github"
+    "reflux": "^0.1.13"
   },
   "devDependencies": {
     "cjsx-loader": "^0.3.0",
