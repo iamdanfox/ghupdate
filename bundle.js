@@ -712,13 +712,15 @@
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, Reflux, UserStore, code, getParameterByName, qwest, _accessToken, _accessTokenError, _accessTokenLoading, _username;
+	var Actions, Github, Reflux, UserStore, code, getParameterByName, qwest, _accessToken, _accessTokenError, _accessTokenLoading, _github, _username;
 
 	Reflux = __webpack_require__(20);
 
 	Actions = __webpack_require__(8);
 
 	qwest = __webpack_require__(43);
+
+	Github = __webpack_require__(309);
 
 	_username = null;
 
@@ -727,6 +729,8 @@
 	_accessTokenLoading = false;
 
 	_accessTokenError = false;
+
+	_github = null;
 
 	module.exports = UserStore = Reflux.createStore({
 	  init: function() {
@@ -744,7 +748,8 @@
 	      this.trigger();
 	      return qwest.post('https://ghupdate.herokuapp.com/login/oauth/access_token?code=' + code, {}).success(function(response) {
 	        if (response.access_token != null) {
-	          return _accessToken = response.access_token;
+	          _accessToken = response.access_token;
+	          return this._connectToGithub();
 	        } else {
 	          console.error(response);
 	          return _accessTokenError = true;
@@ -759,6 +764,12 @@
 	        };
 	      })(this));
 	    }
+	  },
+	  _connectToGithub: function() {
+	    return _github = new Github({
+	      auth: 'oauth',
+	      token: _accessToken
+	    });
 	  },
 	  getUsername: function() {
 	    return _username;
@@ -775,6 +786,9 @@
 	  getAccessToken: function() {
 	    return _accessToken;
 	  },
+	  getGithub: function() {
+	    return _github;
+	  },
 	  queryString: function() {
 	    if (_accessToken != null) {
 	      return '?access_token=' + _accessToken;
@@ -785,8 +799,14 @@
 	});
 
 	UserStore.listen(function() {
-	  return console.debug('debug UserStore', UserStore.getUsername(), UserStore.getAccessToken());
+	  return console.debug('UserStore token =', UserStore.getAccessToken());
 	});
+
+	window.debugUserStoreSetToken = function(token) {
+	  _accessToken = token;
+	  UserStore._connectToGithub();
+	  return UserStore.trigger();
+	};
 
 	getParameterByName = function(name) {
 	  var regex, results;
@@ -919,29 +939,47 @@
 	    return this.listenTo(repoStore, this.loadTreeIfNecessary);
 	  },
 	  loadTreeIfNecessary: function() {
-	    var selectedRepoName;
+	    var github, repo, selectedRepoName;
 	    selectedRepoName = repoStore.getSelectedRepoName();
 	    if (_cachedTreeForRepo !== selectedRepoName) {
 	      _tree = null;
 	      _treeLoading = true;
 	      _treeLoadingError = false;
-	      return qwest.get(("https://api.github.com/repos/" + (userStore.getUsername()) + "/" + selectedRepoName + "/branches/gh-pages") + userStore.queryString()).success((function(_this) {
-	        return function(branchObject) {
-	          return qwest.get(branchObject.commit.commit.tree.url).success(function(response) {
-	            _cachedTreeForRepo = selectedRepoName;
+	      github = userStore.getGithub();
+	      if (github != null) {
+	        repo = github.getRepo(userStore.getUsername(), selectedRepoName);
+	        return repo.getTree('gh-pages', (function(_this) {
+	          return function(err, tree) {
 	            _treeLoading = false;
-	            _tree = response.tree;
+	            if (err != null) {
+	              console.error(err);
+	              return _treeLoadingError = true;
+	            } else {
+	              _cachedTreeForRepo = selectedRepoName;
+	              _tree = tree;
+	              return _this.trigger();
+	            }
+	          };
+	        })(this));
+	      } else {
+	        return qwest.get(("https://api.github.com/repos/" + (userStore.getUsername()) + "/" + selectedRepoName + "/branches/gh-pages") + userStore.queryString()).success((function(_this) {
+	          return function(branchObject) {
+	            return qwest.get(branchObject.commit.commit.tree.url).success(function(response) {
+	              _cachedTreeForRepo = selectedRepoName;
+	              _treeLoading = false;
+	              _tree = response.tree;
+	              return _this.trigger();
+	            });
+	          };
+	        })(this)).error((function(_this) {
+	          return function(err) {
+	            console.error(err);
+	            _treeLoadingError = true;
+	            _treeLoading = false;
 	            return _this.trigger();
-	          });
-	        };
-	      })(this)).error((function(_this) {
-	        return function(err) {
-	          console.error(err);
-	          _treeLoadingError = true;
-	          _treeLoading = false;
-	          return _this.trigger();
-	        };
-	      })(this));
+	          };
+	        })(this));
+	      }
 	    }
 	  },
 	  isLoading: function() {
@@ -965,33 +1003,19 @@
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, FileStore, Github, Reflux, UserStore, _github, _selectedFile;
+	var Actions, FileStore, Reflux, UserStore, _selectedFile;
 
 	Reflux = __webpack_require__(20);
 
 	Actions = __webpack_require__(8);
 
-	Github = __webpack_require__(309);
-
 	UserStore = __webpack_require__(21);
 
 	_selectedFile = null;
 
-	_github = null;
-
 	module.exports = FileStore = Reflux.createStore({
 	  init: function() {
-	    this.listenTo(Actions.selectFile, this.selectFile);
-	    return this.listenTo(UserStore, this.connectToGithub);
-	  },
-	  connectToGithub: function() {
-	    if (UserStore.isLoggedIn()) {
-	      _github = new Github({
-	        auth: 'oauth',
-	        token: UserStore.getAccessToken()
-	      });
-	      return console.log('connected to github', _github);
-	    }
+	    return this.listenTo(Actions.selectFile, this.selectFile);
 	  },
 	  selectFile: function(filePath) {
 	    _selectedFile = filePath;

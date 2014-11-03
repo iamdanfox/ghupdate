@@ -15,26 +15,40 @@ module.exports = RepoTreeStore = Reflux.createStore
 
   loadTreeIfNecessary: ->
     selectedRepoName = repoStore.getSelectedRepoName()
-    if _cachedTreeForRepo isnt selectedRepoName
 
+    if _cachedTreeForRepo isnt selectedRepoName
       _tree = null
       _treeLoading = true
       _treeLoadingError = false
-      qwest
-        .get("https://api.github.com/repos/#{userStore.getUsername()}/#{selectedRepoName}/branches/gh-pages"+userStore.queryString())
-        .success (branchObject) =>
-          qwest
-            .get(branchObject.commit.commit.tree.url)
-            .success (response) =>
-              _cachedTreeForRepo = selectedRepoName
-              _treeLoading = false
-              _tree = response.tree
-              @trigger()
-        .error (err) =>
-          console.error err
-          _treeLoadingError = true
+
+      github = userStore.getGithub()
+      if github?
+        repo = github.getRepo userStore.getUsername(), selectedRepoName
+        repo.getTree 'gh-pages', (err, tree) =>
           _treeLoading = false
-          @trigger()
+          if err?
+            console.error err
+            _treeLoadingError = true
+          else
+            _cachedTreeForRepo = selectedRepoName
+            _tree = tree
+            @trigger()
+      else
+        qwest
+          .get("https://api.github.com/repos/#{userStore.getUsername()}/#{selectedRepoName}/branches/gh-pages"+userStore.queryString())
+          .success (branchObject) =>
+            qwest
+              .get(branchObject.commit.commit.tree.url)
+              .success (response) =>
+                _cachedTreeForRepo = selectedRepoName
+                _treeLoading = false
+                _tree = response.tree
+                @trigger()
+          .error (err) =>
+            console.error err
+            _treeLoadingError = true
+            _treeLoading = false
+            @trigger()
 
   isLoading: ->
     _treeLoading

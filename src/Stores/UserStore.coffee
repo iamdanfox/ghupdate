@@ -1,13 +1,14 @@
 Reflux = require 'reflux'
 Actions = require '../Actions.coffee'
 qwest = require '../../lib/qwest.js'
+Github = require 'github-api'
 
 
 _username = null
 _accessToken = null
 _accessTokenLoading = false
 _accessTokenError = false
-
+_github = null
 module.exports = UserStore = Reflux.createStore
   init: ->
     @listenTo Actions.setUsername, @setUsername
@@ -27,6 +28,7 @@ module.exports = UserStore = Reflux.createStore
         .success (response) ->
           if response.access_token?
             _accessToken = response.access_token
+            @_connectToGithub()
           else
             console.error response
             _accessTokenError = true
@@ -36,6 +38,11 @@ module.exports = UserStore = Reflux.createStore
         .complete =>
           _accessTokenLoading = false
           @trigger()
+
+  _connectToGithub: ->
+    _github = new Github
+      auth: 'oauth'
+      token: _accessToken
 
   getUsername: ->
     return _username
@@ -52,13 +59,21 @@ module.exports = UserStore = Reflux.createStore
   getAccessToken: ->
     return _accessToken
 
+  getGithub: ->
+    return _github
+
   queryString: ->
     if _accessToken? then '?access_token=' + _accessToken else ''
 
 
-#debug
+#debugging flow - real, deployed version echoes out the token, can set this locally for useful dev
 UserStore.listen ->
-  console.debug 'debug UserStore', UserStore.getUsername(), UserStore.getAccessToken()
+  console.debug 'UserStore token =', UserStore.getAccessToken()
+
+window.debugUserStoreSetToken = (token) ->
+  _accessToken = token
+  UserStore._connectToGithub()
+  UserStore.trigger()
 
 
 getParameterByName = (name) ->
