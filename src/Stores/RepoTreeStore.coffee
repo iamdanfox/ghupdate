@@ -1,6 +1,5 @@
 require('es6-promise').polyfill()
 Reflux = require 'reflux'
-userStore = require './UserStore.coffee'
 repoStore = require './RepoStore.coffee'
 apiModule = require '../ApiModule.coffee'
 

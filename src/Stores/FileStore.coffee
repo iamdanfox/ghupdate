@@ -1,6 +1,5 @@
 Reflux = require 'reflux'
 Actions = require '../Actions.coffee'
-UserStore = require './UserStore.coffee'
 
 
 _selectedFile = null
