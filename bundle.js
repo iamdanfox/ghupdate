@@ -985,13 +985,15 @@
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Reflux, UserReposStore, qwest, userStore, _cachedReposForUsername, _repos, _reposLoading, _reposLoadingError;
+	var Reflux, UserReposStore, apiModule, userStore, _cachedReposForUsername, _repos, _reposLoading, _reposLoadingError;
+
+	__webpack_require__(259).polyfill();
 
 	Reflux = __webpack_require__(21);
 
-	qwest = __webpack_require__(66);
-
 	userStore = __webpack_require__(23);
+
+	apiModule = __webpack_require__(44);
 
 	_cachedReposForUsername = null;
 
@@ -1013,14 +1015,14 @@
 	      _reposLoadingError = false;
 	      _repos = null;
 	      this.trigger();
-	      return qwest.get(("https://api.github.com/users/" + newUsername + "/repos") + userStore.queryString()).success(function(repos) {
+	      return apiModule.getRepos().then(function(repos) {
 	        _cachedReposForUsername = newUsername;
 	        _repos = repos;
 	        return _reposLoadingError = false;
-	      }).error(function(err) {
+	      })["catch"](function(err) {
 	        console.error(err);
 	        return _reposLoadingError = true;
-	      }).complete((function(_this) {
+	      }).then((function(_this) {
 	        return function() {
 	          _reposLoading = false;
 	          return _this.trigger();
@@ -1102,7 +1104,7 @@
 	      _treeLoading = true;
 	      _treeLoadingError = false;
 	      this.trigger();
-	      return apiModule.getGHPagesTree(userStore.getUsername(), selectedRepoName).then(function(tree) {
+	      return apiModule.getGHPagesTree(selectedRepoName).then(function(tree) {
 	        _cachedTreeForRepo = selectedRepoName;
 	        return _tree = tree;
 	      })["catch"](function(err) {
@@ -1121,9 +1123,6 @@
 	  },
 	  hasError: function() {
 	    return _treeLoadingError;
-	  },
-	  getTree: function() {
-	    return _tree;
 	  },
 	  getHTMLFiles: function() {
 	    return _tree != null ? _tree.filter(function(item) {
@@ -4884,7 +4883,7 @@
 /* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ApiModule, userStore;
+	var ApiModule, userStore, _promisify;
 
 	__webpack_require__(259).polyfill();
 
@@ -4892,14 +4891,24 @@
 
 	userStore = __webpack_require__(23);
 
+	_promisify = function(resolve, reject) {
+	  return function(errorValue, successValue) {
+	    if (errorValue) {
+	      return reject(errorValue);
+	    } else {
+	      return resolve(successValue);
+	    }
+	  };
+	};
+
 	module.exports = ApiModule = {
-	  getGHPagesTree: function(username, repo) {
-	    var github;
+	  getGHPagesTree: function(repo) {
+	    var github, username;
+	    username = userStore.getUsername();
 	    github = userStore.getGithub();
 	    if (github != null) {
-	      repo = github.getRepo(username, repo);
-	      return repo.getTree('gh-pages', function(error, tree) {
-	        return callback(error, tree);
+	      return new Promise(function(resolve, reject) {
+	        return github.getRepo(username, repo).getTree('gh-pages', _promisify(resolve, reject));
 	      });
 	    } else {
 	      return fetch("https://api.github.com/repos/" + username + "/" + repo + "/branches/gh-pages").then(function(response) {
@@ -4910,6 +4919,19 @@
 	        return response.json();
 	      }).then(function(json) {
 	        return json.tree;
+	      });
+	    }
+	  },
+	  getRepos: function() {
+	    var github;
+	    github = userStore.getGithub();
+	    if (github != null) {
+	      return new Promise(function(resolve, reject) {
+	        return github.getUser().repos(_promisify(resolve, reject));
+	      });
+	    } else {
+	      return fetch("https://api.github.com/users/" + (userStore.getUsername()) + "/repos").then(function(response) {
+	        return response.json();
 	      });
 	    }
 	  }

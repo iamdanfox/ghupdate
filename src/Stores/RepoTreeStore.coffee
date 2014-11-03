@@ -23,7 +23,7 @@ module.exports = RepoTreeStore = Reflux.createStore
       _treeLoadingError = false
       @trigger()
 
-      apiModule.getGHPagesTree userStore.getUsername(), selectedRepoName
+      apiModule.getGHPagesTree selectedRepoName
         .then (tree) ->
           _cachedTreeForRepo = selectedRepoName
           _tree = tree
@@ -39,9 +39,6 @@ module.exports = RepoTreeStore = Reflux.createStore
 
   hasError: ->
     _treeLoadingError
-
-  getTree: ->
-    _tree
 
   getHTMLFiles: ->
     _tree?.filter (item) -> /\.html$/.test item.path

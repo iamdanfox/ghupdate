@@ -1,6 +1,7 @@
+require('es6-promise').polyfill()
 Reflux = require 'reflux'
-qwest = require '../../lib/qwest.js'
 userStore = require './UserStore.coffee'
+apiModule = require '../ApiModule.coffee'
 
 
 _cachedReposForUsername = null
@@ -19,16 +20,15 @@ module.exports = UserReposStore = Reflux.createStore
       _reposLoadingError = false
       _repos = null
       @trigger()
-      qwest
-        .get("https://api.github.com/users/#{newUsername}/repos"+userStore.queryString())
-        .success (repos) ->
+      apiModule.getRepos()
+        .then (repos) ->
           _cachedReposForUsername = newUsername
           _repos = repos
           _reposLoadingError = false
-        .error (err) ->
+        .catch (err) ->
           console.error err
           _reposLoadingError = true
-        .complete =>
+        .then =>
           _reposLoading = false
           @trigger()
 
