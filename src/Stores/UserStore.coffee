@@ -2,7 +2,6 @@ require('es6-promise').polyfill()
 require 'fetch'
 Reflux = require 'reflux'
 Actions = require '../Actions.coffee'
-Github = require 'github-api'
 
 
 _username = null
@@ -41,6 +40,7 @@ module.exports = UserStore = Reflux.createStore
           @trigger()
 
   _connectToGithub: ->
+    Github = require 'github-api'
     _github = new Github
       auth: 'oauth'
       token: _accessToken

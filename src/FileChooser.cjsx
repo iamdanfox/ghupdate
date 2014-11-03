@@ -1,10 +1,6 @@
-require './FileChooser.less'
 React = require 'react'
-Loading = require './Loading.cjsx'
 Reflux = require 'reflux'
 Stores = require './Stores.coffee'
-Actions = require './Actions.coffee'
-
 
 
 FileChooser = module.exports = React.createClass
@@ -22,6 +18,8 @@ FileChooser = module.exports = React.createClass
       htmlFiles: Stores.repoTreeStore.getHTMLFiles()
 
   render: ->
+    require './FileChooser.less'
+    Loading = require './Loading.cjsx'
     <Loading loading={@state.loading} error={@state.error} errorMessage="Error loading file list">
       <TreeView htmlFiles={@state.htmlFiles} />
     </Loading>
@@ -46,6 +44,7 @@ TreeFileView = React.createClass
     item: React.PropTypes.object.isRequired
 
   selectFile: ->
+    Actions = require './Actions.coffee'
     Actions.selectFile @props.item.path
 
   render: ->

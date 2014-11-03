@@ -1,13 +1,10 @@
-require './App.less'
 React = require 'react'
 Reflux = require 'reflux'
 Stores = require './Stores.coffee'
-UsernameChooser = require './UsernameChooser.cjsx'
 RepoChooser = require './RepoChooser.cjsx'
 FileChooser = require './FileChooser.cjsx'
 Editor = require './Editor.cjsx'
 LogInButton = require './LogInButton.cjsx'
-
 
 App = module.exports = React.createClass
   displayName: 'App'
@@ -27,9 +24,11 @@ App = module.exports = React.createClass
       @setState file: Stores.fileStore.getSelectedFile()
 
   render: ->
+    require './App.less'
     <div className="ghu-app">
       <h1>GH Update</h1>
-      { unless @state.username?
+      { unless @state.username? then do ->
+          UsernameChooser = require './UsernameChooser.cjsx'
           <UsernameChooser />
         else
           unless @state.repoName?

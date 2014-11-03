@@ -1,4 +1,3 @@
-require './RepoChooser.less'
 React = require 'react'
 timeago = require 'timeago'
 Loading = require './Loading.cjsx'
@@ -25,6 +24,7 @@ module.exports = RepoChooser = React.createClass
       repos: Stores.userReposStore.getRepos()
 
   render: ->
+    require './RepoChooser.less'
     <Loading loading={@state.loading} error={@state.error} errorMessage='Error loading repos, please try again'>
       <RepoList repos={@state.repos} />
     </Loading>

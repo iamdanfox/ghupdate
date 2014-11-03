@@ -1,7 +1,5 @@
-require './Editor.less'
 Reflux = require 'reflux'
 React = require 'react'
-FileChooser = require './FileChooser.cjsx'
 Stores = require './Stores.coffee'
 
 
@@ -21,6 +19,7 @@ module.exports = Editor = React.createClass
     console.log 'Save not implemented yet'
 
   render: ->
+    require './Editor.less'
     <div className='ghu-editor'>
       Editing {@state.file}
       <button onClick={@handleSave}>Save</button>

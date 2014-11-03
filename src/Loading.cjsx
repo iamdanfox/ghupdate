@@ -1,6 +1,5 @@
-require './Loading.less'
 React = require 'react'
-Spinkit = require 'react-spinkit'
+
 
 Loading = module.exports = React.createClass
   displayName: 'Loading'
@@ -12,7 +11,9 @@ Loading = module.exports = React.createClass
     children: React.PropTypes.renderable.isRequired
 
   render: ->
+    require './Loading.less'
     if @props.loading
+      Spinkit = require 'react-spinkit'
       <div className='ghu-spinner'>
         <Spinkit spinnerName='double-bounce' cssRequire />
       </div>
