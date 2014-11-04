@@ -2,6 +2,7 @@ require('es6-promise').polyfill()
 require 'fetch'
 Reflux = require 'reflux'
 Actions = require '../Actions.coffee'
+Github = require 'github-api'
 
 
 _username = null
@@ -14,6 +15,7 @@ module.exports = UserStore = Reflux.createStore
   init: ->
     @listenTo Actions.setUsername, @setUsername
     @listenTo Actions.getAccessTokenForCode, @getAccessTokenForCode
+    @listenTo Actions.readAccessTokenFromLocalStorage, @readAccessTokenFromLocalStorage
 
   setUsername: (newUsername) ->
     _username = newUsername
@@ -29,6 +31,7 @@ module.exports = UserStore = Reflux.createStore
         .then (json) ->
           if json.access_token?
             _accessToken = json.access_token
+            localStorage 'ghu-token', _accessToken
           else
             Promise.reject json
         .then @_connectToGithub
@@ -39,8 +42,26 @@ module.exports = UserStore = Reflux.createStore
           _accessTokenLoading = false
           @trigger()
 
+  readAccessTokenFromLocalStorage: ->
+    token = localStorage.getItem 'ghu-token'
+    if not _accessTokenLoading and token?
+      _accessTokenLoading = true
+      _accessTokenError = false
+      @trigger()
+      fetch('https://api.github.com/user', {
+        headers:
+          'Accept': 'application/vnd.github.v3+json'
+          'Authorization': 'token ' + token
+      }).then (response) ->
+        if response.status is 200
+          _accessToken = token
+        else
+          _accessTokenError = true
+      .then =>
+        _accessTokenLoading = false
+        @trigger()
+
   _connectToGithub: ->
-    Github = require 'github-api'
     _github = new Github
       auth: 'oauth'
       token: _accessToken
