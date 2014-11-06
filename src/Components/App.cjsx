@@ -1,6 +1,7 @@
 React = require 'react'
 Reflux = require 'reflux'
 Stores = require '../Stores.coffee'
+Actions = require '../Actions.coffee'
 RepoChooser = require './RepoChooser.cjsx'
 FileChooser = require './FileChooser.cjsx'
 Editor = require './Editor.cjsx'
@@ -43,12 +44,16 @@ App = module.exports = React.createClass
           else
             unless @state.file?
               <div>
-                <h2 className='ghu-username'>{@state.username}/{@state.repoName}</h2>
+                <h2 className='ghu-username'>
+                  <a onClick={-> Actions.selectRepo null}>{@state.username}</a> / {@state.repoName}
+                </h2>
                 <FileChooser />
               </div>
             else
               <div>
-                <h2 className='ghu-username'>{@state.username}/{@state.repoName}/{@state.file}</h2>
+                <h2 className='ghu-username'>
+                  <a onClick={-> Actions.selectRepo null}>{@state.username}</a> / <a onClick={-> Actions.selectFile null}>{@state.repoName}</a> / {@state.file}
+                </h2>
                 { unless @state.isLoggedIn
                     <div>
                       Please log in
