@@ -172,13 +172,6 @@
 	  fileContentsStore: __webpack_require__(28)
 	};
 
-	Stores.repoTreeStore.listen(function() {
-	  var _ref;
-	  if (((_ref = Stores.repoTreeStore.getHTMLFiles()) != null ? _ref.length : void 0) === 1) {
-	    return Actions.selectFile(Stores.repoTreeStore.getHTMLFiles()[0].path);
-	  }
-	});
-
 
 /***/ },
 /* 5 */
@@ -1031,7 +1024,7 @@
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Reflux, RepoTreeStore, apiModule, repoStore, _cachedTreeForRepo, _tree, _treeLoading, _treeLoadingError;
+	var Actions, Reflux, RepoTreeStore, apiModule, repoStore, _cachedTreeForRepo, _tree, _treeLoading, _treeLoadingError;
 
 	__webpack_require__(131).polyfill();
 
@@ -1040,6 +1033,8 @@
 	repoStore = __webpack_require__(25);
 
 	apiModule = __webpack_require__(66);
+
+	Actions = __webpack_require__(2);
 
 	_cachedTreeForRepo = null;
 
@@ -1085,6 +1080,13 @@
 	    return _tree != null ? _tree.filter(function(item) {
 	      return /\.html$/.test(item.path);
 	    }) : void 0;
+	  }
+	});
+
+	RepoTreeStore.listen(function() {
+	  var _ref;
+	  if (((_ref = RepoTreeStore.getHTMLFiles()) != null ? _ref.length : void 0) === 1) {
+	    return Actions.selectFile(RepoTreeStore.getHTMLFiles()[0].path);
 	  }
 	});
 

@@ -10,8 +10,3 @@ module.exports = Stores =
   repoTreeStore:     require './Stores/RepoTreeStore.coffee'
   fileStore:         require './Stores/FileStore.coffee'
   fileContentsStore: require './Stores/FileContentsStore.coffee'
-
-# SHORTCUT CODE
-Stores.repoTreeStore.listen ->
-  if Stores.repoTreeStore.getHTMLFiles()?.length is 1
-    Actions.selectFile Stores.repoTreeStore.getHTMLFiles()[0].path

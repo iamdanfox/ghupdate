@@ -2,6 +2,7 @@ require('es6-promise').polyfill()
 Reflux = require 'reflux'
 repoStore = require './RepoStore.coffee'
 apiModule = require '../ApiModule.coffee'
+Actions = require '../Actions.coffee'
 
 
 _cachedTreeForRepo = null
@@ -41,3 +42,8 @@ module.exports = RepoTreeStore = Reflux.createStore
 
   getHTMLFiles: ->
     _tree?.filter (item) -> /\.html$/.test item.path
+
+# SHORTCUT CODE
+RepoTreeStore.listen ->
+  if RepoTreeStore.getHTMLFiles()?.length is 1
+    Actions.selectFile RepoTreeStore.getHTMLFiles()[0].path
