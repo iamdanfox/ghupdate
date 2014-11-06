@@ -164,6 +164,7 @@
 	module.exports = Stores = {
 	  userStore: __webpack_require__(23),
 	  accessTokenStore: __webpack_require__(239),
+	  githubStore: __webpack_require__(240),
 	  userReposStore: __webpack_require__(24),
 	  repoStore: __webpack_require__(25),
 	  repoTreeStore: __webpack_require__(26),
@@ -917,42 +918,24 @@
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, Github, Reflux, UserStore, accessTokenStore, _github, _username;
+	var Actions, Reflux, UserStore, _username;
 
 	Reflux = __webpack_require__(10);
 
 	Actions = __webpack_require__(2);
 
-	Github = __webpack_require__(68);
-
-	accessTokenStore = __webpack_require__(239);
-
 	_username = null;
-
-	_github = null;
 
 	module.exports = UserStore = Reflux.createStore({
 	  init: function() {
-	    this.listenTo(Actions.setUsername, this.setUsername);
-	    return this.listenTo(accessTokenStore, this._connectToGithubIfNecessary);
+	    return this.listenTo(Actions.setUsername, this.setUsername);
 	  },
 	  setUsername: function(newUsername) {
 	    _username = newUsername;
 	    return this.trigger();
 	  },
-	  _connectToGithubIfNecessary: function() {
-	    if (accessTokenStore.isLoggedIn() && (_github == null)) {
-	      return _github = new Github({
-	        auth: 'oauth',
-	        token: accessTokenStore.getAccessToken()
-	      });
-	    }
-	  },
 	  getUsername: function() {
 	    return _username;
-	  },
-	  getGithub: function() {
-	    return _github;
 	  }
 	});
 
@@ -8130,13 +8113,15 @@
 /* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ApiModule, fileStore, repoStore, userStore, _promisify;
+	var ApiModule, fileStore, githubStore, repoStore, userStore, _promisify;
 
 	__webpack_require__(131).polyfill();
 
 	__webpack_require__(69);
 
 	userStore = __webpack_require__(23);
+
+	githubStore = __webpack_require__(240);
 
 	repoStore = __webpack_require__(25);
 
@@ -8159,7 +8144,7 @@
 	    pathToFile = fileStore.getSelectedFile();
 	    username = userStore.getUsername();
 	    repo = repoStore.getSelectedRepoName();
-	    github = userStore.getGithub();
+	    github = githubStore.getGithub();
 	    if (github != null) {
 	      return new Promise(function(resolve, reject) {
 	        return github.getRepo(username, repo).write('gh-pages', pathToFile, contents, commitMessage, _promisify(resolve, reject));
@@ -8173,7 +8158,7 @@
 	    pathToFile = fileStore.getSelectedFile();
 	    username = userStore.getUsername();
 	    repo = repoStore.getSelectedRepoName();
-	    github = userStore.getGithub();
+	    github = githubStore.getGithub();
 	    if (github != null) {
 	      return new Promise(function(resolve, reject) {
 	        return github.getRepo(username, repo).read('gh-pages', pathToFile, _promisify(resolve, reject));
@@ -8185,7 +8170,7 @@
 	  getGHPagesTree: function(repo) {
 	    var github, username;
 	    username = userStore.getUsername();
-	    github = userStore.getGithub();
+	    github = githubStore.getGithub();
 	    if (github != null) {
 	      return new Promise(function(resolve, reject) {
 	        return github.getRepo(username, repo).getTree('gh-pages', _promisify(resolve, reject));
@@ -8204,7 +8189,7 @@
 	  },
 	  getRepos: function() {
 	    var github;
-	    github = userStore.getGithub();
+	    github = githubStore.getGithub();
 	    if (github != null) {
 	      return new Promise(function(resolve, reject) {
 	        return github.getUser().repos(_promisify(resolve, reject));
@@ -27567,6 +27552,39 @@
 	  },
 	  getAccessToken: function() {
 	    return _accessToken;
+	  }
+	});
+
+
+/***/ },
+/* 240 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Github, GithubStore, Reflux, accessTokenStore, _github;
+
+	Reflux = __webpack_require__(10);
+
+	Github = __webpack_require__(68);
+
+	accessTokenStore = __webpack_require__(239);
+
+	_github = null;
+
+	module.exports = GithubStore = Reflux.createStore({
+	  init: function() {
+	    return this.listenTo(accessTokenStore, this._connectToGithubIfNecessary);
+	  },
+	  _connectToGithubIfNecessary: function() {
+	    if (accessTokenStore.isLoggedIn() && (_github == null)) {
+	      _github = new Github({
+	        auth: 'oauth',
+	        token: accessTokenStore.getAccessToken()
+	      });
+	      return this.trigger();
+	    }
+	  },
+	  getGithub: function() {
+	    return _github;
 	  }
 	});
 

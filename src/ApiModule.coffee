@@ -1,6 +1,7 @@
 require('es6-promise').polyfill()
 require 'fetch'
 userStore = require './Stores/UserStore.coffee'
+githubStore = require './Stores/GithubStore.coffee'
 repoStore = require './Stores/RepoStore.coffee'
 fileStore = require './Stores/FileStore.coffee'
 
@@ -16,7 +17,7 @@ module.exports = ApiModule =
     pathToFile = fileStore.getSelectedFile()
     username = userStore.getUsername()
     repo = repoStore.getSelectedRepoName()
-    github = userStore.getGithub()
+    github = githubStore.getGithub()
 
     if github?
       return new Promise (resolve, reject) ->
@@ -30,7 +31,7 @@ module.exports = ApiModule =
     pathToFile = fileStore.getSelectedFile()
     username = userStore.getUsername()
     repo = repoStore.getSelectedRepoName()
-    github = userStore.getGithub()
+    github = githubStore.getGithub()
 
     if github?
       return new Promise (resolve, reject) ->
@@ -42,7 +43,7 @@ module.exports = ApiModule =
 
   getGHPagesTree: (repo) -> # return a promise
     username = userStore.getUsername()
-    github = userStore.getGithub()
+    github = githubStore.getGithub()
     if github?
       return new Promise (resolve, reject) ->
         github
@@ -56,7 +57,7 @@ module.exports = ApiModule =
         .then (json) -> json.tree
 
   getRepos: ->
-    github = userStore.getGithub()
+    github = githubStore.getGithub()
     if github?
       return new Promise (resolve, reject) ->
         github
