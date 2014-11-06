@@ -28448,6 +28448,27 @@
   \****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
+	
+	/*
+	
+	RefluxRouter v0.0.1
+	===================
+	
+	Keep Reflux stores in sync with the address bar using two way binding.
+	
+	The RefluxRouter is parameterised by a number of RouteBindings.  Whenever the
+	hash address changes, the first RouteBinding that claims it `canHandleUrl` will
+	have its `handleUrl` function called.  This should trigger some Actions and
+	update the contents of the stores.
+	
+	In addition, whenever these Stores change, the RefluxRouter asks each
+	RouteBinding to perform its `makeUrl` function.  The hash is updated to the
+	first string that is successfully returned.
+	
+	TODO:
+	 - Allow `start` to accept a `urlPrefix`
+	 - Allow composed routers to appear in routeBindings (with an accompanying prefix)
+	 */
 	var RefluxRouter,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 	
@@ -28513,7 +28534,7 @@
 	  RefluxRouter.prototype.getRouteBindingForUrl = function(url) {
 	    var matches;
 	    matches = this.routeBindings.filter(function(routeBinding) {
-	      return routeBinding.matchesUrl(url);
+	      return routeBinding.canHandleUrl(url);
 	    });
 	    if (matches.length > 0) {
 	      return matches[0];
@@ -28539,7 +28560,7 @@
 	
 	module.exports = RouteBinding = (function() {
 	  function RouteBinding(options) {
-	    this.matchesUrl = __bind(this.matchesUrl, this);
+	    this.canHandleUrl = __bind(this.canHandleUrl, this);
 	    this.urlRegex = __bind(this.urlRegex, this);
 	    this.makeUrl = __bind(this.makeUrl, this);
 	    this.handleUrl = __bind(this.handleUrl, this);
@@ -28584,7 +28605,7 @@
 	    return new RegExp("^" + regex + "$");
 	  };
 	
-	  RouteBinding.prototype.matchesUrl = function(string) {
+	  RouteBinding.prototype.canHandleUrl = function(string) {
 	    return this.urlRegex().test(string);
 	  };
 	

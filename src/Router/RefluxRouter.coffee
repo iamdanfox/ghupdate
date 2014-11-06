@@ -1,3 +1,24 @@
+###
+
+RefluxRouter v0.0.1
+===================
+
+Keep Reflux stores in sync with the address bar using two way binding.
+
+The RefluxRouter is parameterised by a number of RouteBindings.  Whenever the
+hash address changes, the first RouteBinding that claims it `canHandleUrl` will
+have its `handleUrl` function called.  This should trigger some Actions and
+update the contents of the stores.
+
+In addition, whenever these Stores change, the RefluxRouter asks each
+RouteBinding to perform its `makeUrl` function.  The hash is updated to the
+first string that is successfully returned.
+
+TODO:
+ - Allow `start` to accept a `urlPrefix`
+ - Allow composed routers to appear in routeBindings (with an accompanying prefix)
+
+###
 module.exports = class RefluxRouter
   constructor: (@routeBindings) ->
 
@@ -25,7 +46,6 @@ module.exports = class RefluxRouter
       @getRouteBindingForUrl(url).handleUrl url
       @_lastUrlHandled = url
 
-  # ask all RouteBindings to make a URL, returns the first
   makeUrl: ->
     urls = @routeBindings
       .map (routeBinding) -> routeBinding.makeUrl()
@@ -38,7 +58,7 @@ module.exports = class RefluxRouter
   # return whichever RouteBinding claims the best match for a given url
   getRouteBindingForUrl: (url) ->
     matches = @routeBindings
-      .filter (routeBinding) -> routeBinding.matchesUrl url
+      .filter (routeBinding) -> routeBinding.canHandleUrl url
     if matches.length > 0
       return matches[0]
     else

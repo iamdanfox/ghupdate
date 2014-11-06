@@ -25,10 +25,10 @@ module.exports = class RouteBinding
 
   urlRegex: =>
     regex = @pattern
-      .replace /\(\/\)/g, '/?'
-      .replace /\//g, '\\/'
-      .replace /:([^\/\)\\]+)/g, '([^\\/]+)'
+      .replace /\(\/\)/g, '/?' # trailing (/) is an optional slash
+      .replace /\//g, '\\/' # Every slash in the string needs to be escaped
+      .replace /:([^\/\)\\]+)/g, '([^\\/]+)' # Replace :name with a capturing pattern
     return new RegExp("^#{regex}$")
 
-  matchesUrl: (string) =>
+  canHandleUrl: (string) =>
     @urlRegex().test string
