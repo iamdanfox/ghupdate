@@ -8,8 +8,9 @@ module.exports = RepoStore = Reflux.createStore
     @listenTo Actions.selectRepo, @selectRepo
 
   selectRepo: (repoName) ->
-    _selectedRepoName = repoName
-    @trigger()
+    if _selectedRepoName isnt repoName
+      _selectedRepoName = repoName
+      @trigger()
 
   getSelectedRepoName: ->
     _selectedRepoName

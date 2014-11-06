@@ -115,14 +115,17 @@
 	  }
 	
 	  Router.prototype.start = function() {
-	    var allStores, store, stores, _i, _len;
+	    var allStores, deduped, store, stores, _i, _len;
 	    console.log('Router.start', window.location.hash);
 	    stores = this.routeBindings.map(function(routeBinding) {
 	      return routeBinding.listenToStores;
 	    });
 	    allStores = [].concat.apply([], stores);
-	    for (_i = 0, _len = allStores.length; _i < _len; _i++) {
-	      store = allStores[_i];
+	    deduped = allStores.filter(function(item, index, array) {
+	      return index === array.lastIndexOf(item);
+	    });
+	    for (_i = 0, _len = deduped.length; _i < _len; _i++) {
+	      store = deduped[_i];
 	      store.listen(this.handleStoreChange);
 	    }
 	    window.addEventListener('hashchange', this.handleHashChange, false);
@@ -134,17 +137,18 @@
 	    newUrl = '#' + this.makeUrl();
 	    if (window.location.hash !== newUrl) {
 	      console.log("pushing new hash: from: '" + window.location.hash + "' to '" + newUrl + "'");
-	      this._lastPushed = newUrl;
+	      this._lastUrlHandled = newUrl;
 	      return window.location.hash = newUrl;
 	    }
 	  };
 	
 	  Router.prototype.handleHashChange = function() {
 	    var url;
-	    if (window.location.hash !== this._lastPushed) {
+	    if (window.location.hash !== this._lastUrlHandled) {
 	      console.log("noticed hash changed: '" + window.location.hash + "'");
 	      url = window.location.hash.replace('#', '');
-	      return this.getRouteBindingForUrl(url).handleUrl(url);
+	      this.getRouteBindingForUrl(url).handleUrl(url);
+	      return this._lastUrlHandled = url;
 	    }
 	  };
 	
@@ -752,8 +756,10 @@
 	    return this.listenTo(Actions.setUsername, this.setUsername);
 	  },
 	  setUsername: function(newUsername) {
-	    _username = newUsername;
-	    return this.trigger();
+	    if (_username !== newUsername) {
+	      _username = newUsername;
+	      return this.trigger();
+	    }
 	  },
 	  getUsername: function() {
 	    return _username;
@@ -984,8 +990,10 @@
 	    return this.listenTo(Actions.selectRepo, this.selectRepo);
 	  },
 	  selectRepo: function(repoName) {
-	    _selectedRepoName = repoName;
-	    return this.trigger();
+	    if (_selectedRepoName !== repoName) {
+	      _selectedRepoName = repoName;
+	      return this.trigger();
+	    }
 	  },
 	  getSelectedRepoName: function() {
 	    return _selectedRepoName;
@@ -1087,8 +1095,10 @@
 	    return this.listenTo(Actions.selectFile, this.selectFile);
 	  },
 	  selectFile: function(filePath) {
-	    _selectedFile = filePath;
-	    return this.trigger();
+	    if (_selectedFile !== filePath) {
+	      _selectedFile = filePath;
+	      return this.trigger();
+	    }
 	  },
 	  getSelectedFile: function() {
 	    return _selectedFile;

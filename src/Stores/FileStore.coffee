@@ -8,8 +8,9 @@ module.exports = FileStore = Reflux.createStore
     @listenTo Actions.selectFile, @selectFile
 
   selectFile: (filePath) ->
-    _selectedFile = filePath
-    @trigger()
+    if _selectedFile isnt filePath
+      _selectedFile = filePath
+      @trigger()
 
   getSelectedFile: ->
     _selectedFile

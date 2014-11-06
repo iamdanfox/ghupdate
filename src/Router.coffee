@@ -17,7 +17,8 @@ class Router
     console.log 'Router.start', window.location.hash
     stores = @routeBindings.map (routeBinding) -> routeBinding.listenToStores
     allStores = [].concat.apply [], stores
-    for store in allStores
+    deduped = allStores.filter (item, index, array) -> index is array.lastIndexOf item
+    for store in deduped
       store.listen @handleStoreChange
     window.addEventListener 'hashchange', @handleHashChange, false
     @handleHashChange()
@@ -26,14 +27,15 @@ class Router
     newUrl = '#'+@makeUrl()
     if window.location.hash isnt newUrl
       console.log "pushing new hash: from: '" + window.location.hash + "' to '" + newUrl + "'"
-      @_lastPushed = newUrl
+      @_lastUrlHandled = newUrl
       window.location.hash = newUrl
 
   handleHashChange: =>
-    if window.location.hash isnt @_lastPushed # ie someone else triggered it
+    if window.location.hash isnt @_lastUrlHandled # ie someone else triggered it
       console.log "noticed hash changed: '#{window.location.hash}'"
       url = window.location.hash.replace '#', ''
       @getRouteBindingForUrl(url).handleUrl url
+      @_lastUrlHandled = url
 
   # ask all RouteBindings to make a URL, returns the first
   makeUrl: ->

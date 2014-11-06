@@ -7,8 +7,9 @@ module.exports = UserStore = Reflux.createStore
     @listenTo Actions.setUsername, @setUsername
 
   setUsername: (newUsername) ->
-    _username = newUsername
-    @trigger()
+    if _username isnt newUsername
+      _username = newUsername
+      @trigger()
 
   getUsername: ->
     return _username
