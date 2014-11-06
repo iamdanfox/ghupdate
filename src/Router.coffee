@@ -3,10 +3,17 @@ Stores = require './Stores.coffee'
 
 
 class RouteBinding
-  constructor: ({@urlRegex, @handleUrl, @listenToStores, @makeUrl}) ->
+  constructor: ({@pattern, @handleUrl, @listenToStores, @makeUrl}) ->
+
+  urlRegex: ->
+    regex = @pattern
+      .replace /\(\/\)/g, '/?'
+      .replace /\//g, '\\/'
+      .replace /:([^\/\)\(\\]+)/g, '([^\\/]+)'
+    return new RegExp("^#{regex}$")
 
   matchesUrl: (string) ->
-    @urlRegex.test string
+    @urlRegex().test string
 
 
 
@@ -61,11 +68,10 @@ class Router
 
 myRouter = new Router [
     new RouteBinding
-      # /users/:username/repos/:repo/files/:file(/)
-      urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/files\/([^\/]+)\/?$/
+      pattern: '/users/:username/repos/:repo/files/:file(/)'
       handleUrl: (string) ->
         console.log 'usersreposfiles handleUrl'
-        [username, repo, filename] = @urlRegex.exec(string)[1..]
+        [username, repo, filename] = @urlRegex().exec(string)[1..]
         Actions.setUsername username
         Actions.selectRepo repo
         Actions.selectFile filename
@@ -77,11 +83,10 @@ myRouter = new Router [
         if username? and repo? and file? then "/users/#{username}/repos/#{repo}/files/#{file}" else null
   ,
     new RouteBinding
-      # /users/:username/repos/:repo(/)
-      urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/?$/
+      pattern: '/users/:username/repos/:repo(/)'
       handleUrl: (string) ->
         console.log 'usersrepos handleUrl'
-        [username, repo] = @urlRegex.exec(string)[1..]
+        [username, repo] = @urlRegex().exec(string)[1..]
         Actions.setUsername username
         Actions.selectRepo repo
         Actions.selectFile null
@@ -92,11 +97,10 @@ myRouter = new Router [
         if username? and repo? then "/users/#{username}/repos/#{repo}" else null
   ,
     new RouteBinding
-      # /users/:username(/)
-      urlRegex: /^\/users\/([^\/]+)\/?$/
+      pattern: '/users/:username(/)'
       handleUrl: (string) ->
         console.log 'users handleUrl'
-        [username] = @urlRegex.exec(string)[1..]
+        [username] = @urlRegex().exec(string)[1..]
         Actions.setUsername username
         Actions.selectRepo null
         Actions.selectFile null
@@ -106,8 +110,7 @@ myRouter = new Router [
         if username? then "/users/#{username}" else null
   ,
     new RouteBinding
-      # /
-      urlRegex: /^\/?$/
+      pattern: '/'
       handleUrl: (string) ->
         console.log 'default handleUrl'
         Actions.selectFile null

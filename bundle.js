@@ -96,11 +96,17 @@
 	
 	RouteBinding = (function() {
 	  function RouteBinding(_arg) {
-	    this.urlRegex = _arg.urlRegex, this.handleUrl = _arg.handleUrl, this.listenToStores = _arg.listenToStores, this.makeUrl = _arg.makeUrl;
+	    this.pattern = _arg.pattern, this.handleUrl = _arg.handleUrl, this.listenToStores = _arg.listenToStores, this.makeUrl = _arg.makeUrl;
 	  }
 	
+	  RouteBinding.prototype.urlRegex = function() {
+	    var regex;
+	    regex = this.pattern.replace(/\(\/\)/g, '/?').replace(/\//g, '\\/').replace(/:([^\/\)\(\\]+)/g, '([^\\/]+)');
+	    return new RegExp("^" + regex + "$");
+	  };
+	
 	  RouteBinding.prototype.matchesUrl = function(string) {
-	    return this.urlRegex.test(string);
+	    return this.urlRegex().test(string);
 	  };
 	
 	  return RouteBinding;
@@ -184,11 +190,11 @@
 	
 	myRouter = new Router([
 	  new RouteBinding({
-	    urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/files\/([^\/]+)\/?$/,
+	    pattern: '/users/:username/repos/:repo/files/:file(/)',
 	    handleUrl: function(string) {
 	      var filename, repo, username, _ref;
 	      console.log('usersreposfiles handleUrl');
-	      _ref = this.urlRegex.exec(string).slice(1), username = _ref[0], repo = _ref[1], filename = _ref[2];
+	      _ref = this.urlRegex().exec(string).slice(1), username = _ref[0], repo = _ref[1], filename = _ref[2];
 	      Actions.setUsername(username);
 	      Actions.selectRepo(repo);
 	      return Actions.selectFile(filename);
@@ -206,11 +212,11 @@
 	      }
 	    }
 	  }), new RouteBinding({
-	    urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/?$/,
+	    pattern: '/users/:username/repos/:repo(/)',
 	    handleUrl: function(string) {
 	      var repo, username, _ref;
 	      console.log('usersrepos handleUrl');
-	      _ref = this.urlRegex.exec(string).slice(1), username = _ref[0], repo = _ref[1];
+	      _ref = this.urlRegex().exec(string).slice(1), username = _ref[0], repo = _ref[1];
 	      Actions.setUsername(username);
 	      Actions.selectRepo(repo);
 	      return Actions.selectFile(null);
@@ -227,11 +233,11 @@
 	      }
 	    }
 	  }), new RouteBinding({
-	    urlRegex: /^\/users\/([^\/]+)\/?$/,
+	    pattern: '/users/:username(/)',
 	    handleUrl: function(string) {
 	      var username;
 	      console.log('users handleUrl');
-	      username = this.urlRegex.exec(string).slice(1)[0];
+	      username = this.urlRegex().exec(string).slice(1)[0];
 	      Actions.setUsername(username);
 	      Actions.selectRepo(null);
 	      return Actions.selectFile(null);
@@ -247,7 +253,7 @@
 	      }
 	    }
 	  }), new RouteBinding({
-	    urlRegex: /^\/?$/,
+	    pattern: '/',
 	    handleUrl: function(string) {
 	      console.log('default handleUrl');
 	      Actions.selectFile(null);
