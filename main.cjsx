@@ -9,3 +9,5 @@ React.renderComponent <App />, document.getElementsByTagName('body')[0]
 
 Actions.readCodeFromUrl()
 Actions.readAccessTokenFromLocalStorage()
+
+Router.start()

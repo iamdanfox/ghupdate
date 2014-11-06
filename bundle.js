@@ -64,6 +64,8 @@
 	Actions.readCodeFromUrl();
 	
 	Actions.readAccessTokenFromLocalStorage();
+	
+	Router.start();
 
 
 /***/ },
@@ -87,144 +89,17 @@
   \***************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, RouteBinding, Router, Stores, myRouter,
-	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	var Actions, RefluxRouter, RouteBinding, Stores;
 	
 	Actions = __webpack_require__(/*! ./Actions.coffee */ 1);
 	
 	Stores = __webpack_require__(/*! ./Stores.coffee */ 4);
 	
-	RouteBinding = (function() {
-	  function RouteBinding(options) {
-	    this.matchesUrl = __bind(this.matchesUrl, this);
-	    this.urlRegex = __bind(this.urlRegex, this);
-	    this.makeUrl = __bind(this.makeUrl, this);
-	    this.handleUrl = __bind(this.handleUrl, this);
-	    this.pattern = options.pattern, this.listenToStores = options.listenToStores;
-	    this._handleUrl = options.handleUrl;
-	    this._makeUrl = options.makeUrl;
-	  }
+	RefluxRouter = __webpack_require__(/*! ./Router/RefluxRouter.coffee */ 242);
 	
-	  RouteBinding.prototype.handleUrl = function(string) {
-	    var i, key, keys, urlParameters, values;
-	    keys = this.pattern.match(/:([^\/\(]+)/g);
-	    urlParameters = {};
-	    values = this.urlRegex().exec(string).slice(1);
-	    for (i in keys) {
-	      key = keys[i];
-	      urlParameters[key.substr(1)] = values[i];
-	    }
-	    return this._handleUrl(urlParameters);
-	  };
+	RouteBinding = __webpack_require__(/*! ./Router/RouteBinding.coffee */ 243);
 	
-	  RouteBinding.prototype.makeUrl = function() {
-	    var key, mapping, url, value;
-	    mapping = this._makeUrl();
-	    if (mapping != null) {
-	      url = this.pattern.replace('(/)', '');
-	      for (key in mapping) {
-	        value = mapping[key];
-	        if (value === null) {
-	          return null;
-	        }
-	        url = url.replace(':' + key, value);
-	      }
-	      return url;
-	    } else {
-	      return null;
-	    }
-	  };
-	
-	  RouteBinding.prototype.urlRegex = function() {
-	    var regex;
-	    regex = this.pattern.replace(/\(\/\)/g, '/?').replace(/\//g, '\\/').replace(/:([^\/\)\\]+)/g, '([^\\/]+)');
-	    return new RegExp("^" + regex + "$");
-	  };
-	
-	  RouteBinding.prototype.matchesUrl = function(string) {
-	    return this.urlRegex().test(string);
-	  };
-	
-	  return RouteBinding;
-	
-	})();
-	
-	Router = (function() {
-	  function Router(routeBindings) {
-	    this.routeBindings = routeBindings;
-	    this.handleHashChange = __bind(this.handleHashChange, this);
-	    this.handleStoreChange = __bind(this.handleStoreChange, this);
-	  }
-	
-	  Router.prototype.start = function() {
-	    var allStores, deduped, store, stores, _i, _len;
-	    console.log('Router.start', window.location.hash);
-	    stores = this.routeBindings.map(function(routeBinding) {
-	      return routeBinding.listenToStores;
-	    });
-	    allStores = [].concat.apply([], stores);
-	    deduped = allStores.filter(function(item, index, array) {
-	      return index === array.lastIndexOf(item);
-	    });
-	    for (_i = 0, _len = deduped.length; _i < _len; _i++) {
-	      store = deduped[_i];
-	      store.listen(this.handleStoreChange);
-	    }
-	    window.addEventListener('hashchange', this.handleHashChange, false);
-	    return this.handleHashChange();
-	  };
-	
-	  Router.prototype.handleStoreChange = function() {
-	    var newUrl;
-	    newUrl = '#' + this.makeUrl();
-	    if (window.location.hash !== newUrl) {
-	      console.log("pushing new hash: from: '" + window.location.hash + "' to '" + newUrl + "'");
-	      this._lastUrlHandled = newUrl;
-	      return window.location.hash = newUrl;
-	    }
-	  };
-	
-	  Router.prototype.handleHashChange = function() {
-	    var url;
-	    if (window.location.hash !== this._lastUrlHandled) {
-	      console.log("noticed hash changed: '" + window.location.hash + "'");
-	      url = window.location.hash.replace('#', '');
-	      this.getRouteBindingForUrl(url).handleUrl(url);
-	      return this._lastUrlHandled = url;
-	    }
-	  };
-	
-	  Router.prototype.makeUrl = function() {
-	    var urls;
-	    urls = this.routeBindings.map(function(routeBinding) {
-	      return routeBinding.makeUrl();
-	    }).filter(function(url) {
-	      return url != null;
-	    });
-	    if (urls.length > 0) {
-	      return urls[0];
-	    } else {
-	      throw new Error('makeUrl failed for all RouteBindings');
-	    }
-	  };
-	
-	  Router.prototype.getRouteBindingForUrl = function(url) {
-	    var matches;
-	    matches = this.routeBindings.filter(function(routeBinding) {
-	      return routeBinding.matchesUrl(url);
-	    });
-	    if (matches.length > 0) {
-	      return matches[0];
-	    } else {
-	      throw new Error('no RouteBinding matched ' + url);
-	    }
-	  };
-	
-	  return Router;
-	
-	})();
-	
-	myRouter = new Router([
+	module.exports = new RefluxRouter([
 	  new RouteBinding({
 	    pattern: '/users/:username/repos/:repo/files/:file(/)',
 	    handleUrl: function(_arg) {
@@ -298,8 +173,6 @@
 	    }
 	  })
 	]);
-	
-	myRouter.start();
 
 
 /***/ },
@@ -28567,6 +28440,158 @@
 	module.exports = toArray;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 71)))
+
+/***/ },
+/* 242 */
+/*!****************************************!*\
+  !*** ./src/Router/RefluxRouter.coffee ***!
+  \****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var RefluxRouter,
+	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	
+	module.exports = RefluxRouter = (function() {
+	  function RefluxRouter(routeBindings) {
+	    this.routeBindings = routeBindings;
+	    this.handleHashChange = __bind(this.handleHashChange, this);
+	    this.handleStoreChange = __bind(this.handleStoreChange, this);
+	  }
+	
+	  RefluxRouter.prototype.start = function() {
+	    var allStores, deduped, store, stores, _i, _len;
+	    console.log('Router.start', window.location.hash);
+	    stores = this.routeBindings.map(function(routeBinding) {
+	      return routeBinding.listenToStores;
+	    });
+	    allStores = [].concat.apply([], stores);
+	    deduped = allStores.filter(function(item, index, array) {
+	      return index === array.lastIndexOf(item);
+	    });
+	    for (_i = 0, _len = deduped.length; _i < _len; _i++) {
+	      store = deduped[_i];
+	      store.listen(this.handleStoreChange);
+	    }
+	    window.addEventListener('hashchange', this.handleHashChange, false);
+	    return this.handleHashChange();
+	  };
+	
+	  RefluxRouter.prototype.handleStoreChange = function() {
+	    var newUrl;
+	    newUrl = '#' + this.makeUrl();
+	    if (window.location.hash !== newUrl) {
+	      console.log("pushing new hash: from: '" + window.location.hash + "' to '" + newUrl + "'");
+	      this._lastUrlHandled = newUrl;
+	      return window.location.hash = newUrl;
+	    }
+	  };
+	
+	  RefluxRouter.prototype.handleHashChange = function() {
+	    var url;
+	    if (window.location.hash !== this._lastUrlHandled) {
+	      console.log("noticed hash changed: '" + window.location.hash + "'");
+	      url = window.location.hash.replace('#', '');
+	      this.getRouteBindingForUrl(url).handleUrl(url);
+	      return this._lastUrlHandled = url;
+	    }
+	  };
+	
+	  RefluxRouter.prototype.makeUrl = function() {
+	    var urls;
+	    urls = this.routeBindings.map(function(routeBinding) {
+	      return routeBinding.makeUrl();
+	    }).filter(function(url) {
+	      return url != null;
+	    });
+	    if (urls.length > 0) {
+	      return urls[0];
+	    } else {
+	      throw new Error('makeUrl failed for all RouteBindings');
+	    }
+	  };
+	
+	  RefluxRouter.prototype.getRouteBindingForUrl = function(url) {
+	    var matches;
+	    matches = this.routeBindings.filter(function(routeBinding) {
+	      return routeBinding.matchesUrl(url);
+	    });
+	    if (matches.length > 0) {
+	      return matches[0];
+	    } else {
+	      throw new Error('no RouteBinding matched ' + url);
+	    }
+	  };
+	
+	  return RefluxRouter;
+	
+	})();
+
+
+/***/ },
+/* 243 */
+/*!****************************************!*\
+  !*** ./src/Router/RouteBinding.coffee ***!
+  \****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var RouteBinding,
+	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	
+	module.exports = RouteBinding = (function() {
+	  function RouteBinding(options) {
+	    this.matchesUrl = __bind(this.matchesUrl, this);
+	    this.urlRegex = __bind(this.urlRegex, this);
+	    this.makeUrl = __bind(this.makeUrl, this);
+	    this.handleUrl = __bind(this.handleUrl, this);
+	    this.pattern = options.pattern, this.listenToStores = options.listenToStores;
+	    this._handleUrl = options.handleUrl;
+	    this._makeUrl = options.makeUrl;
+	  }
+	
+	  RouteBinding.prototype.handleUrl = function(string) {
+	    var i, key, keys, urlParameters, values;
+	    keys = this.pattern.match(/:([^\/\(]+)/g);
+	    urlParameters = {};
+	    values = this.urlRegex().exec(string).slice(1);
+	    for (i in keys) {
+	      key = keys[i];
+	      urlParameters[key.substr(1)] = values[i];
+	    }
+	    return this._handleUrl(urlParameters);
+	  };
+	
+	  RouteBinding.prototype.makeUrl = function() {
+	    var key, mapping, url, value;
+	    mapping = this._makeUrl();
+	    if (mapping != null) {
+	      url = this.pattern.replace('(/)', '');
+	      for (key in mapping) {
+	        value = mapping[key];
+	        if (value === null) {
+	          return null;
+	        }
+	        url = url.replace(':' + key, value);
+	      }
+	      return url;
+	    } else {
+	      return null;
+	    }
+	  };
+	
+	  RouteBinding.prototype.urlRegex = function() {
+	    var regex;
+	    regex = this.pattern.replace(/\(\/\)/g, '/?').replace(/\//g, '\\/').replace(/:([^\/\)\\]+)/g, '([^\\/]+)');
+	    return new RegExp("^" + regex + "$");
+	  };
+	
+	  RouteBinding.prototype.matchesUrl = function(string) {
+	    return this.urlRegex().test(string);
+	  };
+	
+	  return RouteBinding;
+	
+	})();
+
 
 /***/ }
 /******/ ])
