@@ -31,13 +31,13 @@ module.exports = UserStore = Reflux.createStore
         .then (json) ->
           if json.access_token?
             _accessToken = json.access_token
-            localStorage 'ghu-token', _accessToken
+            localStorage.setItem 'ghu-token', _accessToken
           else
             Promise.reject json
         .then @_connectToGithub
         .catch (error) ->
-          console.error error
           _accessTokenError = true
+          console.error error
         .then =>
           _accessTokenLoading = false
           @trigger()
@@ -56,7 +56,11 @@ module.exports = UserStore = Reflux.createStore
         if response.status is 200
           _accessToken = token
         else
-          _accessTokenError = true
+          Promise.reject()
+      .then @_connectToGithub
+      .catch ->
+        _accessTokenError = true
+        localStorage.removeItem 'ghu-token'
       .then =>
         _accessTokenLoading = false
         @trigger()

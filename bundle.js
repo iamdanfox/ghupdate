@@ -46,11 +46,11 @@
 
 	var Actions, App, React;
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
 	App = __webpack_require__(1);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	window.React = React;
 
@@ -65,19 +65,19 @@
 
 	var App, Editor, FileChooser, LogInButton, React, Reflux, RepoChooser, Stores;
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
 	Reflux = __webpack_require__(12);
 
-	Stores = __webpack_require__(3);
+	Stores = __webpack_require__(4);
 
-	RepoChooser = __webpack_require__(4);
+	RepoChooser = __webpack_require__(5);
 
-	FileChooser = __webpack_require__(5);
+	FileChooser = __webpack_require__(6);
 
-	Editor = __webpack_require__(6);
+	Editor = __webpack_require__(7);
 
-	LogInButton = __webpack_require__(7);
+	LogInButton = __webpack_require__(8);
 
 	App = module.exports = React.createClass({
 	  displayName: 'App',
@@ -118,7 +118,7 @@
 	      "className": "ghu-app"
 	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username == null ? (function() {
 	      var UsernameChooser;
-	      UsernameChooser = __webpack_require__(8);
+	      UsernameChooser = __webpack_require__(9);
 	      return React.createElement(UsernameChooser, null);
 	    })() : this.state.repoName == null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
@@ -137,16 +137,27 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(9);
+	var Actions, Reflux;
+
+	Reflux = __webpack_require__(12);
+
+	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo', 'selectFile', 'getAccessTokenForCode', 'readAccessTokenFromLocalStorage', 'saveFile']);
 
 
 /***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__(10);
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var Actions, Stores;
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	module.exports = Stores = {
 	  userStore: __webpack_require__(23),
@@ -166,12 +177,12 @@
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Actions, Loading, React, Reflux, RepoChooser, RepoLink, RepoList, Stores, timeago;
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
 	timeago = __webpack_require__(51);
 
@@ -179,9 +190,9 @@
 
 	Reflux = __webpack_require__(12);
 
-	Stores = __webpack_require__(3);
+	Stores = __webpack_require__(4);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	module.exports = RepoChooser = React.createClass({
 	  displayName: 'RepoChooser',
@@ -254,16 +265,16 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var FileChooser, React, Reflux, Stores, TreeFileView, TreeView;
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
 	Reflux = __webpack_require__(12);
 
-	Stores = __webpack_require__(3);
+	Stores = __webpack_require__(4);
 
 	FileChooser = module.exports = React.createClass({
 	  displayName: 'FileChooser',
@@ -324,7 +335,7 @@
 	  },
 	  selectFile: function() {
 	    var Actions;
-	    Actions = __webpack_require__(10);
+	    Actions = __webpack_require__(2);
 	    return Actions.selectFile(this.props.item.path);
 	  },
 	  render: function() {
@@ -338,20 +349,20 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Actions, Editor, Loading, React, Reflux, fileContentsStore, fileStore, _ref;
 
 	Reflux = __webpack_require__(12);
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
 	Loading = __webpack_require__(11);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
-	_ref = __webpack_require__(3), fileStore = _ref.fileStore, fileContentsStore = _ref.fileContentsStore;
+	_ref = __webpack_require__(4), fileStore = _ref.fileStore, fileContentsStore = _ref.fileContentsStore;
 
 	module.exports = Editor = React.createClass({
 	  displayName: 'Editor',
@@ -394,16 +405,16 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var LogInButton, React, Reflux, Stores;
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
 	Reflux = __webpack_require__(12);
 
-	Stores = __webpack_require__(3);
+	Stores = __webpack_require__(4);
 
 	LogInButton = module.exports = React.createClass({
 	  displayName: 'LogInButton',
@@ -450,14 +461,14 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Actions, React, UsernameChooser;
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	UsernameChooser = module.exports = React.createClass({
 	  displayName: 'UsernameChooser',
@@ -468,7 +479,7 @@
 	  render: function() {
 	    var LogInButton;
 	    __webpack_require__(21);
-	    LogInButton = __webpack_require__(7);
+	    LogInButton = __webpack_require__(8);
 	    return React.createElement(React.DOM.div, {
 	      "className": 'ghu-username-chooser'
 	    }, React.createElement(React.DOM.form, {
@@ -484,7 +495,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -642,23 +653,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(127)))
 
 /***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Actions, Reflux;
-
-	Reflux = __webpack_require__(12);
-
-	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo', 'selectFile', 'getAccessTokenForCode', 'readAccessTokenFromLocalStorage', 'saveFile']);
-
-
-/***/ },
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Loading, React;
 
-	React = __webpack_require__(2);
+	React = __webpack_require__(3);
 
 	Loading = module.exports = React.createClass({
 	  displayName: 'Loading',
@@ -922,7 +922,7 @@
 
 	Reflux = __webpack_require__(12);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	Github = __webpack_require__(129);
 
@@ -958,13 +958,13 @@
 	      }).then(function(json) {
 	        if (json.access_token != null) {
 	          _accessToken = json.access_token;
-	          return localStorage('ghu-token', _accessToken);
+	          return localStorage.setItem('ghu-token', _accessToken);
 	        } else {
 	          return Promise.reject(json);
 	        }
 	      }).then(this._connectToGithub)["catch"](function(error) {
-	        console.error(error);
-	        return _accessTokenError = true;
+	        _accessTokenError = true;
+	        return console.error(error);
 	      }).then((function(_this) {
 	        return function() {
 	          _accessTokenLoading = false;
@@ -989,8 +989,11 @@
 	        if (response.status === 200) {
 	          return _accessToken = token;
 	        } else {
-	          return _accessTokenError = true;
+	          return Promise.reject();
 	        }
+	      }).then(this._connectToGithub)["catch"](function() {
+	        _accessTokenError = true;
+	        return localStorage.removeItem('ghu-token');
 	      }).then((function(_this) {
 	        return function() {
 	          _accessTokenLoading = false;
@@ -1130,7 +1133,7 @@
 
 	Reflux = __webpack_require__(12);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	_selectedRepoName = null;
 
@@ -1218,7 +1221,7 @@
 
 	Reflux = __webpack_require__(12);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	_selectedFile = null;
 
@@ -1250,7 +1253,7 @@
 
 	apiModule = __webpack_require__(66);
 
-	Actions = __webpack_require__(10);
+	Actions = __webpack_require__(2);
 
 	_cachedContentsForFile = null;
 
@@ -25041,7 +25044,7 @@
 	"use strict";
 
 	var LinkedStateMixin = __webpack_require__(221);
-	var React = __webpack_require__(9);
+	var React = __webpack_require__(10);
 	var ReactComponentWithPureRenderMixin =
 	  __webpack_require__(222);
 	var ReactCSSTransitionGroup = __webpack_require__(223);
@@ -25512,7 +25515,7 @@
 
 	"use strict";
 
-	var React = __webpack_require__(9);
+	var React = __webpack_require__(10);
 
 	var ReactTransitionGroup = __webpack_require__(224);
 	var ReactCSSTransitionGroupChild = __webpack_require__(233);
@@ -25584,7 +25587,7 @@
 
 	"use strict";
 
-	var React = __webpack_require__(9);
+	var React = __webpack_require__(10);
 	var ReactTransitionChildMapping = __webpack_require__(234);
 
 	var cloneWithProps = __webpack_require__(226);
@@ -26079,7 +26082,7 @@
 	var EventConstants = __webpack_require__(70);
 	var EventPluginHub = __webpack_require__(140);
 	var EventPropagators = __webpack_require__(145);
-	var React = __webpack_require__(9);
+	var React = __webpack_require__(10);
 	var ReactDescriptor = __webpack_require__(37);
 	var ReactDOM = __webpack_require__(38);
 	var ReactBrowserEventEmitter = __webpack_require__(92);
@@ -26745,7 +26748,7 @@
 	 * consumption of ReactLink easier; see LinkedValueUtils and LinkedStateMixin.
 	 */
 
-	var React = __webpack_require__(9);
+	var React = __webpack_require__(10);
 
 	/**
 	 * @param {*} value current value of the link
@@ -26923,7 +26926,7 @@
 
 	"use strict";
 
-	var React = __webpack_require__(9);
+	var React = __webpack_require__(10);
 
 	var CSSCore = __webpack_require__(236);
 	var ReactTransitionEvents = __webpack_require__(237);
