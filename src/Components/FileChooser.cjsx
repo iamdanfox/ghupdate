@@ -34,7 +34,7 @@ TreeView = React.createClass
 
   render: ->
     <ul className='ghu-file-chooser'>
-      { <TreeFileView item={item} /> for item in @props.htmlFiles }
+      { <TreeFileView item={item} key={item.path} /> for item in @props.htmlFiles }
     </ul>
 
 

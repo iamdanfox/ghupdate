@@ -105,7 +105,6 @@
 	    handleUrl: function(_arg) {
 	      var file, repo, username;
 	      username = _arg.username, repo = _arg.repo, file = _arg.file;
-	      console.log('usersreposfiles handleUrl', username, repo, file);
 	      Actions.setUsername(username);
 	      Actions.selectRepo(repo);
 	      return Actions.selectFile(file);
@@ -123,7 +122,6 @@
 	    handleUrl: function(_arg) {
 	      var repo, username;
 	      username = _arg.username, repo = _arg.repo;
-	      console.log('usersrepos handleUrl', username, repo);
 	      Actions.setUsername(username);
 	      Actions.selectRepo(repo);
 	      return Actions.selectFile(null);
@@ -140,7 +138,6 @@
 	    handleUrl: function(_arg) {
 	      var username;
 	      username = _arg.username;
-	      console.log('users handleUrl', username);
 	      Actions.setUsername(username);
 	      Actions.selectRepo(null);
 	      return Actions.selectFile(null);
@@ -154,7 +151,6 @@
 	  }), new RouteBinding({
 	    pattern: '(/)',
 	    handleUrl: function() {
-	      console.log('default handleUrl');
 	      Actions.selectFile(null);
 	      Actions.selectRepo(null);
 	      return Actions.setUsername(null);
@@ -447,7 +443,8 @@
 	      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
 	        item = _ref[_i];
 	        _results.push(React.createElement(TreeFileView, {
-	          "item": item
+	          "item": item,
+	          "key": item.path
 	        }));
 	      }
 	      return _results;
@@ -696,7 +693,6 @@
 	
 	  RefluxRouter.prototype.start = function() {
 	    var allStores, deduped, store, stores, _i, _len;
-	    console.log('Router.start', window.location.hash);
 	    stores = this.routeBindings.map(function(routeBinding) {
 	      return routeBinding.listenToStores;
 	    });
@@ -716,7 +712,6 @@
 	    var newUrl;
 	    newUrl = '#' + this.makeUrl();
 	    if (window.location.hash !== newUrl) {
-	      console.log("pushing new hash: from: '" + window.location.hash + "' to '" + newUrl + "'");
 	      this._lastUrlHandled = newUrl;
 	      return window.location.hash = newUrl;
 	    }
@@ -725,7 +720,6 @@
 	  RefluxRouter.prototype.handleHashChange = function() {
 	    var url;
 	    if (window.location.hash !== this._lastUrlHandled) {
-	      console.log("noticed hash changed: '" + window.location.hash + "'");
 	      url = window.location.hash.replace('#', '');
 	      this.getRouteBindingForUrl(url).handleUrl(url);
 	      return this._lastUrlHandled = url;

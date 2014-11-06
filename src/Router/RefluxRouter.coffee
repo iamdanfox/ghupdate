@@ -23,7 +23,7 @@ module.exports = class RefluxRouter
   constructor: (@routeBindings) ->
 
   start: ->
-    console.log 'Router.start', window.location.hash
+    # console.log 'Router.start', window.location.hash
     stores = @routeBindings.map (routeBinding) -> routeBinding.listenToStores
     allStores = [].concat.apply [], stores
     deduped = allStores.filter (item, index, array) -> index is array.lastIndexOf item
@@ -35,13 +35,13 @@ module.exports = class RefluxRouter
   handleStoreChange: =>
     newUrl = '#'+@makeUrl()
     if window.location.hash isnt newUrl
-      console.log "pushing new hash: from: '" + window.location.hash + "' to '" + newUrl + "'"
+      # console.log "pushing new hash: from: '" + window.location.hash + "' to '" + newUrl + "'"
       @_lastUrlHandled = newUrl
       window.location.hash = newUrl
 
   handleHashChange: =>
     if window.location.hash isnt @_lastUrlHandled # ie someone else triggered it
-      console.log "noticed hash changed: '#{window.location.hash}'"
+      # console.log "noticed hash changed: '#{window.location.hash}'"
       url = window.location.hash.replace '#', ''
       @getRouteBindingForUrl(url).handleUrl url
       @_lastUrlHandled = url

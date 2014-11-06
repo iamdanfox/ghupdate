@@ -8,7 +8,7 @@ module.exports = new RefluxRouter [
     new RouteBinding
       pattern: '/users/:username/repos/:repo/files/:file(/)'
       handleUrl: ({username, repo, file}) ->
-        console.log 'usersreposfiles handleUrl', username, repo, file
+        # console.log 'usersreposfiles handleUrl', username, repo, file
         Actions.setUsername username
         Actions.selectRepo repo
         Actions.selectFile file
@@ -21,7 +21,7 @@ module.exports = new RefluxRouter [
     new RouteBinding
       pattern: '/users/:username/repos/:repo(/)'
       handleUrl: ({username, repo}) ->
-        console.log 'usersrepos handleUrl', username, repo
+        # console.log 'usersrepos handleUrl', username, repo
         Actions.setUsername username
         Actions.selectRepo repo
         Actions.selectFile null
@@ -33,7 +33,7 @@ module.exports = new RefluxRouter [
     new RouteBinding
       pattern: '/users/:username(/)'
       handleUrl: ({username}) ->
-        console.log 'users handleUrl', username
+        # console.log 'users handleUrl', username
         Actions.setUsername username
         Actions.selectRepo null
         Actions.selectFile null
@@ -44,7 +44,7 @@ module.exports = new RefluxRouter [
     new RouteBinding
       pattern: '(/)'
       handleUrl: ->
-        console.log 'default handleUrl'
+        # console.log 'default handleUrl'
         Actions.selectFile null
         Actions.selectRepo null
         Actions.setUsername null
