@@ -130,7 +130,7 @@
 	      "className": 'ghu-username'
 	    }, this.state.username, "\x2F", this.state.repoName), React.createElement(FileChooser, null)) : React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
-	    }, this.state.username, "\x2F", this.state.repoName, "\x2F", this.state.file), (!Stores.userStore.isLoggedIn() ? React.createElement(React.DOM.div, null, "Please log in", React.createElement(LogInButton, null)) : React.createElement(Editor, null)))));
+	    }, this.state.username, "\x2F", this.state.repoName, "\x2F", this.state.file), (!Stores.accessTokenStore.isLoggedIn() ? React.createElement(React.DOM.div, null, "Please log in", React.createElement(LogInButton, null)) : React.createElement(Editor, null)))));
 	  }
 	});
 
@@ -163,6 +163,7 @@
 
 	module.exports = Stores = {
 	  userStore: __webpack_require__(23),
+	  accessTokenStore: __webpack_require__(239),
 	  userReposStore: __webpack_require__(24),
 	  repoStore: __webpack_require__(25),
 	  repoTreeStore: __webpack_require__(26),
@@ -423,13 +424,13 @@
 	  mixins: [Reflux.ListenerMixin],
 	  componentWillMount: function() {
 	    this.syncToStore();
-	    return this.listenTo(Stores.userStore, this.syncToStore);
+	    return this.listenTo(Stores.accessTokenStore, this.syncToStore);
 	  },
 	  syncToStore: function() {
 	    return this.setState({
-	      loggedIn: Stores.userStore.isLoggedIn(),
-	      accessTokenLoading: Stores.userStore.getAccessTokenLoading(),
-	      accessTokenError: Stores.userStore.getAccessTokenError()
+	      loggedIn: Stores.accessTokenStore.isLoggedIn(),
+	      accessTokenLoading: Stores.accessTokenStore.getAccessTokenLoading(),
+	      accessTokenError: Stores.accessTokenStore.getAccessTokenError()
 	    });
 	  },
 	  redirectToOAuth: function() {
@@ -916,11 +917,7 @@
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, Github, Reflux, UserStore, _accessToken, _accessTokenError, _accessTokenLoading, _github, _username;
-
-	__webpack_require__(131).polyfill();
-
-	__webpack_require__(69);
+	var Actions, Github, Reflux, UserStore, accessTokenStore, _github, _username;
 
 	Reflux = __webpack_require__(10);
 
@@ -928,106 +925,31 @@
 
 	Github = __webpack_require__(68);
 
+	accessTokenStore = __webpack_require__(239);
+
 	_username = null;
-
-	_accessToken = null;
-
-	_accessTokenLoading = false;
-
-	_accessTokenError = false;
 
 	_github = null;
 
 	module.exports = UserStore = Reflux.createStore({
 	  init: function() {
 	    this.listenTo(Actions.setUsername, this.setUsername);
-	    this.listenTo(Actions.readCodeFromUrl, this.readCodeFromUrl);
-	    return this.listenTo(Actions.readAccessTokenFromLocalStorage, this.readAccessTokenFromLocalStorage);
+	    return this.listenTo(accessTokenStore, this._connectToGithubIfNecessary);
 	  },
 	  setUsername: function(newUsername) {
 	    _username = newUsername;
 	    return this.trigger();
 	  },
-	  readCodeFromUrl: function() {
-	    var code, regex, results;
-	    regex = new RegExp("[\\?&]code=([^&#]*)");
-	    results = regex.exec(location.search);
-	    code = results != null ? decodeURIComponent(results[1].replace(/\+/g, " ")) : '';
-	    if (code !== '' && !_accessTokenLoading) {
-	      _accessTokenLoading = true;
-	      _accessTokenError = false;
-	      this.trigger();
-	      return fetch('https://ghupdate.herokuapp.com/login/oauth/access_token?code=' + code, {
-	        method: 'post'
-	      }).then(function(response) {
-	        return response.json();
-	      }).then(function(json) {
-	        if (json.access_token != null) {
-	          _accessToken = json.access_token;
-	          return localStorage.setItem('ghu-token', _accessToken);
-	        } else {
-	          return Promise.reject(json);
-	        }
-	      }).then(this._connectToGithub)["catch"](function(error) {
-	        _accessTokenError = true;
-	        return console.error(error);
-	      }).then((function(_this) {
-	        return function() {
-	          _accessTokenLoading = false;
-	          return _this.trigger();
-	        };
-	      })(this));
+	  _connectToGithubIfNecessary: function() {
+	    if (accessTokenStore.isLoggedIn() && (_github == null)) {
+	      return _github = new Github({
+	        auth: 'oauth',
+	        token: accessTokenStore.getAccessToken()
+	      });
 	    }
-	  },
-	  readAccessTokenFromLocalStorage: function() {
-	    var token;
-	    token = localStorage.getItem('ghu-token');
-	    if (!_accessTokenLoading && (token != null)) {
-	      _accessTokenLoading = true;
-	      _accessTokenError = false;
-	      this.trigger();
-	      return fetch('https://api.github.com/user', {
-	        headers: {
-	          'Accept': 'application/vnd.github.v3+json',
-	          'Authorization': 'token ' + token
-	        }
-	      }).then(function(response) {
-	        if (response.status === 200) {
-	          return _accessToken = token;
-	        } else {
-	          return Promise.reject();
-	        }
-	      }).then(this._connectToGithub)["catch"](function() {
-	        _accessTokenError = true;
-	        return localStorage.removeItem('ghu-token');
-	      }).then((function(_this) {
-	        return function() {
-	          _accessTokenLoading = false;
-	          return _this.trigger();
-	        };
-	      })(this));
-	    }
-	  },
-	  _connectToGithub: function() {
-	    return _github = new Github({
-	      auth: 'oauth',
-	      token: _accessToken
-	    });
 	  },
 	  getUsername: function() {
 	    return _username;
-	  },
-	  isLoggedIn: function() {
-	    return _accessToken != null;
-	  },
-	  getAccessTokenLoading: function() {
-	    return _accessTokenLoading;
-	  },
-	  getAccessTokenError: function() {
-	    return _accessTokenError;
-	  },
-	  getAccessToken: function() {
-	    return _accessToken;
 	  },
 	  getGithub: function() {
 	    return _github;
@@ -27548,6 +27470,106 @@
 	module.exports = toArray;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(67)))
+
+/***/ },
+/* 239 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var AccessTokenStore, Actions, Reflux, _accessToken, _accessTokenError, _accessTokenLoading;
+
+	__webpack_require__(131).polyfill();
+
+	__webpack_require__(69);
+
+	Reflux = __webpack_require__(10);
+
+	Actions = __webpack_require__(2);
+
+	_accessToken = null;
+
+	_accessTokenLoading = false;
+
+	_accessTokenError = false;
+
+	module.exports = AccessTokenStore = Reflux.createStore({
+	  init: function() {
+	    this.listenTo(Actions.readCodeFromUrl, this.readCodeFromUrl);
+	    return this.listenTo(Actions.readAccessTokenFromLocalStorage, this.readAccessTokenFromLocalStorage);
+	  },
+	  readCodeFromUrl: function() {
+	    var code, regex, results;
+	    regex = new RegExp("[\\?&]code=([^&#]*)");
+	    results = regex.exec(location.search);
+	    code = results != null ? decodeURIComponent(results[1].replace(/\+/g, " ")) : '';
+	    if (code !== '' && !_accessTokenLoading) {
+	      _accessTokenLoading = true;
+	      _accessTokenError = false;
+	      this.trigger();
+	      return fetch('https://ghupdate.herokuapp.com/login/oauth/access_token?code=' + code, {
+	        method: 'post'
+	      }).then(function(response) {
+	        return response.json();
+	      }).then(function(json) {
+	        if (json.access_token != null) {
+	          _accessToken = json.access_token;
+	          return localStorage.setItem('ghu-token', _accessToken);
+	        } else {
+	          return Promise.reject(json);
+	        }
+	      })["catch"](function(error) {
+	        _accessTokenError = true;
+	        return console.error(error);
+	      }).then((function(_this) {
+	        return function() {
+	          _accessTokenLoading = false;
+	          return _this.trigger();
+	        };
+	      })(this));
+	    }
+	  },
+	  readAccessTokenFromLocalStorage: function() {
+	    var token;
+	    token = localStorage.getItem('ghu-token');
+	    if (!_accessTokenLoading && (token != null)) {
+	      _accessTokenLoading = true;
+	      _accessTokenError = false;
+	      this.trigger();
+	      return fetch('https://api.github.com/user', {
+	        headers: {
+	          'Accept': 'application/vnd.github.v3+json',
+	          'Authorization': 'token ' + token
+	        }
+	      }).then(function(response) {
+	        if (response.status === 200) {
+	          return _accessToken = token;
+	        } else {
+	          return Promise.reject();
+	        }
+	      })["catch"](function() {
+	        _accessTokenError = true;
+	        return localStorage.removeItem('ghu-token');
+	      }).then((function(_this) {
+	        return function() {
+	          _accessTokenLoading = false;
+	          return _this.trigger();
+	        };
+	      })(this));
+	    }
+	  },
+	  isLoggedIn: function() {
+	    return _accessToken != null;
+	  },
+	  getAccessTokenLoading: function() {
+	    return _accessTokenLoading;
+	  },
+	  getAccessTokenError: function() {
+	    return _accessTokenError;
+	  },
+	  getAccessToken: function() {
+	    return _accessToken;
+	  }
+	});
+
 
 /***/ }
 /******/ ])

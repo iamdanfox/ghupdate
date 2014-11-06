@@ -2,24 +2,16 @@ require('es6-promise').polyfill()
 require 'fetch'
 Reflux = require 'reflux'
 Actions = require '../Actions.coffee'
-Github = require 'github-api'
 
 
-_username = null
 _accessToken = null
 _accessTokenLoading = false
 _accessTokenError = false
-_github = null
 
-module.exports = UserStore = Reflux.createStore
+module.exports = AccessTokenStore = Reflux.createStore
   init: ->
-    @listenTo Actions.setUsername, @setUsername
     @listenTo Actions.readCodeFromUrl, @readCodeFromUrl
     @listenTo Actions.readAccessTokenFromLocalStorage, @readAccessTokenFromLocalStorage
-
-  setUsername: (newUsername) ->
-    _username = newUsername
-    @trigger()
 
   readCodeFromUrl: ->
     regex = new RegExp("[\\?&]code=([^&#]*)")
@@ -38,7 +30,6 @@ module.exports = UserStore = Reflux.createStore
             localStorage.setItem 'ghu-token', _accessToken
           else
             Promise.reject json
-        .then @_connectToGithub
         .catch (error) ->
           _accessTokenError = true
           console.error error
@@ -61,21 +52,12 @@ module.exports = UserStore = Reflux.createStore
           _accessToken = token
         else
           Promise.reject()
-      .then @_connectToGithub
       .catch ->
         _accessTokenError = true
         localStorage.removeItem 'ghu-token'
       .then =>
         _accessTokenLoading = false
         @trigger()
-
-  _connectToGithub: ->
-    _github = new Github
-      auth: 'oauth'
-      token: _accessToken
-
-  getUsername: ->
-    return _username
 
   isLoggedIn: ->
     _accessToken?
@@ -88,6 +70,3 @@ module.exports = UserStore = Reflux.createStore
 
   getAccessToken: ->
     return _accessToken
-
-  getGithub: ->
-    return _github

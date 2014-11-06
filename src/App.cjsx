@@ -45,7 +45,7 @@ App = module.exports = React.createClass
             else
               <div>
                 <h2 className='ghu-username'>{@state.username}/{@state.repoName}/{@state.file}</h2>
-                { unless Stores.userStore.isLoggedIn()
+                { unless Stores.accessTokenStore.isLoggedIn()
                     <div>
                       Please log in
                       <LogInButton />

@@ -3,6 +3,7 @@ Actions = require './Actions.coffee'
 
 module.exports = Stores =
   userStore:         require './Stores/UserStore.coffee'
+  accessTokenStore:  require './Stores/AccessTokenStore.coffee'
   userReposStore:    require './Stores/UserReposStore.coffee'
   repoStore:         require './Stores/RepoStore.coffee'
   repoTreeStore:     require './Stores/RepoTreeStore.coffee'

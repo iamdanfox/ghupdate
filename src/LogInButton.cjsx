@@ -9,13 +9,13 @@ LogInButton = module.exports = React.createClass
 
   componentWillMount: ->
     @syncToStore()
-    @listenTo Stores.userStore, @syncToStore
+    @listenTo Stores.accessTokenStore, @syncToStore
 
   syncToStore: ->
     @setState
-      loggedIn: Stores.userStore.isLoggedIn()
-      accessTokenLoading: Stores.userStore.getAccessTokenLoading()
-      accessTokenError: Stores.userStore.getAccessTokenError()
+      loggedIn: Stores.accessTokenStore.isLoggedIn()
+      accessTokenLoading: Stores.accessTokenStore.getAccessTokenLoading()
+      accessTokenError: Stores.accessTokenStore.getAccessTokenError()
 
   redirectToOAuth: ->
     #scope=repo Grants read/write access to code, commit statuses, and deployment statuses for public and private repositories and organizations.
