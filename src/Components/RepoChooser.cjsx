@@ -2,8 +2,8 @@ React = require 'react'
 timeago = require 'timeago'
 Loading = require './Loading.cjsx'
 Reflux = require 'reflux'
-Stores = require './Stores.coffee'
-Actions = require './Actions.coffee'
+Stores = require '../Stores.coffee'
+Actions = require '../Actions.coffee'
 
 
 module.exports = RepoChooser = React.createClass

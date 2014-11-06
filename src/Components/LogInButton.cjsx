@@ -1,6 +1,6 @@
 React = require 'react'
 Reflux = require 'reflux'
-Stores = require './Stores.coffee'
+Stores = require '../Stores.coffee'
 
 
 LogInButton = module.exports = React.createClass

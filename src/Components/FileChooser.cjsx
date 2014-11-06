@@ -1,6 +1,7 @@
 React = require 'react'
 Reflux = require 'reflux'
-Stores = require './Stores.coffee'
+Stores = require '../Stores.coffee'
+Actions = require '../Actions.coffee'
 
 
 FileChooser = module.exports = React.createClass
@@ -44,7 +45,6 @@ TreeFileView = React.createClass
     item: React.PropTypes.object.isRequired
 
   selectFile: ->
-    Actions = require './Actions.coffee'
     Actions.selectFile @props.item.path
 
   render: ->

@@ -1,5 +1,5 @@
 React = require 'react'
-Actions = require './Actions.coffee'
+Actions = require '../Actions.coffee'
 
 
 UsernameChooser = module.exports = React.createClass

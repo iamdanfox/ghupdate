@@ -1,8 +1,8 @@
 Reflux = require 'reflux'
 React = require 'react'
 Loading = require './Loading.cjsx'
-Actions = require './Actions.coffee'
-{fileStore, fileContentsStore} = require './Stores.coffee'
+Actions = require '../Actions.coffee'
+{fileStore, fileContentsStore} = require '../Stores.coffee'
 
 
 module.exports = Editor = React.createClass

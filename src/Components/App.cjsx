@@ -1,6 +1,6 @@
 React = require 'react'
 Reflux = require 'reflux'
-Stores = require './Stores.coffee'
+Stores = require '../Stores.coffee'
 RepoChooser = require './RepoChooser.cjsx'
 FileChooser = require './FileChooser.cjsx'
 Editor = require './Editor.cjsx'
