@@ -1,6 +1,7 @@
 React = require 'react'
 App = require './src/Components/App.cjsx'
 Actions = require './src/Actions.coffee'
+Router = require './src/Router.coffee'
 
 window.React = React # enables Chrome Dev Tools :)
 

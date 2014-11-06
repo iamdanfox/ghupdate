@@ -44,13 +44,15 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, App, React;
+	var Actions, App, React, Router;
 
 	React = __webpack_require__(3);
 
 	App = __webpack_require__(2);
 
 	Actions = __webpack_require__(1);
+
+	Router = __webpack_require__(241);
 
 	window.React = React;
 
@@ -27590,6 +27592,168 @@
 	module.exports = toArray;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(68)))
+
+/***/ },
+/* 241 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Actions, RouteBinding, Router, Stores, myRouter,
+	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+	Actions = __webpack_require__(1);
+
+	Stores = __webpack_require__(14);
+
+	RouteBinding = (function() {
+	  function RouteBinding(_arg) {
+	    this.urlRegex = _arg.urlRegex, this.handleUrl = _arg.handleUrl, this.listenToStores = _arg.listenToStores, this.makeUrl = _arg.makeUrl;
+	  }
+
+	  RouteBinding.prototype.matchesUrl = function(string) {
+	    var matches;
+	    matches = this.urlRegex.exec(string);
+	    if (matches != null) {
+	      return matches.length - 1;
+	    } else {
+	      return Infinity;
+	    }
+	  };
+
+	  return RouteBinding;
+
+	})();
+
+	Router = (function() {
+	  function Router(routeBindings) {
+	    this.routeBindings = routeBindings;
+	    this.handleHashChange = __bind(this.handleHashChange, this);
+	    this.handleStoreChange = __bind(this.handleStoreChange, this);
+	  }
+
+	  Router.prototype.start = function() {
+	    var allStores, store, stores, _i, _len;
+	    stores = this.routeBindings.map(function(routeBinding) {
+	      return routeBinding.listenToStores;
+	    });
+	    allStores = [].concat.apply([], stores);
+	    for (_i = 0, _len = allStores.length; _i < _len; _i++) {
+	      store = allStores[_i];
+	      store.listen(this.handleStoreChange);
+	    }
+	    window.addEventListener('hashchange', this.handleHashChange, false);
+	    return this.handleHashChange();
+	  };
+
+	  Router.prototype.handleStoreChange = function() {
+	    console.log('handleStoreChange');
+	    return window.location.hash = this.makeUrl();
+	  };
+
+	  Router.prototype.handleHashChange = function() {
+	    var url;
+	    console.log('handleHashChange');
+	    url = window.location.hash.replace('#', '');
+	    return this.getRouteBindingForUrl(url).handleUrl(url);
+	  };
+
+	  Router.prototype.makeUrl = function() {
+	    var indexOfLongest, lengths, longest, urls;
+	    urls = this.routeBindings.map(function(routeBinding) {
+	      return routeBinding.makeUrl();
+	    }).filter(function(url) {
+	      return url != null;
+	    });
+	    if (urls.length) {
+	      lengths = urls.map(function(url) {
+	        return url.length;
+	      });
+	      longest = Math.max.apply(Math, lengths);
+	      indexOfLongest = lengths.indexOf(longest);
+	      return urls[indexOfLongest];
+	    } else {
+	      throw new Error('makeUrl failed for all RouteBindings');
+	    }
+	  };
+
+	  Router.prototype.getRouteBindingForUrl = function(url) {
+	    var bestMatch, indexOfBestMatch, matches;
+	    matches = this.routeBindings.map(function(routeBinding) {
+	      return routeBinding.matchesUrl(url);
+	    });
+	    bestMatch = Math.min.apply(Math, matches);
+	    if (bestMatch < Infinity) {
+	      indexOfBestMatch = matches.indexOf(bestMatch);
+	      return this.routeBindings[indexOfBestMatch];
+	    } else {
+	      throw new Error('no RouteBinding matched ' + url);
+	    }
+	  };
+
+	  return Router;
+
+	})();
+
+	myRouter = new Router([
+	  new RouteBinding({
+	    urlRegex: /^\/users\/([^\/]+)\/?$/,
+	    handleUrl: function(string) {
+	      var username;
+	      username = this.urlRegex.exec(string).slice(1)[0];
+	      return Actions.setUsername(username);
+	    },
+	    listenToStores: [Stores.userStore],
+	    makeUrl: function() {
+	      var username;
+	      username = Stores.userStore.getUsername();
+	      if (username != null) {
+	        return "/users/" + username;
+	      } else {
+	        return null;
+	      }
+	    }
+	  }), new RouteBinding({
+	    urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/?$/,
+	    handleUrl: function(string) {
+	      var repo, username, _ref;
+	      _ref = this.urlRegex.exec(string).slice(1), username = _ref[0], repo = _ref[1];
+	      Actions.setUsername(username);
+	      return Actions.selectRepo(repo);
+	    },
+	    listenToStores: [Stores.userStore, Stores.repoStore],
+	    makeUrl: function() {
+	      var repo, username;
+	      username = Stores.userStore.getUsername();
+	      repo = Stores.repoStore.getSelectedRepoName();
+	      if ((username != null) && (repo != null)) {
+	        return "/users/" + username + "/repos/" + repo;
+	      } else {
+	        return null;
+	      }
+	    }
+	  }), new RouteBinding({
+	    urlRegex: /^\/?$/,
+	    handleUrl: function(string) {
+	      Actions.selectFile(null);
+	      Actions.selectRepo(null);
+	      return Actions.setUsername(null);
+	    },
+	    listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore],
+	    makeUrl: function() {
+	      var file, repo, username;
+	      username = Stores.userStore.getUsername();
+	      repo = Stores.repoStore.getSelectedRepoName();
+	      file = Stores.fileStore.getSelectedFile();
+	      if (username === null && repo === null && file === null) {
+	        return '';
+	      } else {
+	        return null;
+	      }
+	    }
+	  })
+	]);
+
+	myRouter.start();
+
 
 /***/ }
 /******/ ])
