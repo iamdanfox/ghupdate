@@ -14,15 +14,19 @@ _github = null
 module.exports = UserStore = Reflux.createStore
   init: ->
     @listenTo Actions.setUsername, @setUsername
-    @listenTo Actions.getAccessTokenForCode, @getAccessTokenForCode
+    @listenTo Actions.readCodeFromUrl, @readCodeFromUrl
     @listenTo Actions.readAccessTokenFromLocalStorage, @readAccessTokenFromLocalStorage
 
   setUsername: (newUsername) ->
     _username = newUsername
     @trigger()
 
-  getAccessTokenForCode: (code) ->
-    if not _accessTokenLoading
+  readCodeFromUrl: ->
+    regex = new RegExp("[\\?&]code=([^&#]*)")
+    results = regex.exec(location.search)
+    code = if results? then decodeURIComponent(results[1].replace(/\+/g, " ")) else ''
+
+    if code isnt '' and not _accessTokenLoading
       _accessTokenLoading = true
       _accessTokenError = false
       @trigger()
@@ -87,27 +91,3 @@ module.exports = UserStore = Reflux.createStore
 
   getGithub: ->
     return _github
-
-  queryString: ->
-    if _accessToken? then '?access_token=' + _accessToken else ''
-
-
-#debugging flow - real, deployed version echoes out the token, can set this locally for useful dev
-UserStore.listen ->
-  console.debug 'UserStore token =', UserStore.getAccessToken()
-
-window.debugUserStoreSetToken = (token) ->
-  _accessToken = token
-  UserStore._connectToGithub()
-  UserStore.trigger()
-
-
-getParameterByName = (name) ->
-  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
-  regex = new RegExp("[\\?&]" + name + "=([^&#]*)")
-  results = regex.exec(location.search)
-  return if results? then decodeURIComponent(results[1].replace(/\+/g, " ")) else ''
-
-code = getParameterByName 'code'
-if code isnt ''
-  Actions.getAccessTokenForCode code

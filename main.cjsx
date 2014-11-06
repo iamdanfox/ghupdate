@@ -6,4 +6,5 @@ window.React = React # enables Chrome Dev Tools :)
 
 React.renderComponent <App />, document.getElementsByTagName('body')[0]
 
+Actions.readCodeFromUrl()
 Actions.readAccessTokenFromLocalStorage()

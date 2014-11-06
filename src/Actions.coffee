@@ -4,7 +4,7 @@ module.exports = Actions = Reflux.createActions [
   'setUsername',
   'selectRepo',
   'selectFile',
-  'getAccessTokenForCode',
+  'readCodeFromUrl',
   'readAccessTokenFromLocalStorage',
   'saveFile'
 ]
