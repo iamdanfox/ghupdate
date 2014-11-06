@@ -7,15 +7,17 @@ LogInButton = module.exports = React.createClass
   displayName: 'LogInButton'
   mixins: [Reflux.ListenerMixin]
 
-  componentWillMount: ->
-    @syncToStore()
-    @listenTo Stores.accessTokenStore, @syncToStore
+  getInitialState: ->
+    loggedIn: Stores.accessTokenStore.isLoggedIn()
+    accessTokenLoading: Stores.accessTokenStore.getAccessTokenLoading()
+    accessTokenError: Stores.accessTokenStore.getAccessTokenError()
 
-  syncToStore: ->
-    @setState
-      loggedIn: Stores.accessTokenStore.isLoggedIn()
-      accessTokenLoading: Stores.accessTokenStore.getAccessTokenLoading()
-      accessTokenError: Stores.accessTokenStore.getAccessTokenError()
+  componentDidMount: ->
+    @listenTo Stores.accessTokenStore, =>
+      if @isMounted() then @setState
+        loggedIn: Stores.accessTokenStore.isLoggedIn()
+        accessTokenLoading: Stores.accessTokenStore.getAccessTokenLoading()
+        accessTokenError: Stores.accessTokenStore.getAccessTokenError()
 
   redirectToOAuth: ->
     #scope=repo Grants read/write access to code, commit statuses, and deployment statuses for public and private repositories and organizations.

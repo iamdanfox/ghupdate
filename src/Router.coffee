@@ -61,6 +61,22 @@ class Router
 
 myRouter = new Router [
     new RouteBinding
+      # /users/:username/repos/:repo/files/:file(/)
+      urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/files\/([^\/]+)\/?$/
+      handleUrl: (string) ->
+        console.log 'usersreposfiles handleUrl'
+        [username, repo, filename] = @urlRegex.exec(string)[1..]
+        Actions.setUsername username
+        Actions.selectRepo repo
+        Actions.selectFile filename
+      listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore]
+      makeUrl: ->
+        username = Stores.userStore.getUsername()
+        repo = Stores.repoStore.getSelectedRepoName()
+        file = Stores.fileStore.getSelectedFile()
+        if username? and repo? and file? then "/users/#{username}/repos/#{repo}/files/#{file}" else null
+  ,
+    new RouteBinding
       # /users/:username/repos/:repo(/)
       urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/?$/
       handleUrl: (string) ->

@@ -184,6 +184,28 @@
 	
 	myRouter = new Router([
 	  new RouteBinding({
+	    urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/files\/([^\/]+)\/?$/,
+	    handleUrl: function(string) {
+	      var filename, repo, username, _ref;
+	      console.log('usersreposfiles handleUrl');
+	      _ref = this.urlRegex.exec(string).slice(1), username = _ref[0], repo = _ref[1], filename = _ref[2];
+	      Actions.setUsername(username);
+	      Actions.selectRepo(repo);
+	      return Actions.selectFile(filename);
+	    },
+	    listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore],
+	    makeUrl: function() {
+	      var file, repo, username;
+	      username = Stores.userStore.getUsername();
+	      repo = Stores.repoStore.getSelectedRepoName();
+	      file = Stores.fileStore.getSelectedFile();
+	      if ((username != null) && (repo != null) && (file != null)) {
+	        return "/users/" + username + "/repos/" + repo + "/files/" + file;
+	      } else {
+	        return null;
+	      }
+	    }
+	  }), new RouteBinding({
 	    urlRegex: /^\/users\/([^\/]+)\/repos\/([^\/]+)\/?$/,
 	    handleUrl: function(string) {
 	      var repo, username, _ref;
@@ -257,7 +279,7 @@
   \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var App, Editor, FileChooser, LogInButton, React, Reflux, RepoChooser, Stores;
+	var App, Editor, FileChooser, LogInButton, React, Reflux, RepoChooser, Stores, UsernameChooser;
 	
 	React = __webpack_require__(/*! react */ 5);
 	
@@ -273,6 +295,8 @@
 	
 	LogInButton = __webpack_require__(/*! ./LogInButton.cjsx */ 9);
 	
+	UsernameChooser = __webpack_require__(/*! ./UsernameChooser.cjsx */ 10);
+	
 	App = module.exports = React.createClass({
 	  displayName: 'App',
 	  mixins: [Reflux.ListenerMixin],
@@ -280,7 +304,8 @@
 	    return {
 	      username: null,
 	      repoName: null,
-	      file: null
+	      file: null,
+	      isLoggedIn: false
 	    };
 	  },
 	  componentDidMount: function() {
@@ -298,10 +323,17 @@
 	        });
 	      };
 	    })(this));
-	    return this.listenTo(Stores.fileStore, (function(_this) {
+	    this.listenTo(Stores.fileStore, (function(_this) {
 	      return function() {
 	        return _this.setState({
 	          file: Stores.fileStore.getSelectedFile()
+	        });
+	      };
+	    })(this));
+	    return this.listenTo(Stores.accessTokenStore, (function(_this) {
+	      return function() {
+	        return _this.setState({
+	          isLoggedIn: Stores.accessTokenStore.isLoggedIn()
 	        });
 	      };
 	    })(this));
@@ -310,11 +342,7 @@
 	    __webpack_require__(/*! ./App.less */ 20);
 	    return React.createElement(React.DOM.div, {
 	      "className": "ghu-app"
-	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username == null ? (function() {
-	      var UsernameChooser;
-	      UsernameChooser = __webpack_require__(/*! ./UsernameChooser.cjsx */ 10);
-	      return React.createElement(UsernameChooser, null);
-	    })() : this.state.repoName == null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
+	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username == null ? React.createElement(UsernameChooser, null) : this.state.repoName == null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
 	    }, this.state.username), React.createElement(RepoChooser, {
 	      "username": this.state.username
@@ -322,7 +350,7 @@
 	      "className": 'ghu-username'
 	    }, this.state.username, "\x2F", this.state.repoName), React.createElement(FileChooser, null)) : React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
-	    }, this.state.username, "\x2F", this.state.repoName, "\x2F", this.state.file), (!Stores.accessTokenStore.isLoggedIn() ? React.createElement(React.DOM.div, null, "Please log in", React.createElement(LogInButton, null)) : React.createElement(Editor, null)))));
+	    }, this.state.username, "\x2F", this.state.repoName, "\x2F", this.state.file), (!this.state.isLoggedIn ? React.createElement(React.DOM.div, null, "Please log in", React.createElement(LogInButton, null)) : React.createElement(Editor, null)))));
 	  }
 	});
 
@@ -560,19 +588,28 @@
 	module.exports = Editor = React.createClass({
 	  displayName: 'Editor',
 	  mixins: [Reflux.ListenerMixin],
-	  componentWillMount: function() {
-	    __webpack_require__(/*! ./Editor.less */ 28);
-	    this.syncToStore();
-	    this.listenTo(fileStore, this.syncToStore);
-	    return this.listenTo(fileContentsStore, this.syncToStore);
-	  },
-	  syncToStore: function() {
-	    return this.setState({
+	  getInitialState: function() {
+	    return {
 	      file: fileStore.getSelectedFile(),
 	      contents: fileContentsStore.getContents(),
 	      loading: fileContentsStore.isLoading(),
 	      error: fileContentsStore.hasError()
-	    });
+	    };
+	  },
+	  componentWillMount: function() {
+	    __webpack_require__(/*! ./Editor.less */ 28);
+	    this.listenTo(fileStore, this.syncToStore);
+	    return this.listenTo(fileContentsStore, this.syncToStore);
+	  },
+	  syncToStore: function() {
+	    if (this.isMounted()) {
+	      return this.setState({
+	        file: fileStore.getSelectedFile(),
+	        contents: fileContentsStore.getContents(),
+	        loading: fileContentsStore.isLoading(),
+	        error: fileContentsStore.hasError()
+	      });
+	    }
 	  },
 	  handleSave: function() {
 	    return Actions.saveFile({
@@ -615,16 +652,25 @@
 	LogInButton = module.exports = React.createClass({
 	  displayName: 'LogInButton',
 	  mixins: [Reflux.ListenerMixin],
-	  componentWillMount: function() {
-	    this.syncToStore();
-	    return this.listenTo(Stores.accessTokenStore, this.syncToStore);
-	  },
-	  syncToStore: function() {
-	    return this.setState({
+	  getInitialState: function() {
+	    return {
 	      loggedIn: Stores.accessTokenStore.isLoggedIn(),
 	      accessTokenLoading: Stores.accessTokenStore.getAccessTokenLoading(),
 	      accessTokenError: Stores.accessTokenStore.getAccessTokenError()
-	    });
+	    };
+	  },
+	  componentDidMount: function() {
+	    return this.listenTo(Stores.accessTokenStore, (function(_this) {
+	      return function() {
+	        if (_this.isMounted()) {
+	          return _this.setState({
+	            loggedIn: Stores.accessTokenStore.isLoggedIn(),
+	            accessTokenLoading: Stores.accessTokenStore.getAccessTokenLoading(),
+	            accessTokenError: Stores.accessTokenStore.getAccessTokenError()
+	          });
+	        }
+	      };
+	    })(this));
 	  },
 	  redirectToOAuth: function() {
 	    return window.location = "https://github.com/login/oauth/authorize" + "?client_id=138c264183219a2ac2c9" + "&amp;scope=repo" + "&amp;redirect_uri=http://iamdanfox.github.io/ghupdate/" + "&amp;state=helloworld";

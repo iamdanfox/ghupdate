@@ -9,14 +9,19 @@ module.exports = Editor = React.createClass
   displayName: 'Editor'
   mixins: [Reflux.ListenerMixin]
 
+  getInitialState: ->
+    file: fileStore.getSelectedFile()
+    contents: fileContentsStore.getContents()
+    loading: fileContentsStore.isLoading()
+    error: fileContentsStore.hasError()
+
   componentWillMount: ->
     require './Editor.less'
-    @syncToStore()
     @listenTo fileStore, @syncToStore
     @listenTo fileContentsStore, @syncToStore
 
   syncToStore: ->
-    @setState
+    if @isMounted() then @setState
       file: fileStore.getSelectedFile()
       contents: fileContentsStore.getContents()
       loading: fileContentsStore.isLoading()

@@ -5,6 +5,8 @@ RepoChooser = require './RepoChooser.cjsx'
 FileChooser = require './FileChooser.cjsx'
 Editor = require './Editor.cjsx'
 LogInButton = require './LogInButton.cjsx'
+UsernameChooser = require './UsernameChooser.cjsx'
+
 
 App = module.exports = React.createClass
   displayName: 'App'
@@ -14,6 +16,7 @@ App = module.exports = React.createClass
     username: null
     repoName: null
     file: null
+    isLoggedIn: false
 
   componentDidMount: ->
     @listenTo Stores.userStore, =>
@@ -22,13 +25,14 @@ App = module.exports = React.createClass
       @setState repoName: Stores.repoStore.getSelectedRepoName()
     @listenTo Stores.fileStore, =>
       @setState file: Stores.fileStore.getSelectedFile()
+    @listenTo Stores.accessTokenStore, =>
+      @setState isLoggedIn: Stores.accessTokenStore.isLoggedIn()
 
   render: ->
     require './App.less'
     <div className="ghu-app">
       <h1>GH Update</h1>
-      { unless @state.username? then do ->
-          UsernameChooser = require './UsernameChooser.cjsx'
+      { unless @state.username?
           <UsernameChooser />
         else
           unless @state.repoName?
@@ -45,7 +49,7 @@ App = module.exports = React.createClass
             else
               <div>
                 <h2 className='ghu-username'>{@state.username}/{@state.repoName}/{@state.file}</h2>
-                { unless Stores.accessTokenStore.isLoggedIn()
+                { unless @state.isLoggedIn
                     <div>
                       Please log in
                       <LogInButton />
