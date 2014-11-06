@@ -4,8 +4,9 @@ Stores = require './Stores.coffee'
 
 class RouteBinding
   constructor: (options) ->
-    {@pattern, @listenToStores, @makeUrl} = options
+    {@pattern, @listenToStores} = options
     @_handleUrl = options.handleUrl
+    @_makeUrl = options.makeUrl
 
   handleUrl: (string) =>
     keys = @pattern.match /:([^\/\(]+)/g
@@ -14,6 +15,17 @@ class RouteBinding
     for i,key of keys
       urlParameters[key.substr 1] = values[i]
     @_handleUrl urlParameters
+
+  makeUrl: =>
+    mapping = @_makeUrl()
+    if mapping?
+      url = @pattern.replace '(/)', ''
+      for key, value of mapping
+        if value is null then return null
+        url = url.replace ':'+key, value
+      return url
+    else
+      return null
 
   urlRegex: =>
     regex = @pattern
@@ -86,10 +98,9 @@ myRouter = new Router [
         Actions.selectFile file
       listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore]
       makeUrl: ->
-        username = Stores.userStore.getUsername()
-        repo = Stores.repoStore.getSelectedRepoName()
-        file = Stores.fileStore.getSelectedFile()
-        if username? and repo? and file? then "/users/#{username}/repos/#{repo}/files/#{file}" else null
+        username: Stores.userStore.getUsername()
+        repo: Stores.repoStore.getSelectedRepoName()
+        file: Stores.fileStore.getSelectedFile()
   ,
     new RouteBinding
       pattern: '/users/:username/repos/:repo(/)'
@@ -100,9 +111,8 @@ myRouter = new Router [
         Actions.selectFile null
       listenToStores: [Stores.userStore, Stores.repoStore]
       makeUrl: ->
-        username = Stores.userStore.getUsername()
-        repo = Stores.repoStore.getSelectedRepoName()
-        if username? and repo? then "/users/#{username}/repos/#{repo}" else null
+        username: Stores.userStore.getUsername()
+        repo: Stores.repoStore.getSelectedRepoName()
   ,
     new RouteBinding
       pattern: '/users/:username(/)'
@@ -113,12 +123,11 @@ myRouter = new Router [
         Actions.selectFile null
       listenToStores: [Stores.userStore]
       makeUrl: ->
-        username = Stores.userStore.getUsername()
-        if username? then "/users/#{username}" else null
+        username: Stores.userStore.getUsername()
   ,
     new RouteBinding
       pattern: '(/)'
-      handleUrl: () ->
+      handleUrl: ->
         console.log 'default handleUrl'
         Actions.selectFile null
         Actions.selectRepo null
@@ -128,8 +137,7 @@ myRouter = new Router [
         username = Stores.userStore.getUsername()
         repo = Stores.repoStore.getSelectedRepoName()
         file = Stores.fileStore.getSelectedFile()
-        if username is null and repo is null and file is null then '/' else null
-
+        if username is null and repo is null and file is null then {} else null
 ]
 
 myRouter.start()

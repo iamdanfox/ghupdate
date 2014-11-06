@@ -98,9 +98,11 @@
 	  function RouteBinding(options) {
 	    this.matchesUrl = __bind(this.matchesUrl, this);
 	    this.urlRegex = __bind(this.urlRegex, this);
+	    this.makeUrl = __bind(this.makeUrl, this);
 	    this.handleUrl = __bind(this.handleUrl, this);
-	    this.pattern = options.pattern, this.listenToStores = options.listenToStores, this.makeUrl = options.makeUrl;
+	    this.pattern = options.pattern, this.listenToStores = options.listenToStores;
 	    this._handleUrl = options.handleUrl;
+	    this._makeUrl = options.makeUrl;
 	  }
 	
 	  RouteBinding.prototype.handleUrl = function(string) {
@@ -113,6 +115,24 @@
 	      urlParameters[key.substr(1)] = values[i];
 	    }
 	    return this._handleUrl(urlParameters);
+	  };
+	
+	  RouteBinding.prototype.makeUrl = function() {
+	    var key, mapping, url, value;
+	    mapping = this._makeUrl();
+	    if (mapping != null) {
+	      url = this.pattern.replace('(/)', '');
+	      for (key in mapping) {
+	        value = mapping[key];
+	        if (value === null) {
+	          return null;
+	        }
+	        url = url.replace(':' + key, value);
+	      }
+	      return url;
+	    } else {
+	      return null;
+	    }
 	  };
 	
 	  RouteBinding.prototype.urlRegex = function() {
@@ -217,15 +237,11 @@
 	    },
 	    listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore],
 	    makeUrl: function() {
-	      var file, repo, username;
-	      username = Stores.userStore.getUsername();
-	      repo = Stores.repoStore.getSelectedRepoName();
-	      file = Stores.fileStore.getSelectedFile();
-	      if ((username != null) && (repo != null) && (file != null)) {
-	        return "/users/" + username + "/repos/" + repo + "/files/" + file;
-	      } else {
-	        return null;
-	      }
+	      return {
+	        username: Stores.userStore.getUsername(),
+	        repo: Stores.repoStore.getSelectedRepoName(),
+	        file: Stores.fileStore.getSelectedFile()
+	      };
 	    }
 	  }), new RouteBinding({
 	    pattern: '/users/:username/repos/:repo(/)',
@@ -239,14 +255,10 @@
 	    },
 	    listenToStores: [Stores.userStore, Stores.repoStore],
 	    makeUrl: function() {
-	      var repo, username;
-	      username = Stores.userStore.getUsername();
-	      repo = Stores.repoStore.getSelectedRepoName();
-	      if ((username != null) && (repo != null)) {
-	        return "/users/" + username + "/repos/" + repo;
-	      } else {
-	        return null;
-	      }
+	      return {
+	        username: Stores.userStore.getUsername(),
+	        repo: Stores.repoStore.getSelectedRepoName()
+	      };
 	    }
 	  }), new RouteBinding({
 	    pattern: '/users/:username(/)',
@@ -260,13 +272,9 @@
 	    },
 	    listenToStores: [Stores.userStore],
 	    makeUrl: function() {
-	      var username;
-	      username = Stores.userStore.getUsername();
-	      if (username != null) {
-	        return "/users/" + username;
-	      } else {
-	        return null;
-	      }
+	      return {
+	        username: Stores.userStore.getUsername()
+	      };
 	    }
 	  }), new RouteBinding({
 	    pattern: '(/)',
@@ -283,7 +291,7 @@
 	      repo = Stores.repoStore.getSelectedRepoName();
 	      file = Stores.fileStore.getSelectedFile();
 	      if (username === null && repo === null && file === null) {
-	        return '/';
+	        return {};
 	      } else {
 	        return null;
 	      }
