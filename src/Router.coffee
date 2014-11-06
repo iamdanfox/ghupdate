@@ -3,16 +3,26 @@ Stores = require './Stores.coffee'
 
 
 class RouteBinding
-  constructor: ({@pattern, @handleUrl, @listenToStores, @makeUrl}) ->
+  constructor: (options) ->
+    {@pattern, @listenToStores, @makeUrl} = options
+    @_handleUrl = options.handleUrl
 
-  urlRegex: ->
+  handleUrl: (string) =>
+    keys = @pattern.match /:([^\/\(]+)/g
+    urlParameters = {}
+    values = @urlRegex().exec(string)[1..]
+    for i,key of keys
+      urlParameters[key.substr 1] = values[i]
+    @_handleUrl urlParameters
+
+  urlRegex: =>
     regex = @pattern
       .replace /\(\/\)/g, '/?'
       .replace /\//g, '\\/'
-      .replace /:([^\/\)\(\\]+)/g, '([^\\/]+)'
+      .replace /:([^\/\)\\]+)/g, '([^\\/]+)'
     return new RegExp("^#{regex}$")
 
-  matchesUrl: (string) ->
+  matchesUrl: (string) =>
     @urlRegex().test string
 
 
@@ -69,12 +79,11 @@ class Router
 myRouter = new Router [
     new RouteBinding
       pattern: '/users/:username/repos/:repo/files/:file(/)'
-      handleUrl: (string) ->
-        console.log 'usersreposfiles handleUrl'
-        [username, repo, filename] = @urlRegex().exec(string)[1..]
+      handleUrl: ({username, repo, file}) ->
+        console.log 'usersreposfiles handleUrl', username, repo, file
         Actions.setUsername username
         Actions.selectRepo repo
-        Actions.selectFile filename
+        Actions.selectFile file
       listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore]
       makeUrl: ->
         username = Stores.userStore.getUsername()
@@ -84,9 +93,8 @@ myRouter = new Router [
   ,
     new RouteBinding
       pattern: '/users/:username/repos/:repo(/)'
-      handleUrl: (string) ->
-        console.log 'usersrepos handleUrl'
-        [username, repo] = @urlRegex().exec(string)[1..]
+      handleUrl: ({username, repo}) ->
+        console.log 'usersrepos handleUrl', username, repo
         Actions.setUsername username
         Actions.selectRepo repo
         Actions.selectFile null
@@ -98,9 +106,8 @@ myRouter = new Router [
   ,
     new RouteBinding
       pattern: '/users/:username(/)'
-      handleUrl: (string) ->
-        console.log 'users handleUrl'
-        [username] = @urlRegex().exec(string)[1..]
+      handleUrl: ({username}) ->
+        console.log 'users handleUrl', username
         Actions.setUsername username
         Actions.selectRepo null
         Actions.selectFile null
@@ -110,8 +117,8 @@ myRouter = new Router [
         if username? then "/users/#{username}" else null
   ,
     new RouteBinding
-      pattern: '/'
-      handleUrl: (string) ->
+      pattern: '(/)'
+      handleUrl: () ->
         console.log 'default handleUrl'
         Actions.selectFile null
         Actions.selectRepo null

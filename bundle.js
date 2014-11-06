@@ -95,13 +95,29 @@
 	Stores = __webpack_require__(/*! ./Stores.coffee */ 4);
 	
 	RouteBinding = (function() {
-	  function RouteBinding(_arg) {
-	    this.pattern = _arg.pattern, this.handleUrl = _arg.handleUrl, this.listenToStores = _arg.listenToStores, this.makeUrl = _arg.makeUrl;
+	  function RouteBinding(options) {
+	    this.matchesUrl = __bind(this.matchesUrl, this);
+	    this.urlRegex = __bind(this.urlRegex, this);
+	    this.handleUrl = __bind(this.handleUrl, this);
+	    this.pattern = options.pattern, this.listenToStores = options.listenToStores, this.makeUrl = options.makeUrl;
+	    this._handleUrl = options.handleUrl;
 	  }
+	
+	  RouteBinding.prototype.handleUrl = function(string) {
+	    var i, key, keys, urlParameters, values;
+	    keys = this.pattern.match(/:([^\/\(]+)/g);
+	    urlParameters = {};
+	    values = this.urlRegex().exec(string).slice(1);
+	    for (i in keys) {
+	      key = keys[i];
+	      urlParameters[key.substr(1)] = values[i];
+	    }
+	    return this._handleUrl(urlParameters);
+	  };
 	
 	  RouteBinding.prototype.urlRegex = function() {
 	    var regex;
-	    regex = this.pattern.replace(/\(\/\)/g, '/?').replace(/\//g, '\\/').replace(/:([^\/\)\(\\]+)/g, '([^\\/]+)');
+	    regex = this.pattern.replace(/\(\/\)/g, '/?').replace(/\//g, '\\/').replace(/:([^\/\)\\]+)/g, '([^\\/]+)');
 	    return new RegExp("^" + regex + "$");
 	  };
 	
@@ -191,13 +207,13 @@
 	myRouter = new Router([
 	  new RouteBinding({
 	    pattern: '/users/:username/repos/:repo/files/:file(/)',
-	    handleUrl: function(string) {
-	      var filename, repo, username, _ref;
-	      console.log('usersreposfiles handleUrl');
-	      _ref = this.urlRegex().exec(string).slice(1), username = _ref[0], repo = _ref[1], filename = _ref[2];
+	    handleUrl: function(_arg) {
+	      var file, repo, username;
+	      username = _arg.username, repo = _arg.repo, file = _arg.file;
+	      console.log('usersreposfiles handleUrl', username, repo, file);
 	      Actions.setUsername(username);
 	      Actions.selectRepo(repo);
-	      return Actions.selectFile(filename);
+	      return Actions.selectFile(file);
 	    },
 	    listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore],
 	    makeUrl: function() {
@@ -213,10 +229,10 @@
 	    }
 	  }), new RouteBinding({
 	    pattern: '/users/:username/repos/:repo(/)',
-	    handleUrl: function(string) {
-	      var repo, username, _ref;
-	      console.log('usersrepos handleUrl');
-	      _ref = this.urlRegex().exec(string).slice(1), username = _ref[0], repo = _ref[1];
+	    handleUrl: function(_arg) {
+	      var repo, username;
+	      username = _arg.username, repo = _arg.repo;
+	      console.log('usersrepos handleUrl', username, repo);
 	      Actions.setUsername(username);
 	      Actions.selectRepo(repo);
 	      return Actions.selectFile(null);
@@ -234,10 +250,10 @@
 	    }
 	  }), new RouteBinding({
 	    pattern: '/users/:username(/)',
-	    handleUrl: function(string) {
+	    handleUrl: function(_arg) {
 	      var username;
-	      console.log('users handleUrl');
-	      username = this.urlRegex().exec(string).slice(1)[0];
+	      username = _arg.username;
+	      console.log('users handleUrl', username);
 	      Actions.setUsername(username);
 	      Actions.selectRepo(null);
 	      return Actions.selectFile(null);
@@ -253,8 +269,8 @@
 	      }
 	    }
 	  }), new RouteBinding({
-	    pattern: '/',
-	    handleUrl: function(string) {
+	    pattern: '(/)',
+	    handleUrl: function() {
 	      console.log('default handleUrl');
 	      Actions.selectFile(null);
 	      Actions.selectRepo(null);
