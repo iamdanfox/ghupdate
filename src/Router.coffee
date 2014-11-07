@@ -14,9 +14,9 @@ module.exports = new RefluxRouter [
         Actions.selectFile file
       listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore]
       makeUrl: ->
-        username: Stores.userStore.getUsername()
-        repo: Stores.repoStore.getSelectedRepoName()
-        file: Stores.fileStore.getSelectedFile()
+        username: Stores.userStore.get()
+        repo: Stores.repoStore.get()
+        file: Stores.fileStore.get()
   ,
     new RouteBinding
       pattern: '/users/:username/repos/:repo(/)'
@@ -27,8 +27,8 @@ module.exports = new RefluxRouter [
         Actions.selectFile null
       listenToStores: [Stores.userStore, Stores.repoStore]
       makeUrl: ->
-        username: Stores.userStore.getUsername()
-        repo: Stores.repoStore.getSelectedRepoName()
+        username: Stores.userStore.get()
+        repo: Stores.repoStore.get()
   ,
     new RouteBinding
       pattern: '/users/:username(/)'
@@ -39,7 +39,7 @@ module.exports = new RefluxRouter [
         Actions.selectFile null
       listenToStores: [Stores.userStore]
       makeUrl: ->
-        username: Stores.userStore.getUsername()
+        username: Stores.userStore.get()
   ,
     new RouteBinding
       pattern: '(/)'
@@ -50,8 +50,8 @@ module.exports = new RefluxRouter [
         Actions.setUsername null
       listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore]
       makeUrl: ->
-        username = Stores.userStore.getUsername()
-        repo = Stores.repoStore.getSelectedRepoName()
-        file = Stores.fileStore.getSelectedFile()
+        username = Stores.userStore.get()
+        repo = Stores.repoStore.get()
+        file = Stores.fileStore.get()
         if username is null and repo is null and file is null then {} else null
 ]

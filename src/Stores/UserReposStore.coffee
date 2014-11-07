@@ -14,7 +14,7 @@ module.exports = UserReposStore = Reflux.createStore
     @listenTo userStore, @loadReposIfNecessary
 
   loadReposIfNecessary: ->
-    newUsername = userStore.getUsername()
+    newUsername = userStore.get()
     if _cachedReposForUsername isnt newUsername
       _reposLoading = true
       _reposLoadingError = false

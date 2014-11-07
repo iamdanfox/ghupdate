@@ -14,10 +14,10 @@ _promisify = (resolve, reject) -> (errorValue, successValue) ->
 module.exports = ApiModule =
 
   writeFileContents: ({contents, commitMessage}) ->
-    pathToFile = fileStore.getSelectedFile()
-    username = userStore.getUsername()
-    repo = repoStore.getSelectedRepoName()
-    github = githubStore.getGithub()
+    pathToFile = fileStore.get()
+    username = userStore.get()
+    repo = repoStore.get()
+    github = githubStore.get()
 
     if github?
       return new Promise (resolve, reject) ->
@@ -28,10 +28,10 @@ module.exports = ApiModule =
       Promise.reject 'Must authorize before trying to write file contents'
 
   getFileContents: ->
-    pathToFile = fileStore.getSelectedFile()
-    username = userStore.getUsername()
-    repo = repoStore.getSelectedRepoName()
-    github = githubStore.getGithub()
+    pathToFile = fileStore.get()
+    username = userStore.get()
+    repo = repoStore.get()
+    github = githubStore.get()
 
     if github?
       return new Promise (resolve, reject) ->
@@ -42,8 +42,8 @@ module.exports = ApiModule =
       Promise.reject 'Must authorize before loading up a file contents'
 
   getGHPagesTree: (repo) -> # return a promise
-    username = userStore.getUsername()
-    github = githubStore.getGithub()
+    username = userStore.get()
+    github = githubStore.get()
     if github?
       return new Promise (resolve, reject) ->
         github
@@ -57,12 +57,12 @@ module.exports = ApiModule =
         .then (json) -> json.tree
 
   getRepos: ->
-    github = githubStore.getGithub()
+    github = githubStore.get()
     if github?
       return new Promise (resolve, reject) ->
         github
           .getUser()
           .repos _promisify(resolve, reject)
     else
-      fetch "https://api.github.com/users/#{userStore.getUsername()}/repos"
+      fetch "https://api.github.com/users/#{userStore.get()}/repos"
         .then (response) -> response.json()

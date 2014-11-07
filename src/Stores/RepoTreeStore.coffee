@@ -15,7 +15,7 @@ module.exports = RepoTreeStore = Reflux.createStore
     @listenTo repoStore, @loadTreeIfNecessary
 
   loadTreeIfNecessary: ->
-    selectedRepoName = repoStore.getSelectedRepoName()
+    selectedRepoName = repoStore.get()
 
     if _cachedTreeForRepo isnt selectedRepoName
       _tree = null

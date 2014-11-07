@@ -12,5 +12,5 @@ module.exports = FileStore = Reflux.createStore
       _selectedFile = filePath
       @trigger()
 
-  getSelectedFile: ->
+  get: ->
     _selectedFile

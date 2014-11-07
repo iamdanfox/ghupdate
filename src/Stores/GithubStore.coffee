@@ -15,5 +15,5 @@ module.exports = GithubStore = Reflux.createStore
         token: accessTokenStore.getAccessToken()
       @trigger()
 
-  getGithub: ->
+  get: ->
     return _github

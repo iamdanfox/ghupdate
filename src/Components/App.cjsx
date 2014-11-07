@@ -21,11 +21,11 @@ App = module.exports = React.createClass
 
   componentDidMount: ->
     @listenTo Stores.userStore, =>
-      @setState username: Stores.userStore.getUsername()
+      @setState username: Stores.userStore.get()
     @listenTo Stores.repoStore, =>
-      @setState repoName: Stores.repoStore.getSelectedRepoName()
+      @setState repoName: Stores.repoStore.get()
     @listenTo Stores.fileStore, =>
-      @setState file: Stores.fileStore.getSelectedFile()
+      @setState file: Stores.fileStore.get()
     @listenTo Stores.accessTokenStore, =>
       @setState isLoggedIn: Stores.accessTokenStore.isLoggedIn()
 

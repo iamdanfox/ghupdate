@@ -10,7 +10,7 @@ module.exports = Editor = React.createClass
   mixins: [Reflux.ListenerMixin]
 
   getInitialState: ->
-    file: fileStore.getSelectedFile()
+    file: fileStore.get()
     contents: fileContentsStore.getContents()
     loading: fileContentsStore.isLoading()
     error: fileContentsStore.hasError()
@@ -22,7 +22,7 @@ module.exports = Editor = React.createClass
 
   syncToStore: ->
     if @isMounted() then @setState
-      file: fileStore.getSelectedFile()
+      file: fileStore.get()
       contents: fileContentsStore.getContents()
       loading: fileContentsStore.isLoading()
       error: fileContentsStore.hasError()

@@ -11,5 +11,5 @@ module.exports = UserStore = Reflux.createStore
       _username = newUsername
       @trigger()
 
-  getUsername: ->
+  get: ->
     return _username

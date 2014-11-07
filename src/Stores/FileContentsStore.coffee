@@ -21,7 +21,7 @@ module.exports = FileContentsStore = Reflux.createStore
         console.log 'writeFileContents succeeded'
 
   loadFileIfNecessary: ->
-    selectedFileName = fileStore.getSelectedFile()
+    selectedFileName = fileStore.get()
 
     if _cachedContentsForFile isnt selectedFileName
       _contents = null

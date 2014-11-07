@@ -77,7 +77,7 @@
 
 	var Actions, Reflux;
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	module.exports = Actions = Reflux.createActions(['setUsername', 'selectRepo', 'selectFile', 'readCodeFromUrl', 'readAccessTokenFromLocalStorage', 'saveFile']);
 
@@ -112,9 +112,9 @@
 	    listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore],
 	    makeUrl: function() {
 	      return {
-	        username: Stores.userStore.getUsername(),
-	        repo: Stores.repoStore.getSelectedRepoName(),
-	        file: Stores.fileStore.getSelectedFile()
+	        username: Stores.userStore.get(),
+	        repo: Stores.repoStore.get(),
+	        file: Stores.fileStore.get()
 	      };
 	    }
 	  }), new RouteBinding({
@@ -129,8 +129,8 @@
 	    listenToStores: [Stores.userStore, Stores.repoStore],
 	    makeUrl: function() {
 	      return {
-	        username: Stores.userStore.getUsername(),
-	        repo: Stores.repoStore.getSelectedRepoName()
+	        username: Stores.userStore.get(),
+	        repo: Stores.repoStore.get()
 	      };
 	    }
 	  }), new RouteBinding({
@@ -145,7 +145,7 @@
 	    listenToStores: [Stores.userStore],
 	    makeUrl: function() {
 	      return {
-	        username: Stores.userStore.getUsername()
+	        username: Stores.userStore.get()
 	      };
 	    }
 	  }), new RouteBinding({
@@ -158,9 +158,9 @@
 	    listenToStores: [Stores.userStore, Stores.repoStore, Stores.fileStore],
 	    makeUrl: function() {
 	      var file, repo, username;
-	      username = Stores.userStore.getUsername();
-	      repo = Stores.repoStore.getSelectedRepoName();
-	      file = Stores.fileStore.getSelectedFile();
+	      username = Stores.userStore.get();
+	      repo = Stores.repoStore.get();
+	      file = Stores.fileStore.get();
 	      if (username === null && repo === null && file === null) {
 	        return {};
 	      } else {
@@ -182,7 +182,7 @@
 	
 	React = __webpack_require__(/*! react */ 10);
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Stores = __webpack_require__(/*! ../Stores.coffee */ 4);
 	
@@ -213,21 +213,21 @@
 	    this.listenTo(Stores.userStore, (function(_this) {
 	      return function() {
 	        return _this.setState({
-	          username: Stores.userStore.getUsername()
+	          username: Stores.userStore.get()
 	        });
 	      };
 	    })(this));
 	    this.listenTo(Stores.repoStore, (function(_this) {
 	      return function() {
 	        return _this.setState({
-	          repoName: Stores.repoStore.getSelectedRepoName()
+	          repoName: Stores.repoStore.get()
 	        });
 	      };
 	    })(this));
 	    this.listenTo(Stores.fileStore, (function(_this) {
 	      return function() {
 	        return _this.setState({
-	          file: Stores.fileStore.getSelectedFile()
+	          file: Stores.fileStore.get()
 	        });
 	      };
 	    })(this));
@@ -280,14 +280,14 @@
 	Actions = __webpack_require__(/*! ./Actions.coffee */ 1);
 	
 	module.exports = Stores = {
-	  userStore: __webpack_require__(/*! ./Stores/UserStore.coffee */ 25),
-	  accessTokenStore: __webpack_require__(/*! ./Stores/AccessTokenStore.coffee */ 26),
-	  githubStore: __webpack_require__(/*! ./Stores/GithubStore.coffee */ 27),
-	  userReposStore: __webpack_require__(/*! ./Stores/UserReposStore.coffee */ 28),
-	  repoStore: __webpack_require__(/*! ./Stores/RepoStore.coffee */ 29),
-	  repoTreeStore: __webpack_require__(/*! ./Stores/RepoTreeStore.coffee */ 30),
-	  fileStore: __webpack_require__(/*! ./Stores/FileStore.coffee */ 31),
-	  fileContentsStore: __webpack_require__(/*! ./Stores/FileContentsStore.coffee */ 32)
+	  userStore: __webpack_require__(/*! ./Stores/UserStore.coffee */ 24),
+	  accessTokenStore: __webpack_require__(/*! ./Stores/AccessTokenStore.coffee */ 25),
+	  githubStore: __webpack_require__(/*! ./Stores/GithubStore.coffee */ 26),
+	  userReposStore: __webpack_require__(/*! ./Stores/UserReposStore.coffee */ 27),
+	  repoStore: __webpack_require__(/*! ./Stores/RepoStore.coffee */ 28),
+	  repoTreeStore: __webpack_require__(/*! ./Stores/RepoTreeStore.coffee */ 29),
+	  fileStore: __webpack_require__(/*! ./Stores/FileStore.coffee */ 30),
+	  fileContentsStore: __webpack_require__(/*! ./Stores/FileContentsStore.coffee */ 31)
 	};
 
 
@@ -306,7 +306,7 @@
 	
 	Loading = __webpack_require__(/*! ./Loading.cjsx */ 13);
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Stores = __webpack_require__(/*! ../Stores.coffee */ 4);
 	
@@ -330,7 +330,7 @@
 	    });
 	  },
 	  render: function() {
-	    __webpack_require__(/*! ./RepoChooser.less */ 18);
+	    __webpack_require__(/*! ./RepoChooser.less */ 16);
 	    return React.createElement(Loading, {
 	      "loading": this.state.loading,
 	      "error": this.state.error,
@@ -393,7 +393,7 @@
 	
 	React = __webpack_require__(/*! react */ 10);
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Stores = __webpack_require__(/*! ../Stores.coffee */ 4);
 	
@@ -415,7 +415,7 @@
 	  },
 	  render: function() {
 	    var Loading;
-	    __webpack_require__(/*! ./FileChooser.less */ 20);
+	    __webpack_require__(/*! ./FileChooser.less */ 18);
 	    Loading = __webpack_require__(/*! ./Loading.cjsx */ 13);
 	    return React.createElement(Loading, {
 	      "loading": this.state.loading,
@@ -479,7 +479,7 @@
 
 	var Actions, Editor, Loading, React, Reflux, fileContentsStore, fileStore, _ref;
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	React = __webpack_require__(/*! react */ 10);
 	
@@ -494,21 +494,21 @@
 	  mixins: [Reflux.ListenerMixin],
 	  getInitialState: function() {
 	    return {
-	      file: fileStore.getSelectedFile(),
+	      file: fileStore.get(),
 	      contents: fileContentsStore.getContents(),
 	      loading: fileContentsStore.isLoading(),
 	      error: fileContentsStore.hasError()
 	    };
 	  },
 	  componentWillMount: function() {
-	    __webpack_require__(/*! ./Editor.less */ 16);
+	    __webpack_require__(/*! ./Editor.less */ 20);
 	    this.listenTo(fileStore, this.syncToStore);
 	    return this.listenTo(fileContentsStore, this.syncToStore);
 	  },
 	  syncToStore: function() {
 	    if (this.isMounted()) {
 	      return this.setState({
-	        file: fileStore.getSelectedFile(),
+	        file: fileStore.get(),
 	        contents: fileContentsStore.getContents(),
 	        loading: fileContentsStore.isLoading(),
 	        error: fileContentsStore.hasError()
@@ -549,7 +549,7 @@
 	
 	React = __webpack_require__(/*! react */ 10);
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Stores = __webpack_require__(/*! ../Stores.coffee */ 4);
 	
@@ -846,7 +846,7 @@
 	    var Spinkit;
 	    __webpack_require__(/*! ./Loading.less */ 35);
 	    if (this.props.loading) {
-	      Spinkit = __webpack_require__(/*! react-spinkit */ 72);
+	      Spinkit = __webpack_require__(/*! react-spinkit */ 74);
 	      return React.createElement(React.DOM.div, {
 	        "className": 'ghu-spinner'
 	      }, React.createElement(Spinkit, {
@@ -904,42 +904,6 @@
 
 /***/ },
 /* 16 */
-/*!************************************!*\
-  !*** ./src/Components/Editor.less ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/Editor.less */ 17);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./~/style-loader/addStyles.js */ 33)(content, {});
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/Editor.less", function() {
-			var newContent = require("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/Editor.less");
-			if(typeof newContent === 'string') newContent = [module.id, newContent, ''];
-			update(newContent);
-		});
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 17 */
-/*!*******************************************************************!*\
-  !*** ./~/css-loader!./~/less-loader!./src/Components/Editor.less ***!
-  \*******************************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(/*! ./~/css-loader/cssToString.js */ 38)();
-	exports.push([module.id, ".ghu-editor {\n  padding: 10px;\n}\n.ghu-editor textarea {\n  display: block;\n  height: 40em;\n  width: 100%;\n}\n.ghu-editor button {\n  display: block;\n  margin: 20px auto;\n  font-size: 130%;\n}\n", ""]);
-
-/***/ },
-/* 18 */
 /*!*****************************************!*\
   !*** ./src/Components/RepoChooser.less ***!
   \*****************************************/
@@ -948,7 +912,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/RepoChooser.less */ 19);
+	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/RepoChooser.less */ 17);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./~/style-loader/addStyles.js */ 33)(content, {});
@@ -965,7 +929,7 @@
 	}
 
 /***/ },
-/* 19 */
+/* 17 */
 /*!************************************************************************!*\
   !*** ./~/css-loader!./~/less-loader!./src/Components/RepoChooser.less ***!
   \************************************************************************/
@@ -975,7 +939,7 @@
 	exports.push([module.id, "h2.ghu-username {\n  text-align: center;\n  font-size: 200%;\n  margin: 0;\n}\nul.ghu-repo-list {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\nul.ghu-repo-list li.ghu-repo-link {\n  padding: 10px 30px;\n  border-top: 1px solid #eee;\n  cursor: pointer;\n}\nul.ghu-repo-list li.ghu-repo-link .ghu-last-updated {\n  display: block;\n  color: #aaa;\n}\nul.ghu-repo-list li.ghu-repo-link:hover {\n  background: #444;\n  color: white;\n}\n", ""]);
 
 /***/ },
-/* 20 */
+/* 18 */
 /*!*****************************************!*\
   !*** ./src/Components/FileChooser.less ***!
   \*****************************************/
@@ -984,7 +948,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/FileChooser.less */ 21);
+	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/FileChooser.less */ 19);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./~/style-loader/addStyles.js */ 33)(content, {});
@@ -1001,7 +965,7 @@
 	}
 
 /***/ },
-/* 21 */
+/* 19 */
 /*!************************************************************************!*\
   !*** ./~/css-loader!./~/less-loader!./src/Components/FileChooser.less ***!
   \************************************************************************/
@@ -1009,6 +973,42 @@
 
 	exports = module.exports = __webpack_require__(/*! ./~/css-loader/cssToString.js */ 38)();
 	exports.push([module.id, "ul.ghu-file-chooser {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\nul.ghu-file-chooser li.file {\n  padding: 10px 30px;\n  border-top: 1px solid #eee;\n  cursor: pointer;\n}\nul.ghu-file-chooser li.file:hover {\n  background: #444;\n  color: white;\n}\n", ""]);
+
+/***/ },
+/* 20 */
+/*!************************************!*\
+  !*** ./src/Components/Editor.less ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/Editor.less */ 21);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./~/style-loader/addStyles.js */ 33)(content, {});
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		module.hot.accept("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/Editor.less", function() {
+			var newContent = require("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/Editor.less");
+			if(typeof newContent === 'string') newContent = [module.id, newContent, ''];
+			update(newContent);
+		});
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 21 */
+/*!*******************************************************************!*\
+  !*** ./~/css-loader!./~/less-loader!./src/Components/Editor.less ***!
+  \*******************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./~/css-loader/cssToString.js */ 38)();
+	exports.push([module.id, ".ghu-editor {\n  padding: 10px;\n}\n.ghu-editor textarea {\n  display: block;\n  height: 40em;\n  width: 100%;\n}\n.ghu-editor button {\n  display: block;\n  margin: 20px auto;\n  font-size: 130%;\n}\n", ""]);
 
 /***/ },
 /* 22 */
@@ -1048,77 +1048,6 @@
 
 /***/ },
 /* 24 */
-/*!*******************************!*\
-  !*** ./~/reflux/src/index.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports.ListenerMethods = __webpack_require__(/*! ./ListenerMethods */ 39);
-	
-	exports.PublisherMethods = __webpack_require__(/*! ./PublisherMethods */ 40);
-	
-	exports.createAction = __webpack_require__(/*! ./createAction */ 41);
-	
-	exports.createStore = __webpack_require__(/*! ./createStore */ 42);
-	
-	exports.connect = __webpack_require__(/*! ./connect */ 43);
-	
-	exports.ListenerMixin = __webpack_require__(/*! ./ListenerMixin */ 44);
-	
-	exports.listenTo = __webpack_require__(/*! ./listenTo */ 45);
-	
-	exports.listenToMany = __webpack_require__(/*! ./listenToMany */ 46);
-	
-	
-	var maker = __webpack_require__(/*! ./joins */ 47).staticJoinCreator;
-	
-	exports.joinTrailing = exports.all = maker("last"); // Reflux.all alias for backward compatibility
-	
-	exports.joinLeading = maker("first");
-	
-	exports.joinStrict = maker("strict");
-	
-	exports.joinConcat = maker("all");
-	
-	
-	/**
-	 * Convenience function for creating a set of actions
-	 *
-	 * @param actionNames the names for the actions to be created
-	 * @returns an object with actions of corresponding action names
-	 */
-	exports.createActions = function(actionNames) {
-	    var i = 0, actions = {};
-	    for (; i < actionNames.length; i++) {
-	        actions[actionNames[i]] = exports.createAction();
-	    }
-	    return actions;
-	};
-	
-	/**
-	 * Sets the eventmitter that Reflux uses
-	 */
-	exports.setEventEmitter = function(ctx) {
-	    var _ = __webpack_require__(/*! ./utils */ 48);
-	    _.EventEmitter = ctx;
-	};
-	
-	/**
-	 * Sets the method used for deferring actions and stores
-	 */
-	exports.nextTick = function(nextTick) {
-	    var _ = __webpack_require__(/*! ./utils */ 48);
-	    _.nextTick = nextTick;
-	};
-	
-	/**
-	 * Provides the set of created actions and stores for introspection
-	 */
-	exports.__keep = __webpack_require__(/*! ./Keep */ 49);
-
-
-/***/ },
-/* 25 */
 /*!*************************************!*\
   !*** ./src/Stores/UserStore.coffee ***!
   \*************************************/
@@ -1126,7 +1055,7 @@
 
 	var Actions, Reflux, UserStore, _username;
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 1);
 	
@@ -1142,14 +1071,14 @@
 	      return this.trigger();
 	    }
 	  },
-	  getUsername: function() {
+	  get: function() {
 	    return _username;
 	  }
 	});
 
 
 /***/ },
-/* 26 */
+/* 25 */
 /*!********************************************!*\
   !*** ./src/Stores/AccessTokenStore.coffee ***!
   \********************************************/
@@ -1157,11 +1086,11 @@
 
 	var AccessTokenStore, Actions, Reflux, _accessToken, _accessTokenError, _accessTokenLoading;
 	
-	__webpack_require__(/*! es6-promise */ 74).polyfill();
+	__webpack_require__(/*! es6-promise */ 76).polyfill();
 	
-	__webpack_require__(/*! fetch */ 75);
+	__webpack_require__(/*! fetch */ 72);
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 1);
 	
@@ -1252,7 +1181,7 @@
 
 
 /***/ },
-/* 27 */
+/* 26 */
 /*!***************************************!*\
   !*** ./src/Stores/GithubStore.coffee ***!
   \***************************************/
@@ -1260,11 +1189,11 @@
 
 	var Github, GithubStore, Reflux, accessTokenStore, _github;
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
-	Github = __webpack_require__(/*! github-api */ 76);
+	Github = __webpack_require__(/*! github-api */ 73);
 	
-	accessTokenStore = __webpack_require__(/*! ./AccessTokenStore.coffee */ 26);
+	accessTokenStore = __webpack_require__(/*! ./AccessTokenStore.coffee */ 25);
 	
 	_github = null;
 	
@@ -1281,14 +1210,14 @@
 	      return this.trigger();
 	    }
 	  },
-	  getGithub: function() {
+	  get: function() {
 	    return _github;
 	  }
 	});
 
 
 /***/ },
-/* 28 */
+/* 27 */
 /*!******************************************!*\
   !*** ./src/Stores/UserReposStore.coffee ***!
   \******************************************/
@@ -1296,13 +1225,13 @@
 
 	var Reflux, UserReposStore, apiModule, userStore, _cachedReposForUsername, _repos, _reposLoading, _reposLoadingError;
 	
-	__webpack_require__(/*! es6-promise */ 74).polyfill();
+	__webpack_require__(/*! es6-promise */ 76).polyfill();
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
-	userStore = __webpack_require__(/*! ./UserStore.coffee */ 25);
+	userStore = __webpack_require__(/*! ./UserStore.coffee */ 24);
 	
-	apiModule = __webpack_require__(/*! ../ApiModule.coffee */ 50);
+	apiModule = __webpack_require__(/*! ../ApiModule.coffee */ 39);
 	
 	_cachedReposForUsername = null;
 	
@@ -1318,7 +1247,7 @@
 	  },
 	  loadReposIfNecessary: function() {
 	    var newUsername;
-	    newUsername = userStore.getUsername();
+	    newUsername = userStore.get();
 	    if (_cachedReposForUsername !== newUsername) {
 	      _reposLoading = true;
 	      _reposLoadingError = false;
@@ -1352,7 +1281,7 @@
 
 
 /***/ },
-/* 29 */
+/* 28 */
 /*!*************************************!*\
   !*** ./src/Stores/RepoStore.coffee ***!
   \*************************************/
@@ -1360,7 +1289,7 @@
 
 	var Actions, Reflux, RepoStore, _selectedRepoName;
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 1);
 	
@@ -1376,14 +1305,14 @@
 	      return this.trigger();
 	    }
 	  },
-	  getSelectedRepoName: function() {
+	  get: function() {
 	    return _selectedRepoName;
 	  }
 	});
 
 
 /***/ },
-/* 30 */
+/* 29 */
 /*!*****************************************!*\
   !*** ./src/Stores/RepoTreeStore.coffee ***!
   \*****************************************/
@@ -1391,13 +1320,13 @@
 
 	var Actions, Reflux, RepoTreeStore, apiModule, repoStore, _cachedTreeForRepo, _tree, _treeLoading, _treeLoadingError;
 	
-	__webpack_require__(/*! es6-promise */ 74).polyfill();
+	__webpack_require__(/*! es6-promise */ 76).polyfill();
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
-	repoStore = __webpack_require__(/*! ./RepoStore.coffee */ 29);
+	repoStore = __webpack_require__(/*! ./RepoStore.coffee */ 28);
 	
-	apiModule = __webpack_require__(/*! ../ApiModule.coffee */ 50);
+	apiModule = __webpack_require__(/*! ../ApiModule.coffee */ 39);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 1);
 	
@@ -1415,7 +1344,7 @@
 	  },
 	  loadTreeIfNecessary: function() {
 	    var selectedRepoName;
-	    selectedRepoName = repoStore.getSelectedRepoName();
+	    selectedRepoName = repoStore.get();
 	    if (_cachedTreeForRepo !== selectedRepoName) {
 	      _tree = null;
 	      _treeLoading = true;
@@ -1457,7 +1386,7 @@
 
 
 /***/ },
-/* 31 */
+/* 30 */
 /*!*************************************!*\
   !*** ./src/Stores/FileStore.coffee ***!
   \*************************************/
@@ -1465,7 +1394,7 @@
 
 	var Actions, FileStore, Reflux, _selectedFile;
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 1);
 	
@@ -1481,14 +1410,14 @@
 	      return this.trigger();
 	    }
 	  },
-	  getSelectedFile: function() {
+	  get: function() {
 	    return _selectedFile;
 	  }
 	});
 
 
 /***/ },
-/* 32 */
+/* 31 */
 /*!*********************************************!*\
   !*** ./src/Stores/FileContentsStore.coffee ***!
   \*********************************************/
@@ -1496,13 +1425,13 @@
 
 	var Actions, FileContentsStore, Reflux, apiModule, fileStore, _cachedContentsForFile, _contents, _contentsLoading, _contentsLoadingError;
 	
-	__webpack_require__(/*! es6-promise */ 74).polyfill();
+	__webpack_require__(/*! es6-promise */ 76).polyfill();
 	
-	Reflux = __webpack_require__(/*! reflux */ 24);
+	Reflux = __webpack_require__(/*! reflux */ 32);
 	
-	fileStore = __webpack_require__(/*! ./FileStore.coffee */ 31);
+	fileStore = __webpack_require__(/*! ./FileStore.coffee */ 30);
 	
-	apiModule = __webpack_require__(/*! ../ApiModule.coffee */ 50);
+	apiModule = __webpack_require__(/*! ../ApiModule.coffee */ 39);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 1);
 	
@@ -1531,7 +1460,7 @@
 	  },
 	  loadFileIfNecessary: function() {
 	    var selectedFileName;
-	    selectedFileName = fileStore.getSelectedFile();
+	    selectedFileName = fileStore.get();
 	    if (_cachedContentsForFile !== selectedFileName) {
 	      _contents = null;
 	      _contentsLoading = true;
@@ -1561,6 +1490,77 @@
 	    return _contents;
 	  }
 	});
+
+
+/***/ },
+/* 32 */
+/*!*******************************!*\
+  !*** ./~/reflux/src/index.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports.ListenerMethods = __webpack_require__(/*! ./ListenerMethods */ 40);
+	
+	exports.PublisherMethods = __webpack_require__(/*! ./PublisherMethods */ 41);
+	
+	exports.createAction = __webpack_require__(/*! ./createAction */ 42);
+	
+	exports.createStore = __webpack_require__(/*! ./createStore */ 43);
+	
+	exports.connect = __webpack_require__(/*! ./connect */ 44);
+	
+	exports.ListenerMixin = __webpack_require__(/*! ./ListenerMixin */ 45);
+	
+	exports.listenTo = __webpack_require__(/*! ./listenTo */ 46);
+	
+	exports.listenToMany = __webpack_require__(/*! ./listenToMany */ 47);
+	
+	
+	var maker = __webpack_require__(/*! ./joins */ 48).staticJoinCreator;
+	
+	exports.joinTrailing = exports.all = maker("last"); // Reflux.all alias for backward compatibility
+	
+	exports.joinLeading = maker("first");
+	
+	exports.joinStrict = maker("strict");
+	
+	exports.joinConcat = maker("all");
+	
+	
+	/**
+	 * Convenience function for creating a set of actions
+	 *
+	 * @param actionNames the names for the actions to be created
+	 * @returns an object with actions of corresponding action names
+	 */
+	exports.createActions = function(actionNames) {
+	    var i = 0, actions = {};
+	    for (; i < actionNames.length; i++) {
+	        actions[actionNames[i]] = exports.createAction();
+	    }
+	    return actions;
+	};
+	
+	/**
+	 * Sets the eventmitter that Reflux uses
+	 */
+	exports.setEventEmitter = function(ctx) {
+	    var _ = __webpack_require__(/*! ./utils */ 49);
+	    _.EventEmitter = ctx;
+	};
+	
+	/**
+	 * Sets the method used for deferring actions and stores
+	 */
+	exports.nextTick = function(nextTick) {
+	    var _ = __webpack_require__(/*! ./utils */ 49);
+	    _.nextTick = nextTick;
+	};
+	
+	/**
+	 * Provides the set of created actions and stores for introspection
+	 */
+	exports.__keep = __webpack_require__(/*! ./Keep */ 50);
 
 
 /***/ },
@@ -1921,7 +1921,7 @@
 	
 	module.exports = React;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 35 */
@@ -2105,13 +2105,110 @@
 
 /***/ },
 /* 39 */
+/*!******************************!*\
+  !*** ./src/ApiModule.coffee ***!
+  \******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var ApiModule, fileStore, githubStore, repoStore, userStore, _promisify;
+	
+	__webpack_require__(/*! es6-promise */ 76).polyfill();
+	
+	__webpack_require__(/*! fetch */ 72);
+	
+	userStore = __webpack_require__(/*! ./Stores/UserStore.coffee */ 24);
+	
+	githubStore = __webpack_require__(/*! ./Stores/GithubStore.coffee */ 26);
+	
+	repoStore = __webpack_require__(/*! ./Stores/RepoStore.coffee */ 28);
+	
+	fileStore = __webpack_require__(/*! ./Stores/FileStore.coffee */ 30);
+	
+	_promisify = function(resolve, reject) {
+	  return function(errorValue, successValue) {
+	    if (errorValue) {
+	      return reject(errorValue);
+	    } else {
+	      return resolve(successValue);
+	    }
+	  };
+	};
+	
+	module.exports = ApiModule = {
+	  writeFileContents: function(_arg) {
+	    var commitMessage, contents, github, pathToFile, repo, username;
+	    contents = _arg.contents, commitMessage = _arg.commitMessage;
+	    pathToFile = fileStore.get();
+	    username = userStore.get();
+	    repo = repoStore.get();
+	    github = githubStore.get();
+	    if (github != null) {
+	      return new Promise(function(resolve, reject) {
+	        return github.getRepo(username, repo).write('gh-pages', pathToFile, contents, commitMessage, _promisify(resolve, reject));
+	      });
+	    } else {
+	      return Promise.reject('Must authorize before trying to write file contents');
+	    }
+	  },
+	  getFileContents: function() {
+	    var github, pathToFile, repo, username;
+	    pathToFile = fileStore.get();
+	    username = userStore.get();
+	    repo = repoStore.get();
+	    github = githubStore.get();
+	    if (github != null) {
+	      return new Promise(function(resolve, reject) {
+	        return github.getRepo(username, repo).read('gh-pages', pathToFile, _promisify(resolve, reject));
+	      });
+	    } else {
+	      return Promise.reject('Must authorize before loading up a file contents');
+	    }
+	  },
+	  getGHPagesTree: function(repo) {
+	    var github, username;
+	    username = userStore.get();
+	    github = githubStore.get();
+	    if (github != null) {
+	      return new Promise(function(resolve, reject) {
+	        return github.getRepo(username, repo).getTree('gh-pages', _promisify(resolve, reject));
+	      });
+	    } else {
+	      return fetch("https://api.github.com/repos/" + username + "/" + repo + "/branches/gh-pages").then(function(response) {
+	        return response.json();
+	      }).then(function(branchObject) {
+	        return fetch(branchObject.commit.commit.tree.url);
+	      }).then(function(response) {
+	        return response.json();
+	      }).then(function(json) {
+	        return json.tree;
+	      });
+	    }
+	  },
+	  getRepos: function() {
+	    var github;
+	    github = githubStore.get();
+	    if (github != null) {
+	      return new Promise(function(resolve, reject) {
+	        return github.getUser().repos(_promisify(resolve, reject));
+	      });
+	    } else {
+	      return fetch("https://api.github.com/users/" + (userStore.get()) + "/repos").then(function(response) {
+	        return response.json();
+	      });
+	    }
+	  }
+	};
+
+
+/***/ },
+/* 40 */
 /*!*****************************************!*\
   !*** ./~/reflux/src/ListenerMethods.js ***!
   \*****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(/*! ./utils */ 48),
-	    maker = __webpack_require__(/*! ./joins */ 47).instanceJoinCreator;
+	var _ = __webpack_require__(/*! ./utils */ 49),
+	    maker = __webpack_require__(/*! ./joins */ 48).instanceJoinCreator;
 	
 	/**
 	 * A module of methods related to listening.
@@ -2284,13 +2381,13 @@
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /*!******************************************!*\
   !*** ./~/reflux/src/PublisherMethods.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(/*! ./utils */ 48);
+	var _ = __webpack_require__(/*! ./utils */ 49);
 	
 	/**
 	 * A module of methods for object that you want to be able to listen to.
@@ -2358,15 +2455,15 @@
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /*!**************************************!*\
   !*** ./~/reflux/src/createAction.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(/*! ./utils */ 48),
-	    Reflux = __webpack_require__(/*! ../src */ 24),
-	    Keep = __webpack_require__(/*! ./Keep */ 49),
+	var _ = __webpack_require__(/*! ./utils */ 49),
+	    Reflux = __webpack_require__(/*! ../src */ 32),
+	    Keep = __webpack_require__(/*! ./Keep */ 50),
 	    allowed = {preEmit:1,shouldEmit:1};
 	
 	/**
@@ -2408,15 +2505,15 @@
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /*!*************************************!*\
   !*** ./~/reflux/src/createStore.js ***!
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(/*! ./utils */ 48),
-	    Reflux = __webpack_require__(/*! ../src */ 24),
-	    Keep = __webpack_require__(/*! ./Keep */ 49),
+	var _ = __webpack_require__(/*! ./utils */ 49),
+	    Reflux = __webpack_require__(/*! ../src */ 32),
+	    Keep = __webpack_require__(/*! ./Keep */ 50),
 	    allowed = {preEmit:1,shouldEmit:1};
 	
 	/**
@@ -2465,14 +2562,14 @@
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /*!*********************************!*\
   !*** ./~/reflux/src/connect.js ***!
   \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Reflux = __webpack_require__(/*! ../src */ 24),
-	    _ = __webpack_require__(/*! ./utils */ 48);
+	var Reflux = __webpack_require__(/*! ../src */ 32),
+	    _ = __webpack_require__(/*! ./utils */ 49);
 	
 	module.exports = function(listenable,key){
 	    return {
@@ -2494,14 +2591,14 @@
 
 
 /***/ },
-/* 44 */
+/* 45 */
 /*!***************************************!*\
   !*** ./~/reflux/src/ListenerMixin.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(/*! ./utils */ 48),
-	    ListenerMethods = __webpack_require__(/*! ./ListenerMethods */ 39);
+	var _ = __webpack_require__(/*! ./utils */ 49),
+	    ListenerMethods = __webpack_require__(/*! ./ListenerMethods */ 40);
 	
 	/**
 	 * A module meant to be consumed as a mixin by a React component. Supplies the methods from
@@ -2518,13 +2615,13 @@
 
 
 /***/ },
-/* 45 */
+/* 46 */
 /*!**********************************!*\
   !*** ./~/reflux/src/listenTo.js ***!
   \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Reflux = __webpack_require__(/*! ../src */ 24);
+	var Reflux = __webpack_require__(/*! ../src */ 32);
 	
 	
 	/**
@@ -2563,13 +2660,13 @@
 
 
 /***/ },
-/* 46 */
+/* 47 */
 /*!**************************************!*\
   !*** ./~/reflux/src/listenToMany.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Reflux = __webpack_require__(/*! ../src */ 24);
+	var Reflux = __webpack_require__(/*! ../src */ 32);
 	
 	/**
 	 * A mixin factory for a React component. Meant as a more convenient way of using the `listenerMixin`,
@@ -2605,7 +2702,7 @@
 
 
 /***/ },
-/* 47 */
+/* 48 */
 /*!*******************************!*\
   !*** ./~/reflux/src/joins.js ***!
   \*******************************/
@@ -2616,7 +2713,7 @@
 	 */
 	
 	var slice = Array.prototype.slice,
-	    createStore = __webpack_require__(/*! ./createStore */ 42),
+	    createStore = __webpack_require__(/*! ./createStore */ 43),
 	    strategyMethodNames = {
 	        strict: "joinStrict",
 	        first: "joinLeading",
@@ -2699,7 +2796,7 @@
 
 
 /***/ },
-/* 48 */
+/* 49 */
 /*!*******************************!*\
   !*** ./~/reflux/src/utils.js ***!
   \*******************************/
@@ -2732,7 +2829,7 @@
 	    return typeof value === 'function';
 	};
 	
-	exports.EventEmitter = __webpack_require__(/*! eventemitter3 */ 137);
+	exports.EventEmitter = __webpack_require__(/*! eventemitter3 */ 143);
 	
 	exports.nextTick = function(callback) {
 	    setTimeout(callback, 0);
@@ -2763,7 +2860,7 @@
 
 
 /***/ },
-/* 49 */
+/* 50 */
 /*!******************************!*\
   !*** ./~/reflux/src/Keep.js ***!
   \******************************/
@@ -2780,103 +2877,6 @@
 	    while(exports.createdActions.length) {
 	        exports.createdActions.pop();
 	    }
-	};
-
-
-/***/ },
-/* 50 */
-/*!******************************!*\
-  !*** ./src/ApiModule.coffee ***!
-  \******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var ApiModule, fileStore, githubStore, repoStore, userStore, _promisify;
-	
-	__webpack_require__(/*! es6-promise */ 74).polyfill();
-	
-	__webpack_require__(/*! fetch */ 75);
-	
-	userStore = __webpack_require__(/*! ./Stores/UserStore.coffee */ 25);
-	
-	githubStore = __webpack_require__(/*! ./Stores/GithubStore.coffee */ 27);
-	
-	repoStore = __webpack_require__(/*! ./Stores/RepoStore.coffee */ 29);
-	
-	fileStore = __webpack_require__(/*! ./Stores/FileStore.coffee */ 31);
-	
-	_promisify = function(resolve, reject) {
-	  return function(errorValue, successValue) {
-	    if (errorValue) {
-	      return reject(errorValue);
-	    } else {
-	      return resolve(successValue);
-	    }
-	  };
-	};
-	
-	module.exports = ApiModule = {
-	  writeFileContents: function(_arg) {
-	    var commitMessage, contents, github, pathToFile, repo, username;
-	    contents = _arg.contents, commitMessage = _arg.commitMessage;
-	    pathToFile = fileStore.getSelectedFile();
-	    username = userStore.getUsername();
-	    repo = repoStore.getSelectedRepoName();
-	    github = githubStore.getGithub();
-	    if (github != null) {
-	      return new Promise(function(resolve, reject) {
-	        return github.getRepo(username, repo).write('gh-pages', pathToFile, contents, commitMessage, _promisify(resolve, reject));
-	      });
-	    } else {
-	      return Promise.reject('Must authorize before trying to write file contents');
-	    }
-	  },
-	  getFileContents: function() {
-	    var github, pathToFile, repo, username;
-	    pathToFile = fileStore.getSelectedFile();
-	    username = userStore.getUsername();
-	    repo = repoStore.getSelectedRepoName();
-	    github = githubStore.getGithub();
-	    if (github != null) {
-	      return new Promise(function(resolve, reject) {
-	        return github.getRepo(username, repo).read('gh-pages', pathToFile, _promisify(resolve, reject));
-	      });
-	    } else {
-	      return Promise.reject('Must authorize before loading up a file contents');
-	    }
-	  },
-	  getGHPagesTree: function(repo) {
-	    var github, username;
-	    username = userStore.getUsername();
-	    github = githubStore.getGithub();
-	    if (github != null) {
-	      return new Promise(function(resolve, reject) {
-	        return github.getRepo(username, repo).getTree('gh-pages', _promisify(resolve, reject));
-	      });
-	    } else {
-	      return fetch("https://api.github.com/repos/" + username + "/" + repo + "/branches/gh-pages").then(function(response) {
-	        return response.json();
-	      }).then(function(branchObject) {
-	        return fetch(branchObject.commit.commit.tree.url);
-	      }).then(function(response) {
-	        return response.json();
-	      }).then(function(json) {
-	        return json.tree;
-	      });
-	    }
-	  },
-	  getRepos: function() {
-	    var github;
-	    github = githubStore.getGithub();
-	    if (github != null) {
-	      return new Promise(function(resolve, reject) {
-	        return github.getUser().repos(_promisify(resolve, reject));
-	      });
-	    } else {
-	      return fetch("https://api.github.com/users/" + (userStore.getUsername()) + "/repos").then(function(response) {
-	        return response.json();
-	      });
-	    }
-	  }
 	};
 
 
@@ -3081,7 +3081,7 @@
 	
 	module.exports = DOMPropertyOperations;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 52 */
@@ -3315,7 +3315,7 @@
 	
 	module.exports = EventPluginUtils;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 53 */
@@ -3478,7 +3478,7 @@
 	
 	module.exports = ReactChildren;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 54 */
@@ -3934,7 +3934,7 @@
 	
 	module.exports = ReactComponent;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 55 */
@@ -5369,7 +5369,7 @@
 	
 	module.exports = ReactCompositeComponent;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 56 */
@@ -5754,7 +5754,7 @@
 	
 	module.exports = ReactDescriptor;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 59 */
@@ -5975,7 +5975,7 @@
 	
 	module.exports = ReactDOM;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 60 */
@@ -6403,7 +6403,7 @@
 	
 	module.exports = ReactDOMComponent;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 61 */
@@ -6541,7 +6541,7 @@
 	  inject: inject
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 62 */
@@ -6889,7 +6889,7 @@
 	
 	module.exports = ReactInstanceHandles;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 63 */
@@ -7580,7 +7580,7 @@
 	
 	module.exports = ReactMount;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 64 */
@@ -8114,7 +8114,7 @@
 	
 	module.exports = ReactPerf;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 66 */
@@ -8565,7 +8565,7 @@
 	  renderComponentToStaticMarkup: renderComponentToStaticMarkup
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 68 */
@@ -8734,7 +8734,7 @@
 	
 	module.exports = onlyChild;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 70 */
@@ -8792,7 +8792,7 @@
 	
 	module.exports = warning;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 71 */
@@ -8855,6 +8855,998 @@
 
 /***/ },
 /* 72 */
+/*!**************************!*\
+  !*** ./~/fetch/fetch.js ***!
+  \**************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	(function() {
+	  'use strict';
+	
+	  if (window.fetch) {
+	    return
+	  }
+	
+	  function Headers(headers) {
+	    this.map = {}
+	
+	    var self = this
+	    if (headers instanceof Headers) {
+	      headers.forEach(function(name, values) {
+	        values.forEach(function(value) {
+	          self.append(name, value)
+	        })
+	      })
+	
+	    } else if (headers) {
+	      Object.getOwnPropertyNames(headers).forEach(function(name) {
+	        self.append(name, headers[name])
+	      })
+	    }
+	  }
+	
+	  Headers.prototype.append = function(name, value) {
+	    var list = this.map[name]
+	    if (!list) {
+	      list = []
+	      this.map[name] = list
+	    }
+	    list.push(value)
+	  }
+	
+	  Headers.prototype['delete'] = function(name) {
+	    delete this.map[name]
+	  }
+	
+	  Headers.prototype.get = function(name) {
+	    var values = this.map[name]
+	    return values ? values[0] : null
+	  }
+	
+	  Headers.prototype.getAll = function(name) {
+	    return this.map[name] || []
+	  }
+	
+	  Headers.prototype.has = function(name) {
+	    return this.map.hasOwnProperty(name)
+	  }
+	
+	  Headers.prototype.set = function(name, value) {
+	    this.map[name] = [value]
+	  }
+	
+	  // Instead of iterable for now.
+	  Headers.prototype.forEach = function(callback) {
+	    var self = this
+	    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+	      callback(name, self.map[name])
+	    })
+	  }
+	
+	  function consumed(body) {
+	    if (body.bodyUsed) {
+	      return Promise.reject(new TypeError('Body already consumed'))
+	    }
+	    body.bodyUsed = true
+	  }
+	
+	  function Body() {
+	    this.body = null
+	    this.bodyUsed = false
+	
+	    this.arrayBuffer = function() {
+	      throw new Error('Not implemented yet')
+	    }
+	
+	    this.blob = function() {
+	      var rejected = consumed(this)
+	      return rejected ? rejected : Promise.resolve(new Blob([this.body]))
+	    }
+	
+	    this.formData = function() {
+	      return Promise.resolve(decode(this.body))
+	    }
+	
+	    this.json = function() {
+	      var rejected = consumed(this)
+	      if (rejected) {
+	        return rejected
+	      }
+	
+	      var body = this.body
+	      return new Promise(function(resolve, reject) {
+	        try {
+	          resolve(JSON.parse(body))
+	        } catch (ex) {
+	          reject(ex)
+	        }
+	      })
+	    }
+	
+	    this.text = function() {
+	      var rejected = consumed(this)
+	      return rejected ? rejected : Promise.resolve(this.body)
+	    }
+	
+	    return this
+	  }
+	
+	  function Request(url, options) {
+	    options = options || {}
+	    this.url = url
+	    this.body = options.body
+	    this.credentials = options.credentials || null
+	    this.headers = new Headers(options.headers)
+	    this.method = options.method || 'GET'
+	    this.mode = options.mode || null
+	    this.referrer = null
+	  }
+	
+	  function decode(body) {
+	    var form = new FormData()
+	    body.trim().split('&').forEach(function(bytes) {
+	      if (bytes) {
+	        var split = bytes.split('=')
+	        var name = split.shift().replace(/\+/g, ' ')
+	        var value = split.join('=').replace(/\+/g, ' ')
+	        form.append(decodeURIComponent(name), decodeURIComponent(value))
+	      }
+	    })
+	    return form
+	  }
+	
+	  function headers(xhr) {
+	    var head = new Headers()
+	    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+	    pairs.forEach(function(header) {
+	      var split = header.trim().split(':')
+	      var key = split.shift().trim()
+	      var value = split.join(':').trim()
+	      head.append(key, value)
+	    })
+	    return head
+	  }
+	
+	  Request.prototype.fetch = function() {
+	    var self = this
+	
+	    return new Promise(function(resolve, reject) {
+	      var xhr = new XMLHttpRequest()
+	
+	      xhr.onload = function() {
+	        var options = {
+	          status: xhr.status,
+	          statusText: xhr.statusText,
+	          headers: headers(xhr)
+	        }
+	        resolve(new Response(xhr.responseText, options))
+	      }
+	
+	      xhr.onerror = function() {
+	        reject()
+	      }
+	
+	      xhr.open(self.method, self.url)
+	
+	      self.headers.forEach(function(name, values) {
+	        values.forEach(function(value) {
+	          xhr.setRequestHeader(name, value)
+	        })
+	      })
+	
+	      xhr.send(self.body)
+	    })
+	  }
+	
+	  Body.call(Request.prototype)
+	
+	  function Response(body, options) {
+	    this.body = body
+	    this.type = 'default'
+	    this.url = null
+	    this.status = options.status
+	    this.statusText = options.statusText
+	    this.headers = options.headers
+	  }
+	
+	  Body.call(Response.prototype)
+	
+	  window.fetch = function (url, options) {
+	    return new Request(url, options).fetch()
+	  }
+	})();
+
+
+/***/ },
+/* 73 */
+/*!********************************!*\
+  !*** ./~/github-api/github.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// Github.js 0.9.0
+	// (c) 2013 Michael Aufreiter, Development Seed
+	// Github.js is freely distributable under the MIT license.
+	// For all details and documentation:
+	// http://substance.io/michael/github
+	
+	(function() {
+	
+	  // Initial Setup
+	  // -------------
+	
+	  var XMLHttpRequest, Base64, _;
+	  if (true) {
+	      XMLHttpRequest = __webpack_require__(/*! xmlhttprequest */ 137).XMLHttpRequest;
+	      _ = __webpack_require__(/*! underscore */ 219);
+	      Base64 = __webpack_require__(/*! ./lib/base64.js */ 161);
+	  }else{
+	      _ = window._;
+	      Base64 = window.Base64;
+	  }
+	  //prefer native XMLHttpRequest always
+	  if (typeof window !== 'undefined' && typeof window.XMLHttpRequest !== 'undefined'){
+	      XMLHttpRequest = window.XMLHttpRequest;
+	  }
+	
+	
+	  var API_URL = 'https://api.github.com';
+	
+	  var Github = function(options) {
+	
+	    // HTTP Request Abstraction
+	    // =======
+	    //
+	    // I'm not proud of this and neither should you be if you were responsible for the XMLHttpRequest spec.
+	
+	    function _request(method, path, data, cb, raw, sync) {
+	      function getURL() {
+	        var url = path.indexOf('//') >= 0 ? path : API_URL + path;
+	        return url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+	      }
+	
+	      var xhr = new XMLHttpRequest();
+	      if (!raw) {xhr.dataType = "json";}
+	
+	      xhr.open(method, getURL(), !sync);
+	      if (!sync) {
+	        xhr.onreadystatechange = function () {
+	          if (this.readyState == 4) {
+	            if (this.status >= 200 && this.status < 300 || this.status === 304) {
+	              cb(null, raw ? this.responseText : this.responseText ? JSON.parse(this.responseText) : true, this);
+	            } else {
+	              cb({path: path, request: this, error: this.status});
+	            }
+	          }
+	        }
+	      };
+	      xhr.setRequestHeader('Accept','application/vnd.github.v3.raw+json');
+	      xhr.setRequestHeader('Content-Type','application/json;charset=UTF-8');
+	      if ((options.token) || (options.username && options.password)) {
+	           xhr.setRequestHeader('Authorization', options.token
+	             ? 'token '+ options.token
+	             : 'Basic ' + Base64.encode(options.username + ':' + options.password)
+	           );
+	         }
+	      data ? xhr.send(JSON.stringify(data)) : xhr.send();
+	      if (sync) return xhr.response;
+	    }
+	
+	    function _requestAllPages(path, cb) {
+	      var results = [];
+	      (function iterate() {
+	        _request("GET", path, null, function(err, res, xhr) {
+	          if (err) {
+	            return cb(err);
+	          }
+	
+	          results.push.apply(results, res);
+	
+	          var links = (xhr.getResponseHeader('link') || '').split(/\s*,\s*/g),
+	              next = _.find(links, function(link) { return /rel="next"/.test(link); });
+	
+	          if (next) {
+	            next = (/<(.*)>/.exec(next) || [])[1];
+	          }
+	
+	          if (!next) {
+	            cb(err, results);
+	          } else {
+	            path = next;
+	            iterate();
+	          }
+	        });
+	      })();
+	    }
+	
+	
+	
+	    // User API
+	    // =======
+	
+	    Github.User = function() {
+	      this.repos = function(cb) {
+	        // Github does not always honor the 1000 limit so we want to iterate over the data set.
+	        _requestAllPages("/user/repos?type=all&per_page=1000&sort=updated", function(err, res) {
+	          cb(err, res);
+	        });
+	      };
+	
+	      // List user organizations
+	      // -------
+	
+	      this.orgs = function(cb) {
+	        _request("GET", "/user/orgs", null, function(err, res) {
+	          cb(err, res);
+	        });
+	      };
+	
+	      // List authenticated user's gists
+	      // -------
+	
+	      this.gists = function(cb) {
+	        _request("GET", "/gists", null, function(err, res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // List authenticated user's unread notifications
+	      // -------
+	
+	      this.notifications = function(cb) {
+	        _request("GET", "/notifications", null, function(err, res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // Show user information
+	      // -------
+	
+	      this.show = function(username, cb) {
+	        var command = username ? "/users/"+username : "/user";
+	
+	        _request("GET", command, null, function(err, res) {
+	          cb(err, res);
+	        });
+	      };
+	
+	      // List user repositories
+	      // -------
+	
+	      this.userRepos = function(username, cb) {
+	        // Github does not always honor the 1000 limit so we want to iterate over the data set.
+	        _requestAllPages("/users/"+username+"/repos?type=all&per_page=1000&sort=updated", function(err, res) {
+	          cb(err, res);
+	        });
+	      };
+	
+	      // List a user's gists
+	      // -------
+	
+	      this.userGists = function(username, cb) {
+	        _request("GET", "/users/"+username+"/gists", null, function(err, res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // List organization repositories
+	      // -------
+	
+	      this.orgRepos = function(orgname, cb) {
+	        // Github does not always honor the 1000 limit so we want to iterate over the data set.
+	        _requestAllPages("/orgs/"+orgname+"/repos?type=all&&page_num=1000&sort=updated&direction=desc", function(err, res) {
+	          cb(err, res);
+	        });
+	      };
+	
+	      // Follow user
+	      // -------
+	
+	      this.follow = function(username, cb) {
+	        _request("PUT", "/user/following/"+username, null, function(err, res) {
+	          cb(err, res);
+	        });
+	      };
+	
+	      // Unfollow user
+	      // -------
+	
+	      this.unfollow = function(username, cb) {
+	        _request("DELETE", "/user/following/"+username, null, function(err, res) {
+	          cb(err, res);
+	        });
+	      };
+	    };
+	
+	
+	    // Repository API
+	    // =======
+	
+	    Github.Repository = function(options) {
+	      var repo = options.name;
+	      var user = options.user;
+	
+	      var that = this;
+	      var repoPath = "/repos/" + user + "/" + repo;
+	
+	      var currentTree = {
+	        "branch": null,
+	        "sha": null
+	      };
+	
+	      // Uses the cache if branch has not been changed
+	      // -------
+	
+	      function updateTree(branch, cb) {
+	        if (branch === currentTree.branch && currentTree.sha) return cb(null, currentTree.sha);
+	        that.getRef("heads/"+branch, function(err, sha) {
+	          currentTree.branch = branch;
+	          currentTree.sha = sha;
+	          cb(err, sha);
+	        });
+	      }
+	
+	      // Get a particular reference
+	      // -------
+	
+	      this.getRef = function(ref, cb) {
+	        _request("GET", repoPath + "/git/refs/" + ref, null, function(err, res) {
+	          if (err) return cb(err);
+	          cb(null, res.object.sha);
+	        });
+	      };
+	
+	      // Create a new reference
+	      // --------
+	      //
+	      // {
+	      //   "ref": "refs/heads/my-new-branch-name",
+	      //   "sha": "827efc6d56897b048c772eb4087f854f46256132"
+	      // }
+	
+	      this.createRef = function(options, cb) {
+	        _request("POST", repoPath + "/git/refs", options, cb);
+	      };
+	
+	      // Delete a reference
+	      // --------
+	      //
+	      // repo.deleteRef('heads/gh-pages')
+	      // repo.deleteRef('tags/v1.0')
+	
+	      this.deleteRef = function(ref, cb) {
+	        _request("DELETE", repoPath + "/git/refs/"+ref, options, cb);
+	      };
+	
+	      // Create a repo  
+	      // -------
+	
+	      this.createRepo = function(options, cb) {
+	        _request("POST", "/user/repos", options, cb);
+	      };
+	
+	      // Delete a repo  
+	      // --------  
+	
+	      this.deleteRepo = function(cb) {  
+	        _request("DELETE", repoPath, options, cb);  
+	      };
+	
+	      // List all tags of a repository
+	      // -------
+	
+	      this.listTags = function(cb) {
+	        _request("GET", repoPath + "/tags", null, function(err, tags) {
+	          if (err) return cb(err);
+	          cb(null, tags);
+	        });
+	      };
+	
+	      // List all pull requests of a respository
+	      // -------
+	
+	      this.listPulls = function(state, cb) {
+	        _request("GET", repoPath + "/pulls" + (state ? '?state=' + state : ''), null, function(err, pulls) {
+	          if (err) return cb(err);
+	          cb(null, pulls);
+	        });
+	      };
+	
+	      // Gets details for a specific pull request
+	      // -------
+	
+	      this.getPull = function(number, cb) {
+	        _request("GET", repoPath + "/pulls/" + number, null, function(err, pull) {
+	          if (err) return cb(err);
+	          cb(null, pull);
+	        });
+	      };
+	
+	      // Retrieve the changes made between base and head
+	      // -------
+	
+	      this.compare = function(base, head, cb) {
+	        _request("GET", repoPath + "/compare/" + base + "..." + head, null, function(err, diff) {
+	          if (err) return cb(err);
+	          cb(null, diff);
+	        });
+	      };
+	
+	      // List all branches of a repository
+	      // -------
+	
+	      this.listBranches = function(cb) {
+	        _request("GET", repoPath + "/git/refs/heads", null, function(err, heads) {
+	          if (err) return cb(err);
+	          cb(null, _.map(heads, function(head) { return _.last(head.ref.split('/')); }));
+	        });
+	      };
+	
+	      // Retrieve the contents of a blob
+	      // -------
+	
+	      this.getBlob = function(sha, cb) {
+	        _request("GET", repoPath + "/git/blobs/" + sha, null, cb, 'raw');
+	      };
+	
+	      // For a given file path, get the corresponding sha (blob for files, tree for dirs)
+	      // -------
+	
+	      this.getSha = function(branch, path, cb) {
+	        // Just use head if path is empty
+	        if (path === "") return that.getRef("heads/"+branch, cb);
+	        that.getTree(branch+"?recursive=true", function(err, tree) {
+	          if (err) return cb(err);
+	          var file = _.select(tree, function(file) {
+	            return file.path === path;
+	          })[0];
+	          cb(null, file ? file.sha : null);
+	        });
+	      };
+	
+	      // Retrieve the tree a commit points to
+	      // -------
+	
+	      this.getTree = function(tree, cb) {
+	        _request("GET", repoPath + "/git/trees/"+tree, null, function(err, res) {
+	          if (err) return cb(err);
+	          cb(null, res.tree);
+	        });
+	      };
+	
+	      // Post a new blob object, getting a blob SHA back
+	      // -------
+	
+	      this.postBlob = function(content, cb) {
+	        if (typeof(content) === "string") {
+	          content = {
+	            "content": content,
+	            "encoding": "utf-8"
+	          };
+	        } else {
+	          	content = {
+	              "content": btoa(String.fromCharCode.apply(null, new Uint8Array(content))),
+	              "encoding": "base64"
+	            };
+	          }
+	
+	        _request("POST", repoPath + "/git/blobs", content, function(err, res) {
+	          if (err) return cb(err);
+	          cb(null, res.sha);
+	        });
+	      };
+	
+	      // Update an existing tree adding a new blob object getting a tree SHA back
+	      // -------
+	
+	      this.updateTree = function(baseTree, path, blob, cb) {
+	        var data = {
+	          "base_tree": baseTree,
+	          "tree": [
+	            {
+	              "path": path,
+	              "mode": "100644",
+	              "type": "blob",
+	              "sha": blob
+	            }
+	          ]
+	        };
+	        _request("POST", repoPath + "/git/trees", data, function(err, res) {
+	          if (err) return cb(err);
+	          cb(null, res.sha);
+	        });
+	      };
+	
+	      // Post a new tree object having a file path pointer replaced
+	      // with a new blob SHA getting a tree SHA back
+	      // -------
+	
+	      this.postTree = function(tree, cb) {
+	        _request("POST", repoPath + "/git/trees", { "tree": tree }, function(err, res) {
+	          if (err) return cb(err);
+	          cb(null, res.sha);
+	        });
+	      };
+	
+	      // Create a new commit object with the current commit SHA as the parent
+	      // and the new tree SHA, getting a commit SHA back
+	      // -------
+	
+	      this.commit = function(parent, tree, message, cb) {
+	        var data = {
+	          "message": message,
+	          "parents": [
+	            parent
+	          ],
+	          "tree": tree
+	        };
+	        if(options.username) {
+	          data.author = {
+	            "name": options.username
+	          };
+	        }
+	
+	        _request("POST", repoPath + "/git/commits", data, function(err, res) {
+	          currentTree.sha = res.sha; // update latest commit
+	          if (err) return cb(err);
+	          cb(null, res.sha);
+	        });
+	      };
+	
+	      // Update the reference of your head to point to the new commit SHA
+	      // -------
+	
+	      this.updateHead = function(head, commit, cb) {
+	        _request("PATCH", repoPath + "/git/refs/heads/" + head, { "sha": commit }, function(err, res) {
+	          cb(err);
+	        });
+	      };
+	
+	      // Show repository information
+	      // -------
+	
+	      this.show = function(cb) {
+	        _request("GET", repoPath, null, cb);
+	      };
+	
+	      // Get contents
+	      // --------
+	
+	      this.contents = function(branch, path, cb, sync) {
+	        return _request("GET", repoPath + "/contents?ref=" + branch + (path ? "&path=" + path : ""), null, cb, 'raw', sync);
+	      };
+	
+	      // Fork repository
+	      // -------
+	
+	      this.fork = function(cb) {
+	        _request("POST", repoPath + "/forks", null, cb);
+	      };
+	
+	      // Branch repository  
+	      // --------  
+	 
+	      this.branch = function(oldBranch,newBranch,cb) {
+	        if(arguments.length === 2 && typeof arguments[1] === "function") {
+	          cb = newBranch;
+	          newBranch = oldBranch;
+	          oldBranch = "master";
+	        }
+	        this.getRef("heads/" + oldBranch, function(err,ref) {
+	          if(err && cb) return cb(err);
+	          that.createRef({
+	            ref: "refs/heads/" + newBranch,
+	            sha: ref
+	          },cb);
+	        });
+	      }
+	
+	      // Create pull request
+	      // --------
+	
+	      this.createPullRequest = function(options, cb) {
+	        _request("POST", repoPath + "/pulls", options, cb);
+	      };
+	
+	      // List hooks
+	      // --------
+	
+	      this.listHooks = function(cb) {
+	        _request("GET", repoPath + "/hooks", null, cb);
+	      };
+	
+	      // Get a hook
+	      // --------
+	
+	      this.getHook = function(id, cb) {
+	        _request("GET", repoPath + "/hooks/" + id, null, cb);
+	      };
+	
+	      // Create a hook
+	      // --------
+	
+	      this.createHook = function(options, cb) {
+	        _request("POST", repoPath + "/hooks", options, cb);
+	      };
+	
+	      // Edit a hook
+	      // --------
+	
+	      this.editHook = function(id, options, cb) {
+	        _request("PATCH", repoPath + "/hooks/" + id, options, cb);
+	      };
+	
+	      // Delete a hook
+	      // --------
+	
+	      this.deleteHook = function(id, cb) {
+	        _request("DELETE", repoPath + "/hooks/" + id, null, cb);
+	      };
+	
+	      // Read file at given path
+	      // -------
+	
+	      this.read = function(branch, path, cb) {
+	        that.getSha(branch, path, function(err, sha) {
+	          if (!sha) return cb("not found", null);
+	          that.getBlob(sha, function(err, content) {
+	            cb(err, content, sha);
+	          });
+	        });
+	      };
+	
+	      // Remove a file from the tree
+	      // -------
+	
+	      this.remove = function(branch, path, cb) {
+	        updateTree(branch, function(err, latestCommit) {
+	          that.getTree(latestCommit+"?recursive=true", function(err, tree) {
+	            // Update Tree
+	            var newTree = _.reject(tree, function(ref) { return ref.path === path; });
+	            _.each(newTree, function(ref) {
+	              if (ref.type === "tree") delete ref.sha;
+	            });
+	
+	            that.postTree(newTree, function(err, rootTree) {
+	              that.commit(latestCommit, rootTree, 'Deleted '+path , function(err, commit) {
+	                that.updateHead(branch, commit, function(err) {
+	                  cb(err);
+	                });
+	              });
+	            });
+	          });
+	        });
+	      };
+	      
+	      // Delete a file from the tree
+	      // -------
+	      
+	      this.delete = function(branch, path, cb) {
+	        that.getSha(branch, path, function(err, sha) {
+	          if (!sha) return cb("not found", null);
+	          var delPath = repoPath + "/contents/" + path;
+	          var params = {
+	            "message": "Deleted " + path,
+	            "sha": sha 
+	          };
+	          delPath += "?message=" + encodeURIComponent(params.message);
+	          delPath += "&sha=" + encodeURIComponent(params.sha);
+	          _request("DELETE", delPath, null, cb);
+	        })
+	      }
+	      
+	      // Move a file to a new location
+	      // -------
+	
+	      this.move = function(branch, path, newPath, cb) {
+	        updateTree(branch, function(err, latestCommit) {
+	          that.getTree(latestCommit+"?recursive=true", function(err, tree) {
+	            // Update Tree
+	            _.each(tree, function(ref) {
+	              if (ref.path === path) ref.path = newPath;
+	              if (ref.type === "tree") delete ref.sha;
+	            });
+	
+	            that.postTree(tree, function(err, rootTree) {
+	              that.commit(latestCommit, rootTree, 'Deleted '+path , function(err, commit) {
+	                that.updateHead(branch, commit, function(err) {
+	                  cb(err);
+	                });
+	              });
+	            });
+	          });
+	        });
+	      };
+	
+	      // Write file contents to a given branch and path
+	      // -------
+	
+	      this.write = function(branch, path, content, message, cb) {
+	        updateTree(branch, function(err, latestCommit) {
+	          if (err) return cb(err);
+	          that.postBlob(content, function(err, blob) {
+	            if (err) return cb(err);
+	            that.updateTree(latestCommit, path, blob, function(err, tree) {
+	              if (err) return cb(err);
+	              that.commit(latestCommit, tree, message, function(err, commit) {
+	                if (err) return cb(err);
+	                that.updateHead(branch, commit, cb);
+	              });
+	            });
+	          });
+	        });
+	      };
+	
+	      // List commits on a repository. Takes an object of optional paramaters:
+	      // sha: SHA or branch to start listing commits from
+	      // path: Only commits containing this file path will be returned
+	      // since: ISO 8601 date - only commits after this date will be returned
+	      // until: ISO 8601 date - only commits before this date will be returned
+	      // -------
+	
+	      this.getCommits = function(options, cb) {
+	          options = options || {};
+	          var url = repoPath + "/commits";
+	          var params = [];
+	          if (options.sha) {
+	              params.push("sha=" + encodeURIComponent(options.sha));
+	          }
+	          if (options.path) {
+	              params.push("path=" + encodeURIComponent(options.path));
+	          }
+	          if (options.since) {
+	              var since = options.since;
+	              if (since.constructor === Date) {
+	                  since = since.toISOString();
+	              }
+	              params.push("since=" + encodeURIComponent(since));
+	          }
+	          if (options.until) {
+	              var until = options.until;
+	              if (until.constructor === Date) {
+	                  until = until.toISOString();
+	              }
+	              params.push("until=" + encodeURIComponent(until));
+	          }
+	          if (params.length > 0) {
+	              url += "?" + params.join("&");
+	          }
+	          _request("GET", url, null, cb);
+	      };
+	    };
+	
+	    // Gists API
+	    // =======
+	
+	    Github.Gist = function(options) {
+	      var id = options.id;
+	      var gistPath = "/gists/"+id;
+	
+	      // Read the gist
+	      // --------
+	
+	      this.read = function(cb) {
+	        _request("GET", gistPath, null, function(err, gist) {
+	          cb(err, gist);
+	        });
+	      };
+	
+	      // Create the gist
+	      // --------
+	      // {
+	      //  "description": "the description for this gist",
+	      //    "public": true,
+	      //    "files": {
+	      //      "file1.txt": {
+	      //        "content": "String file contents"
+	      //      }
+	      //    }
+	      // }
+	
+	      this.create = function(options, cb){
+	        _request("POST","/gists", options, cb);
+	      };
+	
+	      // Delete the gist
+	      // --------
+	
+	      this.delete = function(cb) {
+	        _request("DELETE", gistPath, null, function(err,res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // Fork a gist
+	      // --------
+	
+	      this.fork = function(cb) {
+	        _request("POST", gistPath+"/fork", null, function(err,res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // Update a gist with the new stuff
+	      // --------
+	
+	      this.update = function(options, cb) {
+	        _request("PATCH", gistPath, options, function(err,res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // Star a gist
+	      // --------
+	
+	      this.star = function(cb) {
+	        _request("PUT", gistPath+"/star", null, function(err,res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // Untar a gist
+	      // --------
+	
+	      this.unstar = function(cb) {
+	        _request("DELETE", gistPath+"/star", null, function(err,res) {
+	          cb(err,res);
+	        });
+	      };
+	
+	      // Check if a gist is starred
+	      // --------
+	
+	      this.isStarred = function(cb) {
+	        _request("GET", gistPath+"/star", null, function(err,res) {
+	          cb(err,res);
+	        });
+	      };
+	    };
+	
+	    // Issues API
+	    // ==========
+	
+	    Github.Issue = function(options) {
+	      var path = "/repos/" + options.user + "/" + options.repo + "/issues";
+	
+	      this.list = function(options, cb) {
+	        _request("GET", path, options, function(err, res) {
+	          cb(err,res)
+	        });
+	      };
+	    };
+	
+	    // Top Level API
+	    // -------
+	
+	    this.getIssues = function(user, repo) {
+	      return new Github.Issue({user: user, repo: repo});
+	    };
+	
+	    this.getRepo = function(user, repo) {
+	      return new Github.Repository({user: user, name: repo});
+	    };
+	
+	    this.getUser = function() {
+	      return new Github.User();
+	    };
+	
+	    this.getGist = function(id) {
+	      return new Github.Gist({id: id});
+	    };
+	  };
+	
+	
+	  if (true) {
+	    // Github = exports;
+	    module.exports = Github;
+	  } else {
+	    window.Github = Github;
+	  }
+	}).call(this);
+
+
+/***/ },
+/* 74 */
 /*!***************************************!*\
   !*** ./~/react-spinkit/dist/index.js ***!
   \***************************************/
@@ -8863,7 +9855,7 @@
 	// Generated by CoffeeScript undefined
 	var React;
 	
-	React = __webpack_require__(/*! react/addons */ 139);
+	React = __webpack_require__(/*! react/addons */ 138);
 	
 	module.exports = React.createClass({
 	  displayName: "SpinKit",
@@ -9069,7 +10061,7 @@
 
 
 /***/ },
-/* 73 */
+/* 75 */
 /*!**********************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/process/browser.js ***!
   \**********************************************************/
@@ -9141,7 +10133,7 @@
 
 
 /***/ },
-/* 74 */
+/* 76 */
 /*!*******************************************!*\
   !*** ./~/es6-promise/dist/es6-promise.js ***!
   \*******************************************/
@@ -10113,999 +11105,7 @@
 	      this['ES6Promise'] = es6$promise$umd$$ES6Promise;
 	    }
 	}).call(this);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73), (function() { return this; }()), __webpack_require__(/*! (webpack)/buildin/module.js */ 212)(module)))
-
-/***/ },
-/* 75 */
-/*!**************************!*\
-  !*** ./~/fetch/fetch.js ***!
-  \**************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	(function() {
-	  'use strict';
-	
-	  if (window.fetch) {
-	    return
-	  }
-	
-	  function Headers(headers) {
-	    this.map = {}
-	
-	    var self = this
-	    if (headers instanceof Headers) {
-	      headers.forEach(function(name, values) {
-	        values.forEach(function(value) {
-	          self.append(name, value)
-	        })
-	      })
-	
-	    } else if (headers) {
-	      Object.getOwnPropertyNames(headers).forEach(function(name) {
-	        self.append(name, headers[name])
-	      })
-	    }
-	  }
-	
-	  Headers.prototype.append = function(name, value) {
-	    var list = this.map[name]
-	    if (!list) {
-	      list = []
-	      this.map[name] = list
-	    }
-	    list.push(value)
-	  }
-	
-	  Headers.prototype['delete'] = function(name) {
-	    delete this.map[name]
-	  }
-	
-	  Headers.prototype.get = function(name) {
-	    var values = this.map[name]
-	    return values ? values[0] : null
-	  }
-	
-	  Headers.prototype.getAll = function(name) {
-	    return this.map[name] || []
-	  }
-	
-	  Headers.prototype.has = function(name) {
-	    return this.map.hasOwnProperty(name)
-	  }
-	
-	  Headers.prototype.set = function(name, value) {
-	    this.map[name] = [value]
-	  }
-	
-	  // Instead of iterable for now.
-	  Headers.prototype.forEach = function(callback) {
-	    var self = this
-	    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-	      callback(name, self.map[name])
-	    })
-	  }
-	
-	  function consumed(body) {
-	    if (body.bodyUsed) {
-	      return Promise.reject(new TypeError('Body already consumed'))
-	    }
-	    body.bodyUsed = true
-	  }
-	
-	  function Body() {
-	    this.body = null
-	    this.bodyUsed = false
-	
-	    this.arrayBuffer = function() {
-	      throw new Error('Not implemented yet')
-	    }
-	
-	    this.blob = function() {
-	      var rejected = consumed(this)
-	      return rejected ? rejected : Promise.resolve(new Blob([this.body]))
-	    }
-	
-	    this.formData = function() {
-	      return Promise.resolve(decode(this.body))
-	    }
-	
-	    this.json = function() {
-	      var rejected = consumed(this)
-	      if (rejected) {
-	        return rejected
-	      }
-	
-	      var body = this.body
-	      return new Promise(function(resolve, reject) {
-	        try {
-	          resolve(JSON.parse(body))
-	        } catch (ex) {
-	          reject(ex)
-	        }
-	      })
-	    }
-	
-	    this.text = function() {
-	      var rejected = consumed(this)
-	      return rejected ? rejected : Promise.resolve(this.body)
-	    }
-	
-	    return this
-	  }
-	
-	  function Request(url, options) {
-	    options = options || {}
-	    this.url = url
-	    this.body = options.body
-	    this.credentials = options.credentials || null
-	    this.headers = new Headers(options.headers)
-	    this.method = options.method || 'GET'
-	    this.mode = options.mode || null
-	    this.referrer = null
-	  }
-	
-	  function decode(body) {
-	    var form = new FormData()
-	    body.trim().split('&').forEach(function(bytes) {
-	      if (bytes) {
-	        var split = bytes.split('=')
-	        var name = split.shift().replace(/\+/g, ' ')
-	        var value = split.join('=').replace(/\+/g, ' ')
-	        form.append(decodeURIComponent(name), decodeURIComponent(value))
-	      }
-	    })
-	    return form
-	  }
-	
-	  function headers(xhr) {
-	    var head = new Headers()
-	    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
-	    pairs.forEach(function(header) {
-	      var split = header.trim().split(':')
-	      var key = split.shift().trim()
-	      var value = split.join(':').trim()
-	      head.append(key, value)
-	    })
-	    return head
-	  }
-	
-	  Request.prototype.fetch = function() {
-	    var self = this
-	
-	    return new Promise(function(resolve, reject) {
-	      var xhr = new XMLHttpRequest()
-	
-	      xhr.onload = function() {
-	        var options = {
-	          status: xhr.status,
-	          statusText: xhr.statusText,
-	          headers: headers(xhr)
-	        }
-	        resolve(new Response(xhr.responseText, options))
-	      }
-	
-	      xhr.onerror = function() {
-	        reject()
-	      }
-	
-	      xhr.open(self.method, self.url)
-	
-	      self.headers.forEach(function(name, values) {
-	        values.forEach(function(value) {
-	          xhr.setRequestHeader(name, value)
-	        })
-	      })
-	
-	      xhr.send(self.body)
-	    })
-	  }
-	
-	  Body.call(Request.prototype)
-	
-	  function Response(body, options) {
-	    this.body = body
-	    this.type = 'default'
-	    this.url = null
-	    this.status = options.status
-	    this.statusText = options.statusText
-	    this.headers = options.headers
-	  }
-	
-	  Body.call(Response.prototype)
-	
-	  window.fetch = function (url, options) {
-	    return new Request(url, options).fetch()
-	  }
-	})();
-
-
-/***/ },
-/* 76 */
-/*!********************************!*\
-  !*** ./~/github-api/github.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// Github.js 0.9.0
-	// (c) 2013 Michael Aufreiter, Development Seed
-	// Github.js is freely distributable under the MIT license.
-	// For all details and documentation:
-	// http://substance.io/michael/github
-	
-	(function() {
-	
-	  // Initial Setup
-	  // -------------
-	
-	  var XMLHttpRequest, Base64, _;
-	  if (true) {
-	      XMLHttpRequest = __webpack_require__(/*! xmlhttprequest */ 138).XMLHttpRequest;
-	      _ = __webpack_require__(/*! underscore */ 223);
-	      Base64 = __webpack_require__(/*! ./lib/base64.js */ 182);
-	  }else{
-	      _ = window._;
-	      Base64 = window.Base64;
-	  }
-	  //prefer native XMLHttpRequest always
-	  if (typeof window !== 'undefined' && typeof window.XMLHttpRequest !== 'undefined'){
-	      XMLHttpRequest = window.XMLHttpRequest;
-	  }
-	
-	
-	  var API_URL = 'https://api.github.com';
-	
-	  var Github = function(options) {
-	
-	    // HTTP Request Abstraction
-	    // =======
-	    //
-	    // I'm not proud of this and neither should you be if you were responsible for the XMLHttpRequest spec.
-	
-	    function _request(method, path, data, cb, raw, sync) {
-	      function getURL() {
-	        var url = path.indexOf('//') >= 0 ? path : API_URL + path;
-	        return url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
-	      }
-	
-	      var xhr = new XMLHttpRequest();
-	      if (!raw) {xhr.dataType = "json";}
-	
-	      xhr.open(method, getURL(), !sync);
-	      if (!sync) {
-	        xhr.onreadystatechange = function () {
-	          if (this.readyState == 4) {
-	            if (this.status >= 200 && this.status < 300 || this.status === 304) {
-	              cb(null, raw ? this.responseText : this.responseText ? JSON.parse(this.responseText) : true, this);
-	            } else {
-	              cb({path: path, request: this, error: this.status});
-	            }
-	          }
-	        }
-	      };
-	      xhr.setRequestHeader('Accept','application/vnd.github.v3.raw+json');
-	      xhr.setRequestHeader('Content-Type','application/json;charset=UTF-8');
-	      if ((options.token) || (options.username && options.password)) {
-	           xhr.setRequestHeader('Authorization', options.token
-	             ? 'token '+ options.token
-	             : 'Basic ' + Base64.encode(options.username + ':' + options.password)
-	           );
-	         }
-	      data ? xhr.send(JSON.stringify(data)) : xhr.send();
-	      if (sync) return xhr.response;
-	    }
-	
-	    function _requestAllPages(path, cb) {
-	      var results = [];
-	      (function iterate() {
-	        _request("GET", path, null, function(err, res, xhr) {
-	          if (err) {
-	            return cb(err);
-	          }
-	
-	          results.push.apply(results, res);
-	
-	          var links = (xhr.getResponseHeader('link') || '').split(/\s*,\s*/g),
-	              next = _.find(links, function(link) { return /rel="next"/.test(link); });
-	
-	          if (next) {
-	            next = (/<(.*)>/.exec(next) || [])[1];
-	          }
-	
-	          if (!next) {
-	            cb(err, results);
-	          } else {
-	            path = next;
-	            iterate();
-	          }
-	        });
-	      })();
-	    }
-	
-	
-	
-	    // User API
-	    // =======
-	
-	    Github.User = function() {
-	      this.repos = function(cb) {
-	        // Github does not always honor the 1000 limit so we want to iterate over the data set.
-	        _requestAllPages("/user/repos?type=all&per_page=1000&sort=updated", function(err, res) {
-	          cb(err, res);
-	        });
-	      };
-	
-	      // List user organizations
-	      // -------
-	
-	      this.orgs = function(cb) {
-	        _request("GET", "/user/orgs", null, function(err, res) {
-	          cb(err, res);
-	        });
-	      };
-	
-	      // List authenticated user's gists
-	      // -------
-	
-	      this.gists = function(cb) {
-	        _request("GET", "/gists", null, function(err, res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // List authenticated user's unread notifications
-	      // -------
-	
-	      this.notifications = function(cb) {
-	        _request("GET", "/notifications", null, function(err, res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // Show user information
-	      // -------
-	
-	      this.show = function(username, cb) {
-	        var command = username ? "/users/"+username : "/user";
-	
-	        _request("GET", command, null, function(err, res) {
-	          cb(err, res);
-	        });
-	      };
-	
-	      // List user repositories
-	      // -------
-	
-	      this.userRepos = function(username, cb) {
-	        // Github does not always honor the 1000 limit so we want to iterate over the data set.
-	        _requestAllPages("/users/"+username+"/repos?type=all&per_page=1000&sort=updated", function(err, res) {
-	          cb(err, res);
-	        });
-	      };
-	
-	      // List a user's gists
-	      // -------
-	
-	      this.userGists = function(username, cb) {
-	        _request("GET", "/users/"+username+"/gists", null, function(err, res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // List organization repositories
-	      // -------
-	
-	      this.orgRepos = function(orgname, cb) {
-	        // Github does not always honor the 1000 limit so we want to iterate over the data set.
-	        _requestAllPages("/orgs/"+orgname+"/repos?type=all&&page_num=1000&sort=updated&direction=desc", function(err, res) {
-	          cb(err, res);
-	        });
-	      };
-	
-	      // Follow user
-	      // -------
-	
-	      this.follow = function(username, cb) {
-	        _request("PUT", "/user/following/"+username, null, function(err, res) {
-	          cb(err, res);
-	        });
-	      };
-	
-	      // Unfollow user
-	      // -------
-	
-	      this.unfollow = function(username, cb) {
-	        _request("DELETE", "/user/following/"+username, null, function(err, res) {
-	          cb(err, res);
-	        });
-	      };
-	    };
-	
-	
-	    // Repository API
-	    // =======
-	
-	    Github.Repository = function(options) {
-	      var repo = options.name;
-	      var user = options.user;
-	
-	      var that = this;
-	      var repoPath = "/repos/" + user + "/" + repo;
-	
-	      var currentTree = {
-	        "branch": null,
-	        "sha": null
-	      };
-	
-	      // Uses the cache if branch has not been changed
-	      // -------
-	
-	      function updateTree(branch, cb) {
-	        if (branch === currentTree.branch && currentTree.sha) return cb(null, currentTree.sha);
-	        that.getRef("heads/"+branch, function(err, sha) {
-	          currentTree.branch = branch;
-	          currentTree.sha = sha;
-	          cb(err, sha);
-	        });
-	      }
-	
-	      // Get a particular reference
-	      // -------
-	
-	      this.getRef = function(ref, cb) {
-	        _request("GET", repoPath + "/git/refs/" + ref, null, function(err, res) {
-	          if (err) return cb(err);
-	          cb(null, res.object.sha);
-	        });
-	      };
-	
-	      // Create a new reference
-	      // --------
-	      //
-	      // {
-	      //   "ref": "refs/heads/my-new-branch-name",
-	      //   "sha": "827efc6d56897b048c772eb4087f854f46256132"
-	      // }
-	
-	      this.createRef = function(options, cb) {
-	        _request("POST", repoPath + "/git/refs", options, cb);
-	      };
-	
-	      // Delete a reference
-	      // --------
-	      //
-	      // repo.deleteRef('heads/gh-pages')
-	      // repo.deleteRef('tags/v1.0')
-	
-	      this.deleteRef = function(ref, cb) {
-	        _request("DELETE", repoPath + "/git/refs/"+ref, options, cb);
-	      };
-	
-	      // Create a repo  
-	      // -------
-	
-	      this.createRepo = function(options, cb) {
-	        _request("POST", "/user/repos", options, cb);
-	      };
-	
-	      // Delete a repo  
-	      // --------  
-	
-	      this.deleteRepo = function(cb) {  
-	        _request("DELETE", repoPath, options, cb);  
-	      };
-	
-	      // List all tags of a repository
-	      // -------
-	
-	      this.listTags = function(cb) {
-	        _request("GET", repoPath + "/tags", null, function(err, tags) {
-	          if (err) return cb(err);
-	          cb(null, tags);
-	        });
-	      };
-	
-	      // List all pull requests of a respository
-	      // -------
-	
-	      this.listPulls = function(state, cb) {
-	        _request("GET", repoPath + "/pulls" + (state ? '?state=' + state : ''), null, function(err, pulls) {
-	          if (err) return cb(err);
-	          cb(null, pulls);
-	        });
-	      };
-	
-	      // Gets details for a specific pull request
-	      // -------
-	
-	      this.getPull = function(number, cb) {
-	        _request("GET", repoPath + "/pulls/" + number, null, function(err, pull) {
-	          if (err) return cb(err);
-	          cb(null, pull);
-	        });
-	      };
-	
-	      // Retrieve the changes made between base and head
-	      // -------
-	
-	      this.compare = function(base, head, cb) {
-	        _request("GET", repoPath + "/compare/" + base + "..." + head, null, function(err, diff) {
-	          if (err) return cb(err);
-	          cb(null, diff);
-	        });
-	      };
-	
-	      // List all branches of a repository
-	      // -------
-	
-	      this.listBranches = function(cb) {
-	        _request("GET", repoPath + "/git/refs/heads", null, function(err, heads) {
-	          if (err) return cb(err);
-	          cb(null, _.map(heads, function(head) { return _.last(head.ref.split('/')); }));
-	        });
-	      };
-	
-	      // Retrieve the contents of a blob
-	      // -------
-	
-	      this.getBlob = function(sha, cb) {
-	        _request("GET", repoPath + "/git/blobs/" + sha, null, cb, 'raw');
-	      };
-	
-	      // For a given file path, get the corresponding sha (blob for files, tree for dirs)
-	      // -------
-	
-	      this.getSha = function(branch, path, cb) {
-	        // Just use head if path is empty
-	        if (path === "") return that.getRef("heads/"+branch, cb);
-	        that.getTree(branch+"?recursive=true", function(err, tree) {
-	          if (err) return cb(err);
-	          var file = _.select(tree, function(file) {
-	            return file.path === path;
-	          })[0];
-	          cb(null, file ? file.sha : null);
-	        });
-	      };
-	
-	      // Retrieve the tree a commit points to
-	      // -------
-	
-	      this.getTree = function(tree, cb) {
-	        _request("GET", repoPath + "/git/trees/"+tree, null, function(err, res) {
-	          if (err) return cb(err);
-	          cb(null, res.tree);
-	        });
-	      };
-	
-	      // Post a new blob object, getting a blob SHA back
-	      // -------
-	
-	      this.postBlob = function(content, cb) {
-	        if (typeof(content) === "string") {
-	          content = {
-	            "content": content,
-	            "encoding": "utf-8"
-	          };
-	        } else {
-	          	content = {
-	              "content": btoa(String.fromCharCode.apply(null, new Uint8Array(content))),
-	              "encoding": "base64"
-	            };
-	          }
-	
-	        _request("POST", repoPath + "/git/blobs", content, function(err, res) {
-	          if (err) return cb(err);
-	          cb(null, res.sha);
-	        });
-	      };
-	
-	      // Update an existing tree adding a new blob object getting a tree SHA back
-	      // -------
-	
-	      this.updateTree = function(baseTree, path, blob, cb) {
-	        var data = {
-	          "base_tree": baseTree,
-	          "tree": [
-	            {
-	              "path": path,
-	              "mode": "100644",
-	              "type": "blob",
-	              "sha": blob
-	            }
-	          ]
-	        };
-	        _request("POST", repoPath + "/git/trees", data, function(err, res) {
-	          if (err) return cb(err);
-	          cb(null, res.sha);
-	        });
-	      };
-	
-	      // Post a new tree object having a file path pointer replaced
-	      // with a new blob SHA getting a tree SHA back
-	      // -------
-	
-	      this.postTree = function(tree, cb) {
-	        _request("POST", repoPath + "/git/trees", { "tree": tree }, function(err, res) {
-	          if (err) return cb(err);
-	          cb(null, res.sha);
-	        });
-	      };
-	
-	      // Create a new commit object with the current commit SHA as the parent
-	      // and the new tree SHA, getting a commit SHA back
-	      // -------
-	
-	      this.commit = function(parent, tree, message, cb) {
-	        var data = {
-	          "message": message,
-	          "parents": [
-	            parent
-	          ],
-	          "tree": tree
-	        };
-	        if(options.username) {
-	          data.author = {
-	            "name": options.username
-	          };
-	        }
-	
-	        _request("POST", repoPath + "/git/commits", data, function(err, res) {
-	          currentTree.sha = res.sha; // update latest commit
-	          if (err) return cb(err);
-	          cb(null, res.sha);
-	        });
-	      };
-	
-	      // Update the reference of your head to point to the new commit SHA
-	      // -------
-	
-	      this.updateHead = function(head, commit, cb) {
-	        _request("PATCH", repoPath + "/git/refs/heads/" + head, { "sha": commit }, function(err, res) {
-	          cb(err);
-	        });
-	      };
-	
-	      // Show repository information
-	      // -------
-	
-	      this.show = function(cb) {
-	        _request("GET", repoPath, null, cb);
-	      };
-	
-	      // Get contents
-	      // --------
-	
-	      this.contents = function(branch, path, cb, sync) {
-	        return _request("GET", repoPath + "/contents?ref=" + branch + (path ? "&path=" + path : ""), null, cb, 'raw', sync);
-	      };
-	
-	      // Fork repository
-	      // -------
-	
-	      this.fork = function(cb) {
-	        _request("POST", repoPath + "/forks", null, cb);
-	      };
-	
-	      // Branch repository  
-	      // --------  
-	 
-	      this.branch = function(oldBranch,newBranch,cb) {
-	        if(arguments.length === 2 && typeof arguments[1] === "function") {
-	          cb = newBranch;
-	          newBranch = oldBranch;
-	          oldBranch = "master";
-	        }
-	        this.getRef("heads/" + oldBranch, function(err,ref) {
-	          if(err && cb) return cb(err);
-	          that.createRef({
-	            ref: "refs/heads/" + newBranch,
-	            sha: ref
-	          },cb);
-	        });
-	      }
-	
-	      // Create pull request
-	      // --------
-	
-	      this.createPullRequest = function(options, cb) {
-	        _request("POST", repoPath + "/pulls", options, cb);
-	      };
-	
-	      // List hooks
-	      // --------
-	
-	      this.listHooks = function(cb) {
-	        _request("GET", repoPath + "/hooks", null, cb);
-	      };
-	
-	      // Get a hook
-	      // --------
-	
-	      this.getHook = function(id, cb) {
-	        _request("GET", repoPath + "/hooks/" + id, null, cb);
-	      };
-	
-	      // Create a hook
-	      // --------
-	
-	      this.createHook = function(options, cb) {
-	        _request("POST", repoPath + "/hooks", options, cb);
-	      };
-	
-	      // Edit a hook
-	      // --------
-	
-	      this.editHook = function(id, options, cb) {
-	        _request("PATCH", repoPath + "/hooks/" + id, options, cb);
-	      };
-	
-	      // Delete a hook
-	      // --------
-	
-	      this.deleteHook = function(id, cb) {
-	        _request("DELETE", repoPath + "/hooks/" + id, null, cb);
-	      };
-	
-	      // Read file at given path
-	      // -------
-	
-	      this.read = function(branch, path, cb) {
-	        that.getSha(branch, path, function(err, sha) {
-	          if (!sha) return cb("not found", null);
-	          that.getBlob(sha, function(err, content) {
-	            cb(err, content, sha);
-	          });
-	        });
-	      };
-	
-	      // Remove a file from the tree
-	      // -------
-	
-	      this.remove = function(branch, path, cb) {
-	        updateTree(branch, function(err, latestCommit) {
-	          that.getTree(latestCommit+"?recursive=true", function(err, tree) {
-	            // Update Tree
-	            var newTree = _.reject(tree, function(ref) { return ref.path === path; });
-	            _.each(newTree, function(ref) {
-	              if (ref.type === "tree") delete ref.sha;
-	            });
-	
-	            that.postTree(newTree, function(err, rootTree) {
-	              that.commit(latestCommit, rootTree, 'Deleted '+path , function(err, commit) {
-	                that.updateHead(branch, commit, function(err) {
-	                  cb(err);
-	                });
-	              });
-	            });
-	          });
-	        });
-	      };
-	      
-	      // Delete a file from the tree
-	      // -------
-	      
-	      this.delete = function(branch, path, cb) {
-	        that.getSha(branch, path, function(err, sha) {
-	          if (!sha) return cb("not found", null);
-	          var delPath = repoPath + "/contents/" + path;
-	          var params = {
-	            "message": "Deleted " + path,
-	            "sha": sha 
-	          };
-	          delPath += "?message=" + encodeURIComponent(params.message);
-	          delPath += "&sha=" + encodeURIComponent(params.sha);
-	          _request("DELETE", delPath, null, cb);
-	        })
-	      }
-	      
-	      // Move a file to a new location
-	      // -------
-	
-	      this.move = function(branch, path, newPath, cb) {
-	        updateTree(branch, function(err, latestCommit) {
-	          that.getTree(latestCommit+"?recursive=true", function(err, tree) {
-	            // Update Tree
-	            _.each(tree, function(ref) {
-	              if (ref.path === path) ref.path = newPath;
-	              if (ref.type === "tree") delete ref.sha;
-	            });
-	
-	            that.postTree(tree, function(err, rootTree) {
-	              that.commit(latestCommit, rootTree, 'Deleted '+path , function(err, commit) {
-	                that.updateHead(branch, commit, function(err) {
-	                  cb(err);
-	                });
-	              });
-	            });
-	          });
-	        });
-	      };
-	
-	      // Write file contents to a given branch and path
-	      // -------
-	
-	      this.write = function(branch, path, content, message, cb) {
-	        updateTree(branch, function(err, latestCommit) {
-	          if (err) return cb(err);
-	          that.postBlob(content, function(err, blob) {
-	            if (err) return cb(err);
-	            that.updateTree(latestCommit, path, blob, function(err, tree) {
-	              if (err) return cb(err);
-	              that.commit(latestCommit, tree, message, function(err, commit) {
-	                if (err) return cb(err);
-	                that.updateHead(branch, commit, cb);
-	              });
-	            });
-	          });
-	        });
-	      };
-	
-	      // List commits on a repository. Takes an object of optional paramaters:
-	      // sha: SHA or branch to start listing commits from
-	      // path: Only commits containing this file path will be returned
-	      // since: ISO 8601 date - only commits after this date will be returned
-	      // until: ISO 8601 date - only commits before this date will be returned
-	      // -------
-	
-	      this.getCommits = function(options, cb) {
-	          options = options || {};
-	          var url = repoPath + "/commits";
-	          var params = [];
-	          if (options.sha) {
-	              params.push("sha=" + encodeURIComponent(options.sha));
-	          }
-	          if (options.path) {
-	              params.push("path=" + encodeURIComponent(options.path));
-	          }
-	          if (options.since) {
-	              var since = options.since;
-	              if (since.constructor === Date) {
-	                  since = since.toISOString();
-	              }
-	              params.push("since=" + encodeURIComponent(since));
-	          }
-	          if (options.until) {
-	              var until = options.until;
-	              if (until.constructor === Date) {
-	                  until = until.toISOString();
-	              }
-	              params.push("until=" + encodeURIComponent(until));
-	          }
-	          if (params.length > 0) {
-	              url += "?" + params.join("&");
-	          }
-	          _request("GET", url, null, cb);
-	      };
-	    };
-	
-	    // Gists API
-	    // =======
-	
-	    Github.Gist = function(options) {
-	      var id = options.id;
-	      var gistPath = "/gists/"+id;
-	
-	      // Read the gist
-	      // --------
-	
-	      this.read = function(cb) {
-	        _request("GET", gistPath, null, function(err, gist) {
-	          cb(err, gist);
-	        });
-	      };
-	
-	      // Create the gist
-	      // --------
-	      // {
-	      //  "description": "the description for this gist",
-	      //    "public": true,
-	      //    "files": {
-	      //      "file1.txt": {
-	      //        "content": "String file contents"
-	      //      }
-	      //    }
-	      // }
-	
-	      this.create = function(options, cb){
-	        _request("POST","/gists", options, cb);
-	      };
-	
-	      // Delete the gist
-	      // --------
-	
-	      this.delete = function(cb) {
-	        _request("DELETE", gistPath, null, function(err,res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // Fork a gist
-	      // --------
-	
-	      this.fork = function(cb) {
-	        _request("POST", gistPath+"/fork", null, function(err,res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // Update a gist with the new stuff
-	      // --------
-	
-	      this.update = function(options, cb) {
-	        _request("PATCH", gistPath, options, function(err,res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // Star a gist
-	      // --------
-	
-	      this.star = function(cb) {
-	        _request("PUT", gistPath+"/star", null, function(err,res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // Untar a gist
-	      // --------
-	
-	      this.unstar = function(cb) {
-	        _request("DELETE", gistPath+"/star", null, function(err,res) {
-	          cb(err,res);
-	        });
-	      };
-	
-	      // Check if a gist is starred
-	      // --------
-	
-	      this.isStarred = function(cb) {
-	        _request("GET", gistPath+"/star", null, function(err,res) {
-	          cb(err,res);
-	        });
-	      };
-	    };
-	
-	    // Issues API
-	    // ==========
-	
-	    Github.Issue = function(options) {
-	      var path = "/repos/" + options.user + "/" + options.repo + "/issues";
-	
-	      this.list = function(options, cb) {
-	        _request("GET", path, options, function(err, res) {
-	          cb(err,res)
-	        });
-	      };
-	    };
-	
-	    // Top Level API
-	    // -------
-	
-	    this.getIssues = function(user, repo) {
-	      return new Github.Issue({user: user, repo: repo});
-	    };
-	
-	    this.getRepo = function(user, repo) {
-	      return new Github.Repository({user: user, name: repo});
-	    };
-	
-	    this.getUser = function() {
-	      return new Github.User();
-	    };
-	
-	    this.getGist = function(id) {
-	      return new Github.Gist({id: id});
-	    };
-	  };
-	
-	
-	  if (true) {
-	    // Github = exports;
-	    module.exports = Github;
-	  } else {
-	    window.Github = Github;
-	  }
-	}).call(this);
-
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75), (function() { return this; }()), __webpack_require__(/*! (webpack)/buildin/module.js */ 212)(module)))
 
 /***/ },
 /* 77 */
@@ -11413,7 +11413,7 @@
 	
 	module.exports = DOMProperty;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 78 */
@@ -11672,7 +11672,7 @@
 	
 	module.exports = invariant;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 82 */
@@ -11801,7 +11801,7 @@
 	
 	module.exports = PooledClass;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 83 */
@@ -12004,7 +12004,7 @@
 	
 	module.exports = traverseAllChildren;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 84 */
@@ -12033,7 +12033,7 @@
 	
 	"use strict";
 	
-	var emptyObject = __webpack_require__(/*! ./emptyObject */ 140);
+	var emptyObject = __webpack_require__(/*! ./emptyObject */ 139);
 	var invariant = __webpack_require__(/*! ./invariant */ 81);
 	
 	/**
@@ -12173,7 +12173,7 @@
 	
 	module.exports = ReactOwner;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 85 */
@@ -12202,11 +12202,11 @@
 	
 	"use strict";
 	
-	var CallbackQueue = __webpack_require__(/*! ./CallbackQueue */ 141);
+	var CallbackQueue = __webpack_require__(/*! ./CallbackQueue */ 140);
 	var PooledClass = __webpack_require__(/*! ./PooledClass */ 82);
 	var ReactCurrentOwner = __webpack_require__(/*! ./ReactCurrentOwner */ 57);
 	var ReactPerf = __webpack_require__(/*! ./ReactPerf */ 65);
-	var Transaction = __webpack_require__(/*! ./Transaction */ 142);
+	var Transaction = __webpack_require__(/*! ./Transaction */ 141);
 	
 	var invariant = __webpack_require__(/*! ./invariant */ 81);
 	var mixInto = __webpack_require__(/*! ./mixInto */ 95);
@@ -12448,7 +12448,7 @@
 	
 	module.exports = ReactUpdates;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 86 */
@@ -12516,7 +12516,7 @@
 	
 	module.exports = keyMirror;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 87 */
@@ -12942,7 +12942,7 @@
 	
 	module.exports = ReactEmptyComponent;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 90 */
@@ -13019,7 +13019,7 @@
 	
 	var emptyFunction = __webpack_require__(/*! ./emptyFunction */ 134);
 	var invariant = __webpack_require__(/*! ./invariant */ 81);
-	var joinClasses = __webpack_require__(/*! ./joinClasses */ 143);
+	var joinClasses = __webpack_require__(/*! ./joinClasses */ 142);
 	var merge = __webpack_require__(/*! ./merge */ 87);
 	
 	/**
@@ -13160,7 +13160,7 @@
 	
 	module.exports = ReactPropTransferer;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 92 */
@@ -13239,7 +13239,7 @@
 	
 	module.exports = ReactPropTypeLocationNames;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 94 */
@@ -13311,7 +13311,7 @@
 	
 	module.exports = instantiateReactComponent;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 95 */
@@ -13401,7 +13401,7 @@
 	
 	module.exports = monitorCodeUse;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 97 */
@@ -13732,7 +13732,7 @@
 	
 	module.exports = ReactBrowserComponentMixin;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 102 */
@@ -15599,15 +15599,15 @@
 	
 	"use strict";
 	
-	var ReactDOMIDOperations = __webpack_require__(/*! ./ReactDOMIDOperations */ 161);
+	var ReactDOMIDOperations = __webpack_require__(/*! ./ReactDOMIDOperations */ 162);
 	var ReactMarkupChecksum = __webpack_require__(/*! ./ReactMarkupChecksum */ 135);
 	var ReactMount = __webpack_require__(/*! ./ReactMount */ 63);
 	var ReactPerf = __webpack_require__(/*! ./ReactPerf */ 65);
-	var ReactReconcileTransaction = __webpack_require__(/*! ./ReactReconcileTransaction */ 162);
+	var ReactReconcileTransaction = __webpack_require__(/*! ./ReactReconcileTransaction */ 163);
 	
 	var getReactRootElementInContainer = __webpack_require__(/*! ./getReactRootElementInContainer */ 131);
 	var invariant = __webpack_require__(/*! ./invariant */ 81);
-	var setInnerHTML = __webpack_require__(/*! ./setInnerHTML */ 163);
+	var setInnerHTML = __webpack_require__(/*! ./setInnerHTML */ 164);
 	
 	
 	var ELEMENT_NODE_TYPE = 1;
@@ -15703,7 +15703,7 @@
 	
 	module.exports = ReactComponentBrowserEnvironment;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 113 */
@@ -15733,7 +15733,7 @@
 	"use strict";
 	
 	var ReactUpdates = __webpack_require__(/*! ./ReactUpdates */ 85);
-	var Transaction = __webpack_require__(/*! ./Transaction */ 142);
+	var Transaction = __webpack_require__(/*! ./Transaction */ 141);
 	
 	var emptyFunction = __webpack_require__(/*! ./emptyFunction */ 134);
 	var mixInto = __webpack_require__(/*! ./mixInto */ 95);
@@ -15816,7 +15816,7 @@
 	
 	"use strict";
 	
-	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 164);
+	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 165);
 	var ReactBrowserComponentMixin = __webpack_require__(/*! ./ReactBrowserComponentMixin */ 101);
 	var ReactCompositeComponent = __webpack_require__(/*! ./ReactCompositeComponent */ 55);
 	var ReactDOM = __webpack_require__(/*! ./ReactDOM */ 59);
@@ -15895,7 +15895,7 @@
 	"use strict";
 	
 	var EventConstants = __webpack_require__(/*! ./EventConstants */ 80);
-	var LocalEventTrapMixin = __webpack_require__(/*! ./LocalEventTrapMixin */ 165);
+	var LocalEventTrapMixin = __webpack_require__(/*! ./LocalEventTrapMixin */ 166);
 	var ReactBrowserComponentMixin = __webpack_require__(/*! ./ReactBrowserComponentMixin */ 101);
 	var ReactCompositeComponent = __webpack_require__(/*! ./ReactCompositeComponent */ 55);
 	var ReactDOM = __webpack_require__(/*! ./ReactDOM */ 59);
@@ -15958,7 +15958,7 @@
 	"use strict";
 	
 	var EventConstants = __webpack_require__(/*! ./EventConstants */ 80);
-	var LocalEventTrapMixin = __webpack_require__(/*! ./LocalEventTrapMixin */ 165);
+	var LocalEventTrapMixin = __webpack_require__(/*! ./LocalEventTrapMixin */ 166);
 	var ReactBrowserComponentMixin = __webpack_require__(/*! ./ReactBrowserComponentMixin */ 101);
 	var ReactCompositeComponent = __webpack_require__(/*! ./ReactCompositeComponent */ 55);
 	var ReactDOM = __webpack_require__(/*! ./ReactDOM */ 59);
@@ -16018,9 +16018,9 @@
 	
 	"use strict";
 	
-	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 164);
+	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 165);
 	var DOMPropertyOperations = __webpack_require__(/*! ./DOMPropertyOperations */ 51);
-	var LinkedValueUtils = __webpack_require__(/*! ./LinkedValueUtils */ 166);
+	var LinkedValueUtils = __webpack_require__(/*! ./LinkedValueUtils */ 167);
 	var ReactBrowserComponentMixin = __webpack_require__(/*! ./ReactBrowserComponentMixin */ 101);
 	var ReactCompositeComponent = __webpack_require__(/*! ./ReactCompositeComponent */ 55);
 	var ReactDOM = __webpack_require__(/*! ./ReactDOM */ 59);
@@ -16181,7 +16181,7 @@
 	
 	module.exports = ReactDOMInput;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 118 */
@@ -16246,7 +16246,7 @@
 	
 	module.exports = ReactDOMOption;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 119 */
@@ -16275,8 +16275,8 @@
 	
 	"use strict";
 	
-	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 164);
-	var LinkedValueUtils = __webpack_require__(/*! ./LinkedValueUtils */ 166);
+	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 165);
+	var LinkedValueUtils = __webpack_require__(/*! ./LinkedValueUtils */ 167);
 	var ReactBrowserComponentMixin = __webpack_require__(/*! ./ReactBrowserComponentMixin */ 101);
 	var ReactCompositeComponent = __webpack_require__(/*! ./ReactCompositeComponent */ 55);
 	var ReactDOM = __webpack_require__(/*! ./ReactDOM */ 59);
@@ -16465,9 +16465,9 @@
 	
 	"use strict";
 	
-	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 164);
+	var AutoFocusMixin = __webpack_require__(/*! ./AutoFocusMixin */ 165);
 	var DOMPropertyOperations = __webpack_require__(/*! ./DOMPropertyOperations */ 51);
-	var LinkedValueUtils = __webpack_require__(/*! ./LinkedValueUtils */ 166);
+	var LinkedValueUtils = __webpack_require__(/*! ./LinkedValueUtils */ 167);
 	var ReactBrowserComponentMixin = __webpack_require__(/*! ./ReactBrowserComponentMixin */ 101);
 	var ReactCompositeComponent = __webpack_require__(/*! ./ReactCompositeComponent */ 55);
 	var ReactDOM = __webpack_require__(/*! ./ReactDOM */ 59);
@@ -16588,7 +16588,7 @@
 	
 	module.exports = ReactDOMTextarea;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 121 */
@@ -16618,15 +16618,15 @@
 	
 	"use strict";
 	
-	var EventListener = __webpack_require__(/*! ./EventListener */ 167);
+	var EventListener = __webpack_require__(/*! ./EventListener */ 168);
 	var ExecutionEnvironment = __webpack_require__(/*! ./ExecutionEnvironment */ 71);
 	var PooledClass = __webpack_require__(/*! ./PooledClass */ 82);
 	var ReactInstanceHandles = __webpack_require__(/*! ./ReactInstanceHandles */ 62);
 	var ReactMount = __webpack_require__(/*! ./ReactMount */ 63);
 	var ReactUpdates = __webpack_require__(/*! ./ReactUpdates */ 85);
 	
-	var getEventTarget = __webpack_require__(/*! ./getEventTarget */ 168);
-	var getUnboundedScrollPosition = __webpack_require__(/*! ./getUnboundedScrollPosition */ 169);
+	var getEventTarget = __webpack_require__(/*! ./getEventTarget */ 169);
+	var getUnboundedScrollPosition = __webpack_require__(/*! ./getUnboundedScrollPosition */ 170);
 	var mixInto = __webpack_require__(/*! ./mixInto */ 95);
 	
 	/**
@@ -16874,10 +16874,10 @@
 	var ReactInputSelection = __webpack_require__(/*! ./ReactInputSelection */ 157);
 	var SyntheticEvent = __webpack_require__(/*! ./SyntheticEvent */ 155);
 	
-	var getActiveElement = __webpack_require__(/*! ./getActiveElement */ 170);
+	var getActiveElement = __webpack_require__(/*! ./getActiveElement */ 171);
 	var isTextInputElement = __webpack_require__(/*! ./isTextInputElement */ 156);
 	var keyOf = __webpack_require__(/*! ./keyOf */ 103);
-	var shallowEqual = __webpack_require__(/*! ./shallowEqual */ 171);
+	var shallowEqual = __webpack_require__(/*! ./shallowEqual */ 172);
 	
 	var topLevelTypes = EventConstants.topLevelTypes;
 	
@@ -17126,15 +17126,15 @@
 	var EventConstants = __webpack_require__(/*! ./EventConstants */ 80);
 	var EventPluginUtils = __webpack_require__(/*! ./EventPluginUtils */ 52);
 	var EventPropagators = __webpack_require__(/*! ./EventPropagators */ 153);
-	var SyntheticClipboardEvent = __webpack_require__(/*! ./SyntheticClipboardEvent */ 172);
+	var SyntheticClipboardEvent = __webpack_require__(/*! ./SyntheticClipboardEvent */ 173);
 	var SyntheticEvent = __webpack_require__(/*! ./SyntheticEvent */ 155);
-	var SyntheticFocusEvent = __webpack_require__(/*! ./SyntheticFocusEvent */ 173);
-	var SyntheticKeyboardEvent = __webpack_require__(/*! ./SyntheticKeyboardEvent */ 174);
+	var SyntheticFocusEvent = __webpack_require__(/*! ./SyntheticFocusEvent */ 174);
+	var SyntheticKeyboardEvent = __webpack_require__(/*! ./SyntheticKeyboardEvent */ 175);
 	var SyntheticMouseEvent = __webpack_require__(/*! ./SyntheticMouseEvent */ 160);
-	var SyntheticDragEvent = __webpack_require__(/*! ./SyntheticDragEvent */ 175);
-	var SyntheticTouchEvent = __webpack_require__(/*! ./SyntheticTouchEvent */ 176);
-	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 177);
-	var SyntheticWheelEvent = __webpack_require__(/*! ./SyntheticWheelEvent */ 178);
+	var SyntheticDragEvent = __webpack_require__(/*! ./SyntheticDragEvent */ 176);
+	var SyntheticTouchEvent = __webpack_require__(/*! ./SyntheticTouchEvent */ 177);
+	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 178);
+	var SyntheticWheelEvent = __webpack_require__(/*! ./SyntheticWheelEvent */ 179);
 	
 	var invariant = __webpack_require__(/*! ./invariant */ 81);
 	var keyOf = __webpack_require__(/*! ./keyOf */ 103);
@@ -17523,7 +17523,7 @@
 	
 	module.exports = SimpleEventPlugin;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 126 */
@@ -17702,7 +17702,7 @@
 	
 	module.exports = createFullPageComponent;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 128 */
@@ -17733,11 +17733,11 @@
 	"use strict";
 	
 	var DOMProperty = __webpack_require__(/*! ./DOMProperty */ 77);
-	var ReactDefaultPerfAnalysis = __webpack_require__(/*! ./ReactDefaultPerfAnalysis */ 179);
+	var ReactDefaultPerfAnalysis = __webpack_require__(/*! ./ReactDefaultPerfAnalysis */ 180);
 	var ReactMount = __webpack_require__(/*! ./ReactMount */ 63);
 	var ReactPerf = __webpack_require__(/*! ./ReactPerf */ 65);
 	
-	var performanceNow = __webpack_require__(/*! ./performanceNow */ 180);
+	var performanceNow = __webpack_require__(/*! ./performanceNow */ 181);
 	
 	function roundFloat(val) {
 	  return Math.floor(val * 100) / 100;
@@ -18045,7 +18045,7 @@
 	 * @typechecks
 	 */
 	
-	var isTextNode = __webpack_require__(/*! ./isTextNode */ 181);
+	var isTextNode = __webpack_require__(/*! ./isTextNode */ 182);
 	
 	/*jslint bitwise:true */
 	
@@ -18240,7 +18240,7 @@
 	
 	module.exports = flattenChildren;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 134 */
@@ -18385,9 +18385,9 @@
 	"use strict";
 	
 	var PooledClass = __webpack_require__(/*! ./PooledClass */ 82);
-	var CallbackQueue = __webpack_require__(/*! ./CallbackQueue */ 141);
+	var CallbackQueue = __webpack_require__(/*! ./CallbackQueue */ 140);
 	var ReactPutListenerQueue = __webpack_require__(/*! ./ReactPutListenerQueue */ 185);
-	var Transaction = __webpack_require__(/*! ./Transaction */ 142);
+	var Transaction = __webpack_require__(/*! ./Transaction */ 141);
 	
 	var emptyFunction = __webpack_require__(/*! ./emptyFunction */ 134);
 	var mixInto = __webpack_require__(/*! ./mixInto */ 95);
@@ -18482,219 +18482,6 @@
 
 /***/ },
 /* 137 */
-/*!*******************************************!*\
-  !*** ./~/reflux/~/eventemitter3/index.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	/**
-	 * Representation of a single EventEmitter function.
-	 *
-	 * @param {Function} fn Event handler to be called.
-	 * @param {Mixed} context Context for function execution.
-	 * @param {Boolean} once Only emit once
-	 * @api private
-	 */
-	function EE(fn, context, once) {
-	  this.fn = fn;
-	  this.context = context;
-	  this.once = once || false;
-	}
-	
-	/**
-	 * Minimal EventEmitter interface that is molded against the Node.js
-	 * EventEmitter interface.
-	 *
-	 * @constructor
-	 * @api public
-	 */
-	function EventEmitter() { /* Nothing to set */ }
-	
-	/**
-	 * Holds the assigned EventEmitters by name.
-	 *
-	 * @type {Object}
-	 * @private
-	 */
-	EventEmitter.prototype._events = undefined;
-	
-	/**
-	 * Return a list of assigned event listeners.
-	 *
-	 * @param {String} event The events that should be listed.
-	 * @returns {Array}
-	 * @api public
-	 */
-	EventEmitter.prototype.listeners = function listeners(event) {
-	  if (!this._events || !this._events[event]) return [];
-	
-	  for (var i = 0, l = this._events[event].length, ee = []; i < l; i++) {
-	    ee.push(this._events[event][i].fn);
-	  }
-	
-	  return ee;
-	};
-	
-	/**
-	 * Emit an event to all registered event listeners.
-	 *
-	 * @param {String} event The name of the event.
-	 * @returns {Boolean} Indication if we've emitted an event.
-	 * @api public
-	 */
-	EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-	  if (!this._events || !this._events[event]) return false;
-	
-	  var listeners = this._events[event]
-	    , length = listeners.length
-	    , len = arguments.length
-	    , ee = listeners[0]
-	    , args
-	    , i, j;
-	
-	  if (1 === length) {
-	    if (ee.once) this.removeListener(event, ee.fn, true);
-	
-	    switch (len) {
-	      case 1: return ee.fn.call(ee.context), true;
-	      case 2: return ee.fn.call(ee.context, a1), true;
-	      case 3: return ee.fn.call(ee.context, a1, a2), true;
-	      case 4: return ee.fn.call(ee.context, a1, a2, a3), true;
-	      case 5: return ee.fn.call(ee.context, a1, a2, a3, a4), true;
-	      case 6: return ee.fn.call(ee.context, a1, a2, a3, a4, a5), true;
-	    }
-	
-	    for (i = 1, args = new Array(len -1); i < len; i++) {
-	      args[i - 1] = arguments[i];
-	    }
-	
-	    ee.fn.apply(ee.context, args);
-	  } else {
-	    for (i = 0; i < length; i++) {
-	      if (listeners[i].once) this.removeListener(event, listeners[i].fn, true);
-	
-	      switch (len) {
-	        case 1: listeners[i].fn.call(listeners[i].context); break;
-	        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-	        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-	        default:
-	          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-	            args[j - 1] = arguments[j];
-	          }
-	
-	          listeners[i].fn.apply(listeners[i].context, args);
-	      }
-	    }
-	  }
-	
-	  return true;
-	};
-	
-	/**
-	 * Register a new EventListener for the given event.
-	 *
-	 * @param {String} event Name of the event.
-	 * @param {Functon} fn Callback function.
-	 * @param {Mixed} context The context of the function.
-	 * @api public
-	 */
-	EventEmitter.prototype.on = function on(event, fn, context) {
-	  if (!this._events) this._events = {};
-	  if (!this._events[event]) this._events[event] = [];
-	  this._events[event].push(new EE( fn, context || this ));
-	
-	  return this;
-	};
-	
-	/**
-	 * Add an EventListener that's only called once.
-	 *
-	 * @param {String} event Name of the event.
-	 * @param {Function} fn Callback function.
-	 * @param {Mixed} context The context of the function.
-	 * @api public
-	 */
-	EventEmitter.prototype.once = function once(event, fn, context) {
-	  if (!this._events) this._events = {};
-	  if (!this._events[event]) this._events[event] = [];
-	  this._events[event].push(new EE(fn, context || this, true ));
-	
-	  return this;
-	};
-	
-	/**
-	 * Remove event listeners.
-	 *
-	 * @param {String} event The event we want to remove.
-	 * @param {Function} fn The listener that we need to find.
-	 * @param {Boolean} once Only remove once listeners.
-	 * @api public
-	 */
-	EventEmitter.prototype.removeListener = function removeListener(event, fn, once) {
-	  if (!this._events || !this._events[event]) return this;
-	
-	  var listeners = this._events[event]
-	    , events = [];
-	
-	  if (fn) for (var i = 0, length = listeners.length; i < length; i++) {
-	    if (listeners[i].fn !== fn && listeners[i].once !== once) {
-	      events.push(listeners[i]);
-	    }
-	  }
-	
-	  //
-	  // Reset the array, or remove it completely if we have no more listeners.
-	  //
-	  if (events.length) this._events[event] = events;
-	  else this._events[event] = null;
-	
-	  return this;
-	};
-	
-	/**
-	 * Remove all listeners or only the listeners for the specified event.
-	 *
-	 * @param {String} event The event want to remove all listeners for.
-	 * @api public
-	 */
-	EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-	  if (!this._events) return this;
-	
-	  if (event) this._events[event] = null;
-	  else this._events = {};
-	
-	  return this;
-	};
-	
-	//
-	// Alias methods names because people roll like that.
-	//
-	EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-	EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-	
-	//
-	// This function doesn't apply anymore.
-	//
-	EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-	  return this;
-	};
-	
-	//
-	// Expose the module.
-	//
-	EventEmitter.EventEmitter = EventEmitter;
-	EventEmitter.EventEmitter2 = EventEmitter;
-	EventEmitter.EventEmitter3 = EventEmitter;
-	
-	if ('object' === typeof module && module.exports) {
-	  module.exports = EventEmitter;
-	}
-
-
-/***/ },
-/* 138 */
 /*!********************************!*\
   !*** xmlhttprequest (ignored) ***!
   \********************************/
@@ -18703,7 +18490,7 @@
 	/* (ignored) */
 
 /***/ },
-/* 139 */
+/* 138 */
 /*!***************************!*\
   !*** ./~/react/addons.js ***!
   \***************************/
@@ -18713,7 +18500,7 @@
 
 
 /***/ },
-/* 140 */
+/* 139 */
 /*!************************************!*\
   !*** ./~/react/lib/emptyObject.js ***!
   \************************************/
@@ -18747,10 +18534,10 @@
 	
 	module.exports = emptyObject;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
-/* 141 */
+/* 140 */
 /*!**************************************!*\
   !*** ./~/react/lib/CallbackQueue.js ***!
   \**************************************/
@@ -18860,10 +18647,10 @@
 	
 	module.exports = CallbackQueue;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
-/* 142 */
+/* 141 */
 /*!************************************!*\
   !*** ./~/react/lib/Transaction.js ***!
   \************************************/
@@ -19114,10 +18901,10 @@
 	
 	module.exports = Transaction;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
-/* 143 */
+/* 142 */
 /*!************************************!*\
   !*** ./~/react/lib/joinClasses.js ***!
   \************************************/
@@ -19167,6 +18954,219 @@
 	}
 	
 	module.exports = joinClasses;
+
+
+/***/ },
+/* 143 */
+/*!*******************************************!*\
+  !*** ./~/reflux/~/eventemitter3/index.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	/**
+	 * Representation of a single EventEmitter function.
+	 *
+	 * @param {Function} fn Event handler to be called.
+	 * @param {Mixed} context Context for function execution.
+	 * @param {Boolean} once Only emit once
+	 * @api private
+	 */
+	function EE(fn, context, once) {
+	  this.fn = fn;
+	  this.context = context;
+	  this.once = once || false;
+	}
+	
+	/**
+	 * Minimal EventEmitter interface that is molded against the Node.js
+	 * EventEmitter interface.
+	 *
+	 * @constructor
+	 * @api public
+	 */
+	function EventEmitter() { /* Nothing to set */ }
+	
+	/**
+	 * Holds the assigned EventEmitters by name.
+	 *
+	 * @type {Object}
+	 * @private
+	 */
+	EventEmitter.prototype._events = undefined;
+	
+	/**
+	 * Return a list of assigned event listeners.
+	 *
+	 * @param {String} event The events that should be listed.
+	 * @returns {Array}
+	 * @api public
+	 */
+	EventEmitter.prototype.listeners = function listeners(event) {
+	  if (!this._events || !this._events[event]) return [];
+	
+	  for (var i = 0, l = this._events[event].length, ee = []; i < l; i++) {
+	    ee.push(this._events[event][i].fn);
+	  }
+	
+	  return ee;
+	};
+	
+	/**
+	 * Emit an event to all registered event listeners.
+	 *
+	 * @param {String} event The name of the event.
+	 * @returns {Boolean} Indication if we've emitted an event.
+	 * @api public
+	 */
+	EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+	  if (!this._events || !this._events[event]) return false;
+	
+	  var listeners = this._events[event]
+	    , length = listeners.length
+	    , len = arguments.length
+	    , ee = listeners[0]
+	    , args
+	    , i, j;
+	
+	  if (1 === length) {
+	    if (ee.once) this.removeListener(event, ee.fn, true);
+	
+	    switch (len) {
+	      case 1: return ee.fn.call(ee.context), true;
+	      case 2: return ee.fn.call(ee.context, a1), true;
+	      case 3: return ee.fn.call(ee.context, a1, a2), true;
+	      case 4: return ee.fn.call(ee.context, a1, a2, a3), true;
+	      case 5: return ee.fn.call(ee.context, a1, a2, a3, a4), true;
+	      case 6: return ee.fn.call(ee.context, a1, a2, a3, a4, a5), true;
+	    }
+	
+	    for (i = 1, args = new Array(len -1); i < len; i++) {
+	      args[i - 1] = arguments[i];
+	    }
+	
+	    ee.fn.apply(ee.context, args);
+	  } else {
+	    for (i = 0; i < length; i++) {
+	      if (listeners[i].once) this.removeListener(event, listeners[i].fn, true);
+	
+	      switch (len) {
+	        case 1: listeners[i].fn.call(listeners[i].context); break;
+	        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+	        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+	        default:
+	          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+	            args[j - 1] = arguments[j];
+	          }
+	
+	          listeners[i].fn.apply(listeners[i].context, args);
+	      }
+	    }
+	  }
+	
+	  return true;
+	};
+	
+	/**
+	 * Register a new EventListener for the given event.
+	 *
+	 * @param {String} event Name of the event.
+	 * @param {Functon} fn Callback function.
+	 * @param {Mixed} context The context of the function.
+	 * @api public
+	 */
+	EventEmitter.prototype.on = function on(event, fn, context) {
+	  if (!this._events) this._events = {};
+	  if (!this._events[event]) this._events[event] = [];
+	  this._events[event].push(new EE( fn, context || this ));
+	
+	  return this;
+	};
+	
+	/**
+	 * Add an EventListener that's only called once.
+	 *
+	 * @param {String} event Name of the event.
+	 * @param {Function} fn Callback function.
+	 * @param {Mixed} context The context of the function.
+	 * @api public
+	 */
+	EventEmitter.prototype.once = function once(event, fn, context) {
+	  if (!this._events) this._events = {};
+	  if (!this._events[event]) this._events[event] = [];
+	  this._events[event].push(new EE(fn, context || this, true ));
+	
+	  return this;
+	};
+	
+	/**
+	 * Remove event listeners.
+	 *
+	 * @param {String} event The event we want to remove.
+	 * @param {Function} fn The listener that we need to find.
+	 * @param {Boolean} once Only remove once listeners.
+	 * @api public
+	 */
+	EventEmitter.prototype.removeListener = function removeListener(event, fn, once) {
+	  if (!this._events || !this._events[event]) return this;
+	
+	  var listeners = this._events[event]
+	    , events = [];
+	
+	  if (fn) for (var i = 0, length = listeners.length; i < length; i++) {
+	    if (listeners[i].fn !== fn && listeners[i].once !== once) {
+	      events.push(listeners[i]);
+	    }
+	  }
+	
+	  //
+	  // Reset the array, or remove it completely if we have no more listeners.
+	  //
+	  if (events.length) this._events[event] = events;
+	  else this._events[event] = null;
+	
+	  return this;
+	};
+	
+	/**
+	 * Remove all listeners or only the listeners for the specified event.
+	 *
+	 * @param {String} event The event want to remove all listeners for.
+	 * @api public
+	 */
+	EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+	  if (!this._events) return this;
+	
+	  if (event) this._events[event] = null;
+	  else this._events = {};
+	
+	  return this;
+	};
+	
+	//
+	// Alias methods names because people roll like that.
+	//
+	EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+	EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+	
+	//
+	// This function doesn't apply anymore.
+	//
+	EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+	  return this;
+	};
+	
+	//
+	// Expose the module.
+	//
+	EventEmitter.EventEmitter = EventEmitter;
+	EventEmitter.EventEmitter2 = EventEmitter;
+	EventEmitter.EventEmitter3 = EventEmitter;
+	
+	if ('object' === typeof module && module.exports) {
+	  module.exports = EventEmitter;
+	}
 
 
 /***/ },
@@ -19324,7 +19324,7 @@
 	
 	module.exports = mergeHelpers;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 145 */
@@ -19881,7 +19881,7 @@
 	
 	module.exports = EventPluginHub;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 149 */
@@ -20174,7 +20174,7 @@
 	
 	module.exports = EventPluginRegistry;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 150 */
@@ -20267,7 +20267,7 @@
 	
 	"use strict";
 	
-	var getUnboundedScrollPosition = __webpack_require__(/*! ./getUnboundedScrollPosition */ 169);
+	var getUnboundedScrollPosition = __webpack_require__(/*! ./getUnboundedScrollPosition */ 170);
 	
 	var ViewportMetrics = {
 	
@@ -20516,7 +20516,7 @@
 	
 	module.exports = EventPropagators;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 154 */
@@ -20610,7 +20610,7 @@
 	var PooledClass = __webpack_require__(/*! ./PooledClass */ 82);
 	
 	var emptyFunction = __webpack_require__(/*! ./emptyFunction */ 134);
-	var getEventTarget = __webpack_require__(/*! ./getEventTarget */ 168);
+	var getEventTarget = __webpack_require__(/*! ./getEventTarget */ 169);
 	var merge = __webpack_require__(/*! ./merge */ 87);
 	var mergeInto = __webpack_require__(/*! ./mergeInto */ 99);
 	
@@ -20841,7 +20841,7 @@
 	
 	var containsNode = __webpack_require__(/*! ./containsNode */ 130);
 	var focusNode = __webpack_require__(/*! ./focusNode */ 217);
-	var getActiveElement = __webpack_require__(/*! ./getActiveElement */ 170);
+	var getActiveElement = __webpack_require__(/*! ./getActiveElement */ 171);
 	
 	function isInDocument(node) {
 	  return containsNode(document.documentElement, node);
@@ -21099,7 +21099,7 @@
 	
 	"use strict";
 	
-	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 177);
+	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 178);
 	var ViewportMetrics = __webpack_require__(/*! ./ViewportMetrics */ 151);
 	
 	var getEventModifierState = __webpack_require__(/*! ./getEventModifierState */ 218);
@@ -21170,6 +21170,102 @@
 
 /***/ },
 /* 161 */
+/*!************************************!*\
+  !*** ./~/github-api/lib/base64.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// This code was written by Tyler Akins and has been placed in the
+	// public domain.  It would be nice if you left this header intact.
+	// Base64 code from Tyler Akins -- http://rumkin.com
+	
+	var Base64 = (function () {
+	    var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	
+	    var obj = {
+	        /**
+	         * Encodes a string in base64
+	         * @param {String} input The string to encode in base64.
+	         */
+	        encode: function (input) {
+	            var output = "";
+	            var chr1, chr2, chr3;
+	            var enc1, enc2, enc3, enc4;
+	            var i = 0;
+	
+	            do {
+	                chr1 = input.charCodeAt(i++);
+	                chr2 = input.charCodeAt(i++);
+	                chr3 = input.charCodeAt(i++);
+	
+	                enc1 = chr1 >> 2;
+	                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+	                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+	                enc4 = chr3 & 63;
+	
+	                if (isNaN(chr2)) {
+	                    enc3 = enc4 = 64;
+	                } else if (isNaN(chr3)) {
+	                    enc4 = 64;
+	                }
+	
+	                output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) +
+	                    keyStr.charAt(enc3) + keyStr.charAt(enc4);
+	            } while (i < input.length);
+	
+	            return output;
+	        },
+	
+	        /**
+	         * Decodes a base64 string.
+	         * @param {String} input The string to decode.
+	         */
+	        decode: function (input) {
+	            var output = "";
+	            var chr1, chr2, chr3;
+	            var enc1, enc2, enc3, enc4;
+	            var i = 0;
+	
+	            // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+	            input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+	
+	            do {
+	                enc1 = keyStr.indexOf(input.charAt(i++));
+	                enc2 = keyStr.indexOf(input.charAt(i++));
+	                enc3 = keyStr.indexOf(input.charAt(i++));
+	                enc4 = keyStr.indexOf(input.charAt(i++));
+	
+	                chr1 = (enc1 << 2) | (enc2 >> 4);
+	                chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+	                chr3 = ((enc3 & 3) << 6) | enc4;
+	
+	                output = output + String.fromCharCode(chr1);
+	
+	                if (enc3 != 64) {
+	                    output = output + String.fromCharCode(chr2);
+	                }
+	                if (enc4 != 64) {
+	                    output = output + String.fromCharCode(chr3);
+	                }
+	            } while (i < input.length);
+	
+	            return output;
+	        }
+	    };
+	
+	    return obj;
+	})();
+	if (true) {
+	    // Github = exports;
+	    module.exports = Base64;
+	} else {
+	    window.Base64 = Base64;
+	}
+	
+
+
+/***/ },
+/* 162 */
 /*!*********************************************!*\
   !*** ./~/react/lib/ReactDOMIDOperations.js ***!
   \*********************************************/
@@ -21199,13 +21295,13 @@
 	"use strict";
 	
 	var CSSPropertyOperations = __webpack_require__(/*! ./CSSPropertyOperations */ 100);
-	var DOMChildrenOperations = __webpack_require__(/*! ./DOMChildrenOperations */ 219);
+	var DOMChildrenOperations = __webpack_require__(/*! ./DOMChildrenOperations */ 220);
 	var DOMPropertyOperations = __webpack_require__(/*! ./DOMPropertyOperations */ 51);
 	var ReactMount = __webpack_require__(/*! ./ReactMount */ 63);
 	var ReactPerf = __webpack_require__(/*! ./ReactPerf */ 65);
 	
 	var invariant = __webpack_require__(/*! ./invariant */ 81);
-	var setInnerHTML = __webpack_require__(/*! ./setInnerHTML */ 163);
+	var setInnerHTML = __webpack_require__(/*! ./setInnerHTML */ 164);
 	
 	/**
 	 * Errors for properties that should not be updated with `updatePropertyById()`.
@@ -21365,10 +21461,10 @@
 	
 	module.exports = ReactDOMIDOperations;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
-/* 162 */
+/* 163 */
 /*!**************************************************!*\
   !*** ./~/react/lib/ReactReconcileTransaction.js ***!
   \**************************************************/
@@ -21395,12 +21491,12 @@
 	
 	"use strict";
 	
-	var CallbackQueue = __webpack_require__(/*! ./CallbackQueue */ 141);
+	var CallbackQueue = __webpack_require__(/*! ./CallbackQueue */ 140);
 	var PooledClass = __webpack_require__(/*! ./PooledClass */ 82);
 	var ReactBrowserEventEmitter = __webpack_require__(/*! ./ReactBrowserEventEmitter */ 102);
 	var ReactInputSelection = __webpack_require__(/*! ./ReactInputSelection */ 157);
 	var ReactPutListenerQueue = __webpack_require__(/*! ./ReactPutListenerQueue */ 185);
-	var Transaction = __webpack_require__(/*! ./Transaction */ 142);
+	var Transaction = __webpack_require__(/*! ./Transaction */ 141);
 	
 	var mixInto = __webpack_require__(/*! ./mixInto */ 95);
 	
@@ -21559,7 +21655,7 @@
 
 
 /***/ },
-/* 163 */
+/* 164 */
 /*!*************************************!*\
   !*** ./~/react/lib/setInnerHTML.js ***!
   \*************************************/
@@ -21653,7 +21749,7 @@
 
 
 /***/ },
-/* 164 */
+/* 165 */
 /*!***************************************!*\
   !*** ./~/react/lib/AutoFocusMixin.js ***!
   \***************************************/
@@ -21694,7 +21790,7 @@
 
 
 /***/ },
-/* 165 */
+/* 166 */
 /*!********************************************!*\
   !*** ./~/react/lib/LocalEventTrapMixin.js ***!
   \********************************************/
@@ -21753,10 +21849,10 @@
 	
 	module.exports = LocalEventTrapMixin;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
-/* 166 */
+/* 167 */
 /*!*****************************************!*\
   !*** ./~/react/lib/LinkedValueUtils.js ***!
   \*****************************************/
@@ -21922,10 +22018,10 @@
 	
 	module.exports = LinkedValueUtils;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
-/* 167 */
+/* 168 */
 /*!**************************************!*\
   !*** ./~/react/lib/EventListener.js ***!
   \**************************************/
@@ -22004,10 +22100,10 @@
 	
 	module.exports = EventListener;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
-/* 168 */
+/* 169 */
 /*!***************************************!*\
   !*** ./~/react/lib/getEventTarget.js ***!
   \***************************************/
@@ -22052,7 +22148,7 @@
 
 
 /***/ },
-/* 169 */
+/* 170 */
 /*!***************************************************!*\
   !*** ./~/react/lib/getUnboundedScrollPosition.js ***!
   \***************************************************/
@@ -22106,7 +22202,7 @@
 
 
 /***/ },
-/* 170 */
+/* 171 */
 /*!*****************************************!*\
   !*** ./~/react/lib/getActiveElement.js ***!
   \*****************************************/
@@ -22149,7 +22245,7 @@
 
 
 /***/ },
-/* 171 */
+/* 172 */
 /*!*************************************!*\
   !*** ./~/react/lib/shallowEqual.js ***!
   \*************************************/
@@ -22207,7 +22303,7 @@
 
 
 /***/ },
-/* 172 */
+/* 173 */
 /*!************************************************!*\
   !*** ./~/react/lib/SyntheticClipboardEvent.js ***!
   \************************************************/
@@ -22267,7 +22363,7 @@
 
 
 /***/ },
-/* 173 */
+/* 174 */
 /*!********************************************!*\
   !*** ./~/react/lib/SyntheticFocusEvent.js ***!
   \********************************************/
@@ -22294,7 +22390,7 @@
 	
 	"use strict";
 	
-	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 177);
+	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 178);
 	
 	/**
 	 * @interface FocusEvent
@@ -22320,7 +22416,7 @@
 
 
 /***/ },
-/* 174 */
+/* 175 */
 /*!***********************************************!*\
   !*** ./~/react/lib/SyntheticKeyboardEvent.js ***!
   \***********************************************/
@@ -22347,9 +22443,9 @@
 	
 	"use strict";
 	
-	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 177);
+	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 178);
 	
-	var getEventKey = __webpack_require__(/*! ./getEventKey */ 220);
+	var getEventKey = __webpack_require__(/*! ./getEventKey */ 221);
 	var getEventModifierState = __webpack_require__(/*! ./getEventModifierState */ 218);
 	
 	/**
@@ -22416,7 +22512,7 @@
 
 
 /***/ },
-/* 175 */
+/* 176 */
 /*!*******************************************!*\
   !*** ./~/react/lib/SyntheticDragEvent.js ***!
   \*******************************************/
@@ -22469,7 +22565,7 @@
 
 
 /***/ },
-/* 176 */
+/* 177 */
 /*!********************************************!*\
   !*** ./~/react/lib/SyntheticTouchEvent.js ***!
   \********************************************/
@@ -22496,7 +22592,7 @@
 	
 	"use strict";
 	
-	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 177);
+	var SyntheticUIEvent = __webpack_require__(/*! ./SyntheticUIEvent */ 178);
 	
 	var getEventModifierState = __webpack_require__(/*! ./getEventModifierState */ 218);
 	
@@ -22531,7 +22627,7 @@
 
 
 /***/ },
-/* 177 */
+/* 178 */
 /*!*****************************************!*\
   !*** ./~/react/lib/SyntheticUIEvent.js ***!
   \*****************************************/
@@ -22560,7 +22656,7 @@
 	
 	var SyntheticEvent = __webpack_require__(/*! ./SyntheticEvent */ 155);
 	
-	var getEventTarget = __webpack_require__(/*! ./getEventTarget */ 168);
+	var getEventTarget = __webpack_require__(/*! ./getEventTarget */ 169);
 	
 	/**
 	 * @interface UIEvent
@@ -22607,7 +22703,7 @@
 
 
 /***/ },
-/* 178 */
+/* 179 */
 /*!********************************************!*\
   !*** ./~/react/lib/SyntheticWheelEvent.js ***!
   \********************************************/
@@ -22682,7 +22778,7 @@
 
 
 /***/ },
-/* 179 */
+/* 180 */
 /*!*************************************************!*\
   !*** ./~/react/lib/ReactDefaultPerfAnalysis.js ***!
   \*************************************************/
@@ -22894,7 +22990,7 @@
 
 
 /***/ },
-/* 180 */
+/* 181 */
 /*!***************************************!*\
   !*** ./~/react/lib/performanceNow.js ***!
   \***************************************/
@@ -22919,7 +23015,7 @@
 	 * @typechecks
 	 */
 	
-	var performance = __webpack_require__(/*! ./performance */ 221);
+	var performance = __webpack_require__(/*! ./performance */ 222);
 	
 	/**
 	 * Detect if we can use `window.performance.now()` and gracefully fallback to
@@ -22936,7 +23032,7 @@
 
 
 /***/ },
-/* 181 */
+/* 182 */
 /*!***********************************!*\
   !*** ./~/react/lib/isTextNode.js ***!
   \***********************************/
@@ -22961,7 +23057,7 @@
 	 * @typechecks
 	 */
 	
-	var isNode = __webpack_require__(/*! ./isNode */ 222);
+	var isNode = __webpack_require__(/*! ./isNode */ 223);
 	
 	/**
 	 * @param {*} object The object to check.
@@ -22972,102 +23068,6 @@
 	}
 	
 	module.exports = isTextNode;
-
-
-/***/ },
-/* 182 */
-/*!************************************!*\
-  !*** ./~/github-api/lib/base64.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// This code was written by Tyler Akins and has been placed in the
-	// public domain.  It would be nice if you left this header intact.
-	// Base64 code from Tyler Akins -- http://rumkin.com
-	
-	var Base64 = (function () {
-	    var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-	
-	    var obj = {
-	        /**
-	         * Encodes a string in base64
-	         * @param {String} input The string to encode in base64.
-	         */
-	        encode: function (input) {
-	            var output = "";
-	            var chr1, chr2, chr3;
-	            var enc1, enc2, enc3, enc4;
-	            var i = 0;
-	
-	            do {
-	                chr1 = input.charCodeAt(i++);
-	                chr2 = input.charCodeAt(i++);
-	                chr3 = input.charCodeAt(i++);
-	
-	                enc1 = chr1 >> 2;
-	                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-	                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-	                enc4 = chr3 & 63;
-	
-	                if (isNaN(chr2)) {
-	                    enc3 = enc4 = 64;
-	                } else if (isNaN(chr3)) {
-	                    enc4 = 64;
-	                }
-	
-	                output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) +
-	                    keyStr.charAt(enc3) + keyStr.charAt(enc4);
-	            } while (i < input.length);
-	
-	            return output;
-	        },
-	
-	        /**
-	         * Decodes a base64 string.
-	         * @param {String} input The string to decode.
-	         */
-	        decode: function (input) {
-	            var output = "";
-	            var chr1, chr2, chr3;
-	            var enc1, enc2, enc3, enc4;
-	            var i = 0;
-	
-	            // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
-	            input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-	
-	            do {
-	                enc1 = keyStr.indexOf(input.charAt(i++));
-	                enc2 = keyStr.indexOf(input.charAt(i++));
-	                enc3 = keyStr.indexOf(input.charAt(i++));
-	                enc4 = keyStr.indexOf(input.charAt(i++));
-	
-	                chr1 = (enc1 << 2) | (enc2 >> 4);
-	                chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-	                chr3 = ((enc3 & 3) << 6) | enc4;
-	
-	                output = output + String.fromCharCode(chr1);
-	
-	                if (enc3 != 64) {
-	                    output = output + String.fromCharCode(chr2);
-	                }
-	                if (enc4 != 64) {
-	                    output = output + String.fromCharCode(chr3);
-	                }
-	            } while (i < input.length);
-	
-	            return output;
-	        }
-	    };
-	
-	    return obj;
-	})();
-	if (true) {
-	    // Github = exports;
-	    module.exports = Base64;
-	} else {
-	    window.Base64 = Base64;
-	}
-	
 
 
 /***/ },
@@ -23132,7 +23132,7 @@
 	
 	module.exports = copyProperties;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 184 */
@@ -23748,7 +23748,7 @@
 	module.exports = React;
 	
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 211 */
@@ -23888,7 +23888,7 @@
 	
 	module.exports = accumulate;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 215 */
@@ -24263,403 +24263,6 @@
 
 /***/ },
 /* 219 */
-/*!**********************************************!*\
-  !*** ./~/react/lib/DOMChildrenOperations.js ***!
-  \**********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-2014 Facebook, Inc.
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 *
-	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
-	 *
-	 * @providesModule DOMChildrenOperations
-	 * @typechecks static-only
-	 */
-	
-	"use strict";
-	
-	var Danger = __webpack_require__(/*! ./Danger */ 233);
-	var ReactMultiChildUpdateTypes = __webpack_require__(/*! ./ReactMultiChildUpdateTypes */ 132);
-	
-	var getTextContentAccessor = __webpack_require__(/*! ./getTextContentAccessor */ 159);
-	var invariant = __webpack_require__(/*! ./invariant */ 81);
-	
-	/**
-	 * The DOM property to use when setting text content.
-	 *
-	 * @type {string}
-	 * @private
-	 */
-	var textContentAccessor = getTextContentAccessor();
-	
-	/**
-	 * Inserts `childNode` as a child of `parentNode` at the `index`.
-	 *
-	 * @param {DOMElement} parentNode Parent node in which to insert.
-	 * @param {DOMElement} childNode Child node to insert.
-	 * @param {number} index Index at which to insert the child.
-	 * @internal
-	 */
-	function insertChildAt(parentNode, childNode, index) {
-	  // By exploiting arrays returning `undefined` for an undefined index, we can
-	  // rely exclusively on `insertBefore(node, null)` instead of also using
-	  // `appendChild(node)`. However, using `undefined` is not allowed by all
-	  // browsers so we must replace it with `null`.
-	  parentNode.insertBefore(
-	    childNode,
-	    parentNode.childNodes[index] || null
-	  );
-	}
-	
-	var updateTextContent;
-	if (textContentAccessor === 'textContent') {
-	  /**
-	   * Sets the text content of `node` to `text`.
-	   *
-	   * @param {DOMElement} node Node to change
-	   * @param {string} text New text content
-	   */
-	  updateTextContent = function(node, text) {
-	    node.textContent = text;
-	  };
-	} else {
-	  /**
-	   * Sets the text content of `node` to `text`.
-	   *
-	   * @param {DOMElement} node Node to change
-	   * @param {string} text New text content
-	   */
-	  updateTextContent = function(node, text) {
-	    // In order to preserve newlines correctly, we can't use .innerText to set
-	    // the contents (see #1080), so we empty the element then append a text node
-	    while (node.firstChild) {
-	      node.removeChild(node.firstChild);
-	    }
-	    if (text) {
-	      var doc = node.ownerDocument || document;
-	      node.appendChild(doc.createTextNode(text));
-	    }
-	  };
-	}
-	
-	/**
-	 * Operations for updating with DOM children.
-	 */
-	var DOMChildrenOperations = {
-	
-	  dangerouslyReplaceNodeWithMarkup: Danger.dangerouslyReplaceNodeWithMarkup,
-	
-	  updateTextContent: updateTextContent,
-	
-	  /**
-	   * Updates a component's children by processing a series of updates. The
-	   * update configurations are each expected to have a `parentNode` property.
-	   *
-	   * @param {array<object>} updates List of update configurations.
-	   * @param {array<string>} markupList List of markup strings.
-	   * @internal
-	   */
-	  processUpdates: function(updates, markupList) {
-	    var update;
-	    // Mapping from parent IDs to initial child orderings.
-	    var initialChildren = null;
-	    // List of children that will be moved or removed.
-	    var updatedChildren = null;
-	
-	    for (var i = 0; update = updates[i]; i++) {
-	      if (update.type === ReactMultiChildUpdateTypes.MOVE_EXISTING ||
-	          update.type === ReactMultiChildUpdateTypes.REMOVE_NODE) {
-	        var updatedIndex = update.fromIndex;
-	        var updatedChild = update.parentNode.childNodes[updatedIndex];
-	        var parentID = update.parentID;
-	
-	        ("production" !== process.env.NODE_ENV ? invariant(
-	          updatedChild,
-	          'processUpdates(): Unable to find child %s of element. This ' +
-	          'probably means the DOM was unexpectedly mutated (e.g., by the ' +
-	          'browser), usually due to forgetting a <tbody> when using tables, ' +
-	          'nesting <p> or <a> tags, or using non-SVG elements in an <svg> '+
-	          'parent. Try inspecting the child nodes of the element with React ' +
-	          'ID `%s`.',
-	          updatedIndex,
-	          parentID
-	        ) : invariant(updatedChild));
-	
-	        initialChildren = initialChildren || {};
-	        initialChildren[parentID] = initialChildren[parentID] || [];
-	        initialChildren[parentID][updatedIndex] = updatedChild;
-	
-	        updatedChildren = updatedChildren || [];
-	        updatedChildren.push(updatedChild);
-	      }
-	    }
-	
-	    var renderedMarkup = Danger.dangerouslyRenderMarkup(markupList);
-	
-	    // Remove updated children first so that `toIndex` is consistent.
-	    if (updatedChildren) {
-	      for (var j = 0; j < updatedChildren.length; j++) {
-	        updatedChildren[j].parentNode.removeChild(updatedChildren[j]);
-	      }
-	    }
-	
-	    for (var k = 0; update = updates[k]; k++) {
-	      switch (update.type) {
-	        case ReactMultiChildUpdateTypes.INSERT_MARKUP:
-	          insertChildAt(
-	            update.parentNode,
-	            renderedMarkup[update.markupIndex],
-	            update.toIndex
-	          );
-	          break;
-	        case ReactMultiChildUpdateTypes.MOVE_EXISTING:
-	          insertChildAt(
-	            update.parentNode,
-	            initialChildren[update.parentID][update.fromIndex],
-	            update.toIndex
-	          );
-	          break;
-	        case ReactMultiChildUpdateTypes.TEXT_CONTENT:
-	          updateTextContent(
-	            update.parentNode,
-	            update.textContent
-	          );
-	          break;
-	        case ReactMultiChildUpdateTypes.REMOVE_NODE:
-	          // Already removed by the for-loop above.
-	          break;
-	      }
-	    }
-	  }
-	
-	};
-	
-	module.exports = DOMChildrenOperations;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
-
-/***/ },
-/* 220 */
-/*!************************************!*\
-  !*** ./~/react/lib/getEventKey.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-2014 Facebook, Inc.
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 *
-	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
-	 *
-	 * @providesModule getEventKey
-	 * @typechecks static-only
-	 */
-	
-	"use strict";
-	
-	var invariant = __webpack_require__(/*! ./invariant */ 81);
-	
-	/**
-	 * Normalization of deprecated HTML5 `key` values
-	 * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent#Key_names
-	 */
-	var normalizeKey = {
-	  'Esc': 'Escape',
-	  'Spacebar': ' ',
-	  'Left': 'ArrowLeft',
-	  'Up': 'ArrowUp',
-	  'Right': 'ArrowRight',
-	  'Down': 'ArrowDown',
-	  'Del': 'Delete',
-	  'Win': 'OS',
-	  'Menu': 'ContextMenu',
-	  'Apps': 'ContextMenu',
-	  'Scroll': 'ScrollLock',
-	  'MozPrintableKey': 'Unidentified'
-	};
-	
-	/**
-	 * Translation from legacy `which`/`keyCode` to HTML5 `key`
-	 * Only special keys supported, all others depend on keyboard layout or browser
-	 * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent#Key_names
-	 */
-	var translateToKey = {
-	  8: 'Backspace',
-	  9: 'Tab',
-	  12: 'Clear',
-	  13: 'Enter',
-	  16: 'Shift',
-	  17: 'Control',
-	  18: 'Alt',
-	  19: 'Pause',
-	  20: 'CapsLock',
-	  27: 'Escape',
-	  32: ' ',
-	  33: 'PageUp',
-	  34: 'PageDown',
-	  35: 'End',
-	  36: 'Home',
-	  37: 'ArrowLeft',
-	  38: 'ArrowUp',
-	  39: 'ArrowRight',
-	  40: 'ArrowDown',
-	  45: 'Insert',
-	  46: 'Delete',
-	  112: 'F1', 113: 'F2', 114: 'F3', 115: 'F4', 116: 'F5', 117: 'F6',
-	  118: 'F7', 119: 'F8', 120: 'F9', 121: 'F10', 122: 'F11', 123: 'F12',
-	  144: 'NumLock',
-	  145: 'ScrollLock',
-	  224: 'Meta'
-	};
-	
-	/**
-	 * @param {object} nativeEvent Native browser event.
-	 * @return {string} Normalized `key` property.
-	 */
-	function getEventKey(nativeEvent) {
-	  if (nativeEvent.key) {
-	    // Normalize inconsistent values reported by browsers due to
-	    // implementations of a working draft specification.
-	
-	    // FireFox implements `key` but returns `MozPrintableKey` for all
-	    // printable characters (normalized to `Unidentified`), ignore it.
-	    var key = normalizeKey[nativeEvent.key] || nativeEvent.key;
-	    if (key !== 'Unidentified') {
-	      return key;
-	    }
-	  }
-	
-	  // Browser does not implement `key`, polyfill as much of it as we can.
-	  if (nativeEvent.type === 'keypress') {
-	    // Create the character from the `charCode` ourselves and use as an almost
-	    // perfect replacement.
-	    var charCode = 'charCode' in nativeEvent ?
-	      nativeEvent.charCode :
-	      nativeEvent.keyCode;
-	
-	    // The enter-key is technically both printable and non-printable and can
-	    // thus be captured by `keypress`, no other non-printable key should.
-	    return charCode === 13 ? 'Enter' : String.fromCharCode(charCode);
-	  }
-	  if (nativeEvent.type === 'keydown' || nativeEvent.type === 'keyup') {
-	    // While user keyboard layout determines the actual meaning of each
-	    // `keyCode` value, almost all function keys have a universal value.
-	    return translateToKey[nativeEvent.keyCode] || 'Unidentified';
-	  }
-	
-	  ("production" !== process.env.NODE_ENV ? invariant(false, "Unexpected keyboard event type: %s", nativeEvent.type) : invariant(false));
-	}
-	
-	module.exports = getEventKey;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
-
-/***/ },
-/* 221 */
-/*!************************************!*\
-  !*** ./~/react/lib/performance.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014 Facebook, Inc.
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 *
-	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
-	 *
-	 * @providesModule performance
-	 * @typechecks
-	 */
-	
-	"use strict";
-	
-	var ExecutionEnvironment = __webpack_require__(/*! ./ExecutionEnvironment */ 71);
-	
-	var performance;
-	
-	if (ExecutionEnvironment.canUseDOM) {
-	  performance =
-	    window.performance ||
-	    window.msPerformance ||
-	    window.webkitPerformance;
-	}
-	
-	module.exports = performance || {};
-
-
-/***/ },
-/* 222 */
-/*!*******************************!*\
-  !*** ./~/react/lib/isNode.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014 Facebook, Inc.
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 *
-	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
-	 *
-	 * @providesModule isNode
-	 * @typechecks
-	 */
-	
-	/**
-	 * @param {*} object The object to check.
-	 * @return {boolean} Whether or not the object is a DOM node.
-	 */
-	function isNode(object) {
-	  return !!(object && (
-	    typeof Node === 'function' ? object instanceof Node :
-	      typeof object === 'object' &&
-	      typeof object.nodeType === 'number' &&
-	      typeof object.nodeName === 'string'
-	  ));
-	}
-	
-	module.exports = isNode;
-
-
-/***/ },
-/* 223 */
 /*!*************************************************!*\
   !*** ./~/github-api/~/underscore/underscore.js ***!
   \*************************************************/
@@ -26083,6 +25686,403 @@
 
 
 /***/ },
+/* 220 */
+/*!**********************************************!*\
+  !*** ./~/react/lib/DOMChildrenOperations.js ***!
+  \**********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2014 Facebook, Inc.
+	 *
+	 * Licensed under the Apache License, Version 2.0 (the "License");
+	 * you may not use this file except in compliance with the License.
+	 * You may obtain a copy of the License at
+	 *
+	 * http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing, software
+	 * distributed under the License is distributed on an "AS IS" BASIS,
+	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	 * See the License for the specific language governing permissions and
+	 * limitations under the License.
+	 *
+	 * @providesModule DOMChildrenOperations
+	 * @typechecks static-only
+	 */
+	
+	"use strict";
+	
+	var Danger = __webpack_require__(/*! ./Danger */ 233);
+	var ReactMultiChildUpdateTypes = __webpack_require__(/*! ./ReactMultiChildUpdateTypes */ 132);
+	
+	var getTextContentAccessor = __webpack_require__(/*! ./getTextContentAccessor */ 159);
+	var invariant = __webpack_require__(/*! ./invariant */ 81);
+	
+	/**
+	 * The DOM property to use when setting text content.
+	 *
+	 * @type {string}
+	 * @private
+	 */
+	var textContentAccessor = getTextContentAccessor();
+	
+	/**
+	 * Inserts `childNode` as a child of `parentNode` at the `index`.
+	 *
+	 * @param {DOMElement} parentNode Parent node in which to insert.
+	 * @param {DOMElement} childNode Child node to insert.
+	 * @param {number} index Index at which to insert the child.
+	 * @internal
+	 */
+	function insertChildAt(parentNode, childNode, index) {
+	  // By exploiting arrays returning `undefined` for an undefined index, we can
+	  // rely exclusively on `insertBefore(node, null)` instead of also using
+	  // `appendChild(node)`. However, using `undefined` is not allowed by all
+	  // browsers so we must replace it with `null`.
+	  parentNode.insertBefore(
+	    childNode,
+	    parentNode.childNodes[index] || null
+	  );
+	}
+	
+	var updateTextContent;
+	if (textContentAccessor === 'textContent') {
+	  /**
+	   * Sets the text content of `node` to `text`.
+	   *
+	   * @param {DOMElement} node Node to change
+	   * @param {string} text New text content
+	   */
+	  updateTextContent = function(node, text) {
+	    node.textContent = text;
+	  };
+	} else {
+	  /**
+	   * Sets the text content of `node` to `text`.
+	   *
+	   * @param {DOMElement} node Node to change
+	   * @param {string} text New text content
+	   */
+	  updateTextContent = function(node, text) {
+	    // In order to preserve newlines correctly, we can't use .innerText to set
+	    // the contents (see #1080), so we empty the element then append a text node
+	    while (node.firstChild) {
+	      node.removeChild(node.firstChild);
+	    }
+	    if (text) {
+	      var doc = node.ownerDocument || document;
+	      node.appendChild(doc.createTextNode(text));
+	    }
+	  };
+	}
+	
+	/**
+	 * Operations for updating with DOM children.
+	 */
+	var DOMChildrenOperations = {
+	
+	  dangerouslyReplaceNodeWithMarkup: Danger.dangerouslyReplaceNodeWithMarkup,
+	
+	  updateTextContent: updateTextContent,
+	
+	  /**
+	   * Updates a component's children by processing a series of updates. The
+	   * update configurations are each expected to have a `parentNode` property.
+	   *
+	   * @param {array<object>} updates List of update configurations.
+	   * @param {array<string>} markupList List of markup strings.
+	   * @internal
+	   */
+	  processUpdates: function(updates, markupList) {
+	    var update;
+	    // Mapping from parent IDs to initial child orderings.
+	    var initialChildren = null;
+	    // List of children that will be moved or removed.
+	    var updatedChildren = null;
+	
+	    for (var i = 0; update = updates[i]; i++) {
+	      if (update.type === ReactMultiChildUpdateTypes.MOVE_EXISTING ||
+	          update.type === ReactMultiChildUpdateTypes.REMOVE_NODE) {
+	        var updatedIndex = update.fromIndex;
+	        var updatedChild = update.parentNode.childNodes[updatedIndex];
+	        var parentID = update.parentID;
+	
+	        ("production" !== process.env.NODE_ENV ? invariant(
+	          updatedChild,
+	          'processUpdates(): Unable to find child %s of element. This ' +
+	          'probably means the DOM was unexpectedly mutated (e.g., by the ' +
+	          'browser), usually due to forgetting a <tbody> when using tables, ' +
+	          'nesting <p> or <a> tags, or using non-SVG elements in an <svg> '+
+	          'parent. Try inspecting the child nodes of the element with React ' +
+	          'ID `%s`.',
+	          updatedIndex,
+	          parentID
+	        ) : invariant(updatedChild));
+	
+	        initialChildren = initialChildren || {};
+	        initialChildren[parentID] = initialChildren[parentID] || [];
+	        initialChildren[parentID][updatedIndex] = updatedChild;
+	
+	        updatedChildren = updatedChildren || [];
+	        updatedChildren.push(updatedChild);
+	      }
+	    }
+	
+	    var renderedMarkup = Danger.dangerouslyRenderMarkup(markupList);
+	
+	    // Remove updated children first so that `toIndex` is consistent.
+	    if (updatedChildren) {
+	      for (var j = 0; j < updatedChildren.length; j++) {
+	        updatedChildren[j].parentNode.removeChild(updatedChildren[j]);
+	      }
+	    }
+	
+	    for (var k = 0; update = updates[k]; k++) {
+	      switch (update.type) {
+	        case ReactMultiChildUpdateTypes.INSERT_MARKUP:
+	          insertChildAt(
+	            update.parentNode,
+	            renderedMarkup[update.markupIndex],
+	            update.toIndex
+	          );
+	          break;
+	        case ReactMultiChildUpdateTypes.MOVE_EXISTING:
+	          insertChildAt(
+	            update.parentNode,
+	            initialChildren[update.parentID][update.fromIndex],
+	            update.toIndex
+	          );
+	          break;
+	        case ReactMultiChildUpdateTypes.TEXT_CONTENT:
+	          updateTextContent(
+	            update.parentNode,
+	            update.textContent
+	          );
+	          break;
+	        case ReactMultiChildUpdateTypes.REMOVE_NODE:
+	          // Already removed by the for-loop above.
+	          break;
+	      }
+	    }
+	  }
+	
+	};
+	
+	module.exports = DOMChildrenOperations;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
+
+/***/ },
+/* 221 */
+/*!************************************!*\
+  !*** ./~/react/lib/getEventKey.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2014 Facebook, Inc.
+	 *
+	 * Licensed under the Apache License, Version 2.0 (the "License");
+	 * you may not use this file except in compliance with the License.
+	 * You may obtain a copy of the License at
+	 *
+	 * http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing, software
+	 * distributed under the License is distributed on an "AS IS" BASIS,
+	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	 * See the License for the specific language governing permissions and
+	 * limitations under the License.
+	 *
+	 * @providesModule getEventKey
+	 * @typechecks static-only
+	 */
+	
+	"use strict";
+	
+	var invariant = __webpack_require__(/*! ./invariant */ 81);
+	
+	/**
+	 * Normalization of deprecated HTML5 `key` values
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent#Key_names
+	 */
+	var normalizeKey = {
+	  'Esc': 'Escape',
+	  'Spacebar': ' ',
+	  'Left': 'ArrowLeft',
+	  'Up': 'ArrowUp',
+	  'Right': 'ArrowRight',
+	  'Down': 'ArrowDown',
+	  'Del': 'Delete',
+	  'Win': 'OS',
+	  'Menu': 'ContextMenu',
+	  'Apps': 'ContextMenu',
+	  'Scroll': 'ScrollLock',
+	  'MozPrintableKey': 'Unidentified'
+	};
+	
+	/**
+	 * Translation from legacy `which`/`keyCode` to HTML5 `key`
+	 * Only special keys supported, all others depend on keyboard layout or browser
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent#Key_names
+	 */
+	var translateToKey = {
+	  8: 'Backspace',
+	  9: 'Tab',
+	  12: 'Clear',
+	  13: 'Enter',
+	  16: 'Shift',
+	  17: 'Control',
+	  18: 'Alt',
+	  19: 'Pause',
+	  20: 'CapsLock',
+	  27: 'Escape',
+	  32: ' ',
+	  33: 'PageUp',
+	  34: 'PageDown',
+	  35: 'End',
+	  36: 'Home',
+	  37: 'ArrowLeft',
+	  38: 'ArrowUp',
+	  39: 'ArrowRight',
+	  40: 'ArrowDown',
+	  45: 'Insert',
+	  46: 'Delete',
+	  112: 'F1', 113: 'F2', 114: 'F3', 115: 'F4', 116: 'F5', 117: 'F6',
+	  118: 'F7', 119: 'F8', 120: 'F9', 121: 'F10', 122: 'F11', 123: 'F12',
+	  144: 'NumLock',
+	  145: 'ScrollLock',
+	  224: 'Meta'
+	};
+	
+	/**
+	 * @param {object} nativeEvent Native browser event.
+	 * @return {string} Normalized `key` property.
+	 */
+	function getEventKey(nativeEvent) {
+	  if (nativeEvent.key) {
+	    // Normalize inconsistent values reported by browsers due to
+	    // implementations of a working draft specification.
+	
+	    // FireFox implements `key` but returns `MozPrintableKey` for all
+	    // printable characters (normalized to `Unidentified`), ignore it.
+	    var key = normalizeKey[nativeEvent.key] || nativeEvent.key;
+	    if (key !== 'Unidentified') {
+	      return key;
+	    }
+	  }
+	
+	  // Browser does not implement `key`, polyfill as much of it as we can.
+	  if (nativeEvent.type === 'keypress') {
+	    // Create the character from the `charCode` ourselves and use as an almost
+	    // perfect replacement.
+	    var charCode = 'charCode' in nativeEvent ?
+	      nativeEvent.charCode :
+	      nativeEvent.keyCode;
+	
+	    // The enter-key is technically both printable and non-printable and can
+	    // thus be captured by `keypress`, no other non-printable key should.
+	    return charCode === 13 ? 'Enter' : String.fromCharCode(charCode);
+	  }
+	  if (nativeEvent.type === 'keydown' || nativeEvent.type === 'keyup') {
+	    // While user keyboard layout determines the actual meaning of each
+	    // `keyCode` value, almost all function keys have a universal value.
+	    return translateToKey[nativeEvent.keyCode] || 'Unidentified';
+	  }
+	
+	  ("production" !== process.env.NODE_ENV ? invariant(false, "Unexpected keyboard event type: %s", nativeEvent.type) : invariant(false));
+	}
+	
+	module.exports = getEventKey;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
+
+/***/ },
+/* 222 */
+/*!************************************!*\
+  !*** ./~/react/lib/performance.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014 Facebook, Inc.
+	 *
+	 * Licensed under the Apache License, Version 2.0 (the "License");
+	 * you may not use this file except in compliance with the License.
+	 * You may obtain a copy of the License at
+	 *
+	 * http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing, software
+	 * distributed under the License is distributed on an "AS IS" BASIS,
+	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	 * See the License for the specific language governing permissions and
+	 * limitations under the License.
+	 *
+	 * @providesModule performance
+	 * @typechecks
+	 */
+	
+	"use strict";
+	
+	var ExecutionEnvironment = __webpack_require__(/*! ./ExecutionEnvironment */ 71);
+	
+	var performance;
+	
+	if (ExecutionEnvironment.canUseDOM) {
+	  performance =
+	    window.performance ||
+	    window.msPerformance ||
+	    window.webkitPerformance;
+	}
+	
+	module.exports = performance || {};
+
+
+/***/ },
+/* 223 */
+/*!*******************************!*\
+  !*** ./~/react/lib/isNode.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014 Facebook, Inc.
+	 *
+	 * Licensed under the Apache License, Version 2.0 (the "License");
+	 * you may not use this file except in compliance with the License.
+	 * You may obtain a copy of the License at
+	 *
+	 * http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing, software
+	 * distributed under the License is distributed on an "AS IS" BASIS,
+	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	 * See the License for the specific language governing permissions and
+	 * limitations under the License.
+	 *
+	 * @providesModule isNode
+	 * @typechecks
+	 */
+	
+	/**
+	 * @param {*} object The object to check.
+	 * @return {boolean} Whether or not the object is a DOM node.
+	 */
+	function isNode(object) {
+	  return !!(object && (
+	    typeof Node === 'function' ? object instanceof Node :
+	      typeof object === 'object' &&
+	      typeof object.nodeType === 'number' &&
+	      typeof object.nodeName === 'string'
+	  ));
+	}
+	
+	module.exports = isNode;
+
+
+/***/ },
 /* 224 */
 /*!*****************************************!*\
   !*** ./~/react/lib/LinkedStateMixin.js ***!
@@ -26164,7 +26164,7 @@
 	
 	"use strict";
 	
-	var shallowEqual = __webpack_require__(/*! ./shallowEqual */ 171);
+	var shallowEqual = __webpack_require__(/*! ./shallowEqual */ 172);
 	
 	/**
 	 * If your React component's render function is "pure", e.g. it will render the
@@ -26597,7 +26597,7 @@
 	
 	module.exports = cloneWithProps;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 230 */
@@ -26778,7 +26778,7 @@
 	
 	module.exports = update;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 231 */
@@ -27485,7 +27485,7 @@
 	
 	module.exports = Danger;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 234 */
@@ -27837,7 +27837,7 @@
 	
 	module.exports = ReactCSSTransitionGroupChild;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 237 */
@@ -28055,7 +28055,7 @@
 	
 	module.exports = createNodesFromMarkup;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 239 */
@@ -28185,7 +28185,7 @@
 	
 	module.exports = getMarkupWrap;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 240 */
@@ -28310,7 +28310,7 @@
 	
 	module.exports = CSSCore;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ },
 /* 241 */
@@ -28620,7 +28620,7 @@
 	
 	module.exports = toArray;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 73)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 75)))
 
 /***/ }
 /******/ ])

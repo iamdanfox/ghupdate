@@ -12,5 +12,5 @@ module.exports = RepoStore = Reflux.createStore
       _selectedRepoName = repoName
       @trigger()
 
-  getSelectedRepoName: ->
+  get: ->
     _selectedRepoName
