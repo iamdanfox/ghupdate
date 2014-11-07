@@ -1,5 +1,7 @@
 module.exports = class RouteBinding
   constructor: (options) ->
+    unless options? and options.pattern? and options.listenToStores? and options.handleUrl? and options.makeUrl?
+      throw new Error 'RouteBinding constructor requires: pattern, listenToStores, handleUrl and makeUrl'
     {@pattern, @listenToStores} = options
     @_handleUrl = options.handleUrl
     @_makeUrl = options.makeUrl

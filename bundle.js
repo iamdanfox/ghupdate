@@ -742,6 +742,9 @@ webpackJsonp([0],{
 	    this.urlRegex = __bind(this.urlRegex, this);
 	    this.makeUrl = __bind(this.makeUrl, this);
 	    this.handleUrl = __bind(this.handleUrl, this);
+	    if (!((options != null) && (options.pattern != null) && (options.listenToStores != null) && (options.handleUrl != null) && (options.makeUrl != null))) {
+	      throw new Error('RouteBinding constructor requires: pattern, listenToStores, handleUrl and makeUrl');
+	    }
 	    this.pattern = options.pattern, this.listenToStores = options.listenToStores;
 	    this._handleUrl = options.handleUrl;
 	    this._makeUrl = options.makeUrl;

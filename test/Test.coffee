@@ -39,3 +39,8 @@ describe 'RouteBinding', ->
         makeUrl: -> null
 
       rb2.handleUrl '/hello/brave/new/world'
+
+  describe 'constructor', ->
+    it 'should fail if arguments are missing', ->
+
+      assert.throws (-> rb = new RouteBinding({})), Error
