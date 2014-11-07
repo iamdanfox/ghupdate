@@ -3,7 +3,7 @@ var webpack = require('webpack');
 module.exports = {
   entry: {
     app: './main.cjsx',
-    vendor: ['react']
+    vendor: ['react', 'reflux', 'react-spinkit', 'timeago', 'fetch', 'github-api', 'es6-promise']
   },
   output: {
     filename: 'bundle.js',
