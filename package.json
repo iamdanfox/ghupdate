@@ -17,7 +17,12 @@
     "css-loader": "^0.9.0",
     "less": "^1.7.5",
     "less-loader": "^0.7.7",
+    "mocha": "^2.0.1",
     "style-loader": "^0.8.1",
     "webpack": "^1.4.4"
+  },
+  "scripts": {
+    "watch": "webpack --watch -d",
+    "test": "webpack --config webpack.test.config.js --devtool inline-source-map; ./node_modules/.bin/mocha --ui tdd test.bundle.js"
   }
 }
