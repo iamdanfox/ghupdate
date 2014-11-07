@@ -15,19 +15,17 @@ App = module.exports = React.createClass
 
   getInitialState: ->
     username: null
-    repoName: null
-    file: null
     isLoggedIn: false
+    repoName: null
+    repoTreeStore: Stores.repoTreeStore.getAll()
+    file: null
 
   componentDidMount: ->
-    @listenTo Stores.userStore, =>
-      @setState username: Stores.userStore.get()
-    @listenTo Stores.repoStore, =>
-      @setState repoName: Stores.repoStore.get()
-    @listenTo Stores.fileStore, =>
-      @setState file: Stores.fileStore.get()
-    @listenTo Stores.accessTokenStore, =>
-      @setState isLoggedIn: Stores.accessTokenStore.isLoggedIn()
+    @listenTo Stores.userStore, => @setState username: Stores.userStore.get()
+    @listenTo Stores.accessTokenStore, => @setState isLoggedIn: Stores.accessTokenStore.isLoggedIn()
+    @listenTo Stores.repoStore, => @setState repoName: Stores.repoStore.get()
+    @listenTo Stores.repoTreeStore, => @setState repoTreeStore: Stores.repoTreeStore.getAll()
+    @listenTo Stores.fileStore, => @setState file: Stores.fileStore.get()
 
   render: ->
     require './App.less'
@@ -47,7 +45,10 @@ App = module.exports = React.createClass
                 <h2 className='ghu-username'>
                   <a onClick={-> Actions.selectRepo null}>{@state.username}</a> / {@state.repoName}
                 </h2>
-                <FileChooser />
+                <FileChooser
+                  loading={@state.repoTreeStore.loading}
+                  error={@state.repoTreeStore.error}
+                  htmlFiles={@state.repoTreeStore.htmlFiles} />
               </div>
             else
               <div>

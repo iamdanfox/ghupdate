@@ -8,21 +8,18 @@ FileChooser = module.exports = React.createClass
   displayName: 'FileChooser'
   mixins: [Reflux.ListenerMixin]
 
-  componentWillMount: ->
-    @syncToStore()
-    @listenTo Stores.repoTreeStore, @syncToStore
+  propTypes:
+    htmlFiles: React.PropTypes.array
+    loading: React.PropTypes.bool.isRequired
+    error: React.PropTypes.bool.isRequired
 
-  syncToStore: ->
-    @setState
-      loading: Stores.repoTreeStore.isLoading()
-      error: Stores.repoTreeStore.hasError()
-      htmlFiles: Stores.repoTreeStore.getHTMLFiles()
+  componentWillMount: ->
+    require './FileChooser.less'
 
   render: ->
-    require './FileChooser.less'
     Loading = require './Loading.cjsx'
-    <Loading loading={@state.loading} error={@state.error} errorMessage="Error loading file list">
-      <TreeView htmlFiles={@state.htmlFiles} />
+    <Loading loading={@props.loading} error={@props.error} errorMessage="Error loading file list">
+      <TreeView htmlFiles={@props.htmlFiles} />
     </Loading>
 
 

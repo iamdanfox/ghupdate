@@ -34,6 +34,11 @@ module.exports = RepoTreeStore = Reflux.createStore
           _treeLoading = false
           @trigger()
 
+  getAll: ->
+    loading: _treeLoading
+    error: _treeLoadingError
+    htmlFiles: @getHTMLFiles()
+
   isLoading: ->
     _treeLoading
 
