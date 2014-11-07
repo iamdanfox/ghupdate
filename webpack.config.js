@@ -1,13 +1,19 @@
 var webpack = require('webpack');
 
 module.exports = {
-  entry: './main.cjsx',
+  entry: {
+    app: './main.cjsx',
+    vendor: ['react']
+  },
   output: {
     filename: 'bundle.js',
   },
   resolve: {
     extensions: ['', '.js', '.cjsx', '.less']
   },
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.bundle.js')
+  ],
   module: {
     loaders: [
       { test: /\.coffee$/, loaders: ['coffee-loader']},
