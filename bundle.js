@@ -1279,17 +1279,25 @@ webpackJsonp([0],{
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, Reflux, RepoStore, _selectedRepoName;
+	var Actions, Reflux, RepoStore, userStore, _selectedRepoName;
 	
 	Reflux = __webpack_require__(/*! reflux */ 5);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 23);
 	
+	userStore = __webpack_require__(/*! ./UserStore.coffee */ 166);
+	
 	_selectedRepoName = null;
 	
 	module.exports = RepoStore = Reflux.createStore({
 	  init: function() {
-	    return this.listenTo(Actions.selectRepo, this.selectRepo);
+	    this.listenTo(Actions.selectRepo, this.selectRepo);
+	    return this.listenTo(userStore, this.wipeRepoIfNecessary);
+	  },
+	  wipeRepoIfNecessary: function() {
+	    if (userStore.get() === null) {
+	      return this.selectRepo(null);
+	    }
 	  },
 	  selectRepo: function(repoName) {
 	    if (_selectedRepoName !== repoName) {
@@ -1393,17 +1401,25 @@ webpackJsonp([0],{
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Actions, FileStore, Reflux, _selectedFile;
+	var Actions, FileStore, Reflux, repoStore, _selectedFile;
 	
 	Reflux = __webpack_require__(/*! reflux */ 5);
 	
 	Actions = __webpack_require__(/*! ../Actions.coffee */ 23);
 	
+	repoStore = __webpack_require__(/*! ./RepoStore.coffee */ 170);
+	
 	_selectedFile = null;
 	
 	module.exports = FileStore = Reflux.createStore({
 	  init: function() {
-	    return this.listenTo(Actions.selectFile, this.selectFile);
+	    this.listenTo(Actions.selectFile, this.selectFile);
+	    return this.listenTo(repoStore, this.wipeFileIfNecessary);
+	  },
+	  wipeFileIfNecessary: function() {
+	    if (repoStore.get() === null) {
+	      return this.selectFile(null);
+	    }
 	  },
 	  selectFile: function(filePath) {
 	    if (_selectedFile !== filePath) {
