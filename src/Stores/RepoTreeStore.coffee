@@ -7,7 +7,7 @@ Actions = require '../Actions.coffee'
 
 _cachedTreeForRepo = null
 _tree = null
-_treeLoading = false
+_treeLoading = true
 _treeLoadingError = false
 
 module.exports = RepoTreeStore = Reflux.createStore
@@ -23,16 +23,19 @@ module.exports = RepoTreeStore = Reflux.createStore
       _treeLoadingError = false
       @trigger()
 
-      apiModule.getGHPagesTree selectedRepoName
-        .then (tree) ->
-          _cachedTreeForRepo = selectedRepoName
-          _tree = tree
-        .catch (err) ->
-          console.error err
-          _treeLoadingError = true
-        .then =>
-          _treeLoading = false
-          @trigger()
+      if selectedRepoName is null
+        _cachedTreeForRepo = selectedRepoName
+      else
+        apiModule.getGHPagesTree selectedRepoName
+          .then (tree) ->
+            _cachedTreeForRepo = selectedRepoName
+            _tree = tree
+          .catch (err) ->
+            console.error err
+            _treeLoadingError = true
+          .then =>
+            _treeLoading = false
+            @trigger()
 
   getAll: ->
     loading: _treeLoading

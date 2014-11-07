@@ -7,7 +7,7 @@ Actions = require '../Actions.coffee'
 
 _cachedContentsForFile = null
 _contents = null
-_contentsLoading = false
+_contentsLoading = true
 _contentsLoadingError = false
 
 module.exports = FileContentsStore = Reflux.createStore
@@ -29,16 +29,19 @@ module.exports = FileContentsStore = Reflux.createStore
       _contentsLoadingError = false
       @trigger()
 
-      apiModule.getFileContents()
-        .then (contents) ->
-          _cachedContentsForFile = selectedFileName
-          _contents = contents
-        .catch (error) ->
-          console.error error
-          _contentsLoadingError = true
-        .then =>
-          _contentsLoading = false
-          @trigger()
+      if selectedFileName is null
+        _cachedContentsForFile = selectedFileName
+      else
+        apiModule.getFileContents()
+          .then (contents) ->
+            _cachedContentsForFile = selectedFileName
+            _contents = contents
+          .catch (error) ->
+            console.error error
+            _contentsLoadingError = true
+          .then =>
+            _contentsLoading = false
+            @trigger()
 
   isLoading: ->
     _contentsLoading

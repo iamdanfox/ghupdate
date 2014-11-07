@@ -1335,7 +1335,7 @@ webpackJsonp([0],{
 	
 	_tree = null;
 	
-	_treeLoading = false;
+	_treeLoading = true;
 	
 	_treeLoadingError = false;
 	
@@ -1351,18 +1351,22 @@ webpackJsonp([0],{
 	      _treeLoading = true;
 	      _treeLoadingError = false;
 	      this.trigger();
-	      return apiModule.getGHPagesTree(selectedRepoName).then(function(tree) {
-	        _cachedTreeForRepo = selectedRepoName;
-	        return _tree = tree;
-	      })["catch"](function(err) {
-	        console.error(err);
-	        return _treeLoadingError = true;
-	      }).then((function(_this) {
-	        return function() {
-	          _treeLoading = false;
-	          return _this.trigger();
-	        };
-	      })(this));
+	      if (selectedRepoName === null) {
+	        return _cachedTreeForRepo = selectedRepoName;
+	      } else {
+	        return apiModule.getGHPagesTree(selectedRepoName).then(function(tree) {
+	          _cachedTreeForRepo = selectedRepoName;
+	          return _tree = tree;
+	        })["catch"](function(err) {
+	          console.error(err);
+	          return _treeLoadingError = true;
+	        }).then((function(_this) {
+	          return function() {
+	            _treeLoading = false;
+	            return _this.trigger();
+	          };
+	        })(this));
+	      }
 	    }
 	  },
 	  getAll: function() {
@@ -1457,7 +1461,7 @@ webpackJsonp([0],{
 	
 	_contents = null;
 	
-	_contentsLoading = false;
+	_contentsLoading = true;
 	
 	_contentsLoadingError = false;
 	
@@ -1484,18 +1488,22 @@ webpackJsonp([0],{
 	      _contentsLoading = true;
 	      _contentsLoadingError = false;
 	      this.trigger();
-	      return apiModule.getFileContents().then(function(contents) {
-	        _cachedContentsForFile = selectedFileName;
-	        return _contents = contents;
-	      })["catch"](function(error) {
-	        console.error(error);
-	        return _contentsLoadingError = true;
-	      }).then((function(_this) {
-	        return function() {
-	          _contentsLoading = false;
-	          return _this.trigger();
-	        };
-	      })(this));
+	      if (selectedFileName === null) {
+	        return _cachedContentsForFile = selectedFileName;
+	      } else {
+	        return apiModule.getFileContents().then(function(contents) {
+	          _cachedContentsForFile = selectedFileName;
+	          return _contents = contents;
+	        })["catch"](function(error) {
+	          console.error(error);
+	          return _contentsLoadingError = true;
+	        }).then((function(_this) {
+	          return function() {
+	            _contentsLoading = false;
+	            return _this.trigger();
+	          };
+	        })(this));
+	      }
 	    }
 	  },
 	  isLoading: function() {
