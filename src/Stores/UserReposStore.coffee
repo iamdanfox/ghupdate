@@ -32,6 +32,11 @@ module.exports = UserReposStore = Reflux.createStore
           _reposLoading = false
           @trigger()
 
+  getAll: ->
+    loading: _reposLoading
+    error: _reposLoadingError
+    repos: _repos
+
   isLoading: ->
     _reposLoading
 

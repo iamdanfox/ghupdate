@@ -16,6 +16,7 @@ App = module.exports = React.createClass
   getInitialState: ->
     username: null
     isLoggedIn: false
+    userReposStore: Stores.userReposStore.getAll()
     repoName: null
     repoTreeStore: Stores.repoTreeStore.getAll()
     file: null
@@ -23,6 +24,7 @@ App = module.exports = React.createClass
   componentDidMount: ->
     @listenTo Stores.userStore, => @setState username: Stores.userStore.get()
     @listenTo Stores.accessTokenStore, => @setState isLoggedIn: Stores.accessTokenStore.isLoggedIn()
+    @listenTo Stores.userReposStore, => @setState userReposStore: Stores.userReposStore.getAll()
     @listenTo Stores.repoStore, => @setState repoName: Stores.repoStore.get()
     @listenTo Stores.repoTreeStore, => @setState repoTreeStore: Stores.repoTreeStore.getAll()
     @listenTo Stores.fileStore, => @setState file: Stores.fileStore.get()
@@ -37,7 +39,10 @@ App = module.exports = React.createClass
           unless @state.repoName?
             <div>
               <h2 className='ghu-username'>{@state.username}</h2>
-              <RepoChooser username={@state.username} />
+              <RepoChooser
+                loading={@state.userReposStore.loading}
+                error={@state.userReposStore.error}
+                repos={@state.userReposStore.repos} />
             </div>
           else
             unless @state.file?

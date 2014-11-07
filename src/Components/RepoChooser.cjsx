@@ -11,22 +11,14 @@ module.exports = RepoChooser = React.createClass
   mixins: [Reflux.ListenerMixin]
 
   propTypes:
-    username: React.PropTypes.string.isRequired
-
-  componentWillMount: ->
-    @syncToStore()
-    @listenTo Stores.userReposStore, @syncToStore
-
-  syncToStore: ->
-    @setState
-      loading: Stores.userReposStore.isLoading()
-      error: Stores.userReposStore.hasError()
-      repos: Stores.userReposStore.getRepos()
+    loading: React.PropTypes.bool.isRequired
+    error: React.PropTypes.bool.isRequired
+    repos: React.PropTypes.array
 
   render: ->
     require './RepoChooser.less'
-    <Loading loading={@state.loading} error={@state.error} errorMessage='Error loading repos, please try again'>
-      <RepoList repos={@state.repos} />
+    <Loading loading={@props.loading} error={@props.error} errorMessage='Error loading repos, please try again'>
+      <RepoList repos={@props.repos} />
     </Loading>
 
 

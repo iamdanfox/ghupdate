@@ -167,6 +167,7 @@ webpackJsonp([0],{
 	    return {
 	      username: null,
 	      isLoggedIn: false,
+	      userReposStore: Stores.userReposStore.getAll(),
 	      repoName: null,
 	      repoTreeStore: Stores.repoTreeStore.getAll(),
 	      file: null
@@ -184,6 +185,13 @@ webpackJsonp([0],{
 	      return function() {
 	        return _this.setState({
 	          isLoggedIn: Stores.accessTokenStore.isLoggedIn()
+	        });
+	      };
+	    })(this));
+	    this.listenTo(Stores.userReposStore, (function(_this) {
+	      return function() {
+	        return _this.setState({
+	          userReposStore: Stores.userReposStore.getAll()
 	        });
 	      };
 	    })(this));
@@ -216,7 +224,9 @@ webpackJsonp([0],{
 	    }, React.createElement(React.DOM.h1, null, "GH Update"), (this.state.username == null ? React.createElement(UsernameChooser, null) : this.state.repoName == null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
 	    }, this.state.username), React.createElement(RepoChooser, {
-	      "username": this.state.username
+	      "loading": this.state.userReposStore.loading,
+	      "error": this.state.userReposStore.error,
+	      "repos": this.state.userReposStore.repos
 	    })) : this.state.file == null ? React.createElement(React.DOM.div, null, React.createElement(React.DOM.h2, {
 	      "className": 'ghu-username'
 	    }, React.createElement(React.DOM.a, {
@@ -278,7 +288,7 @@ webpackJsonp([0],{
 	
 	React = __webpack_require__(/*! react */ 1);
 	
-	timeago = __webpack_require__(/*! timeago */ 4);
+	timeago = __webpack_require__(/*! timeago */ 2);
 	
 	Loading = __webpack_require__(/*! ./Loading.cjsx */ 155);
 	
@@ -292,27 +302,18 @@ webpackJsonp([0],{
 	  displayName: 'RepoChooser',
 	  mixins: [Reflux.ListenerMixin],
 	  propTypes: {
-	    username: React.PropTypes.string.isRequired
-	  },
-	  componentWillMount: function() {
-	    this.syncToStore();
-	    return this.listenTo(Stores.userReposStore, this.syncToStore);
-	  },
-	  syncToStore: function() {
-	    return this.setState({
-	      loading: Stores.userReposStore.isLoading(),
-	      error: Stores.userReposStore.hasError(),
-	      repos: Stores.userReposStore.getRepos()
-	    });
+	    loading: React.PropTypes.bool.isRequired,
+	    error: React.PropTypes.bool.isRequired,
+	    repos: React.PropTypes.array
 	  },
 	  render: function() {
-	    __webpack_require__(/*! ./RepoChooser.less */ 160);
+	    __webpack_require__(/*! ./RepoChooser.less */ 158);
 	    return React.createElement(Loading, {
-	      "loading": this.state.loading,
-	      "error": this.state.error,
+	      "loading": this.props.loading,
+	      "error": this.props.error,
 	      "errorMessage": 'Error loading repos, please try again'
 	    }, React.createElement(RepoList, {
-	      "repos": this.state.repos
+	      "repos": this.props.repos
 	    }));
 	  }
 	});
@@ -385,7 +386,7 @@ webpackJsonp([0],{
 	    error: React.PropTypes.bool.isRequired
 	  },
 	  componentWillMount: function() {
-	    return __webpack_require__(/*! ./FileChooser.less */ 158);
+	    return __webpack_require__(/*! ./FileChooser.less */ 160);
 	  },
 	  render: function() {
 	    var Loading;
@@ -877,44 +878,6 @@ webpackJsonp([0],{
 
 /***/ 158:
 /*!*****************************************!*\
-  !*** ./src/Components/FileChooser.less ***!
-  \*****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/FileChooser.less */ 159);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./~/style-loader/addStyles.js */ 82)(content, {});
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/FileChooser.less", function() {
-			var newContent = require("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/FileChooser.less");
-			if(typeof newContent === 'string') newContent = [module.id, newContent, ''];
-			update(newContent);
-		});
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-
-/***/ 159:
-/*!************************************************************************!*\
-  !*** ./~/css-loader!./~/less-loader!./src/Components/FileChooser.less ***!
-  \************************************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(/*! ./~/css-loader/cssToString.js */ 154)();
-	exports.push([module.id, "ul.ghu-file-chooser {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\nul.ghu-file-chooser li.file {\n  padding: 10px 30px;\n  border-top: 1px solid #eee;\n  cursor: pointer;\n}\nul.ghu-file-chooser li.file:hover {\n  background: #444;\n  color: white;\n}\n", ""]);
-
-/***/ },
-
-/***/ 160:
-/*!*****************************************!*\
   !*** ./src/Components/RepoChooser.less ***!
   \*****************************************/
 /***/ function(module, exports, __webpack_require__) {
@@ -922,7 +885,7 @@ webpackJsonp([0],{
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/RepoChooser.less */ 161);
+	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/RepoChooser.less */ 159);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./~/style-loader/addStyles.js */ 82)(content, {});
@@ -940,7 +903,7 @@ webpackJsonp([0],{
 
 /***/ },
 
-/***/ 161:
+/***/ 159:
 /*!************************************************************************!*\
   !*** ./~/css-loader!./~/less-loader!./src/Components/RepoChooser.less ***!
   \************************************************************************/
@@ -948,6 +911,44 @@ webpackJsonp([0],{
 
 	exports = module.exports = __webpack_require__(/*! ./~/css-loader/cssToString.js */ 154)();
 	exports.push([module.id, "h2.ghu-username {\n  text-align: center;\n  font-size: 200%;\n  margin: 0;\n}\nul.ghu-repo-list {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\nul.ghu-repo-list li.ghu-repo-link {\n  padding: 10px 30px;\n  border-top: 1px solid #eee;\n  cursor: pointer;\n}\nul.ghu-repo-list li.ghu-repo-link .ghu-last-updated {\n  display: block;\n  color: #aaa;\n}\nul.ghu-repo-list li.ghu-repo-link:hover {\n  background: #444;\n  color: white;\n}\n", ""]);
+
+/***/ },
+
+/***/ 160:
+/*!*****************************************!*\
+  !*** ./src/Components/FileChooser.less ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./~/css-loader!./~/less-loader!./src/Components/FileChooser.less */ 161);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./~/style-loader/addStyles.js */ 82)(content, {});
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		module.hot.accept("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/FileChooser.less", function() {
+			var newContent = require("!!/Users/danfox/ghupdate/node_modules/css-loader/index.js!/Users/danfox/ghupdate/node_modules/less-loader/index.js!/Users/danfox/ghupdate/src/Components/FileChooser.less");
+			if(typeof newContent === 'string') newContent = [module.id, newContent, ''];
+			update(newContent);
+		});
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+
+/***/ 161:
+/*!************************************************************************!*\
+  !*** ./~/css-loader!./~/less-loader!./src/Components/FileChooser.less ***!
+  \************************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./~/css-loader/cssToString.js */ 154)();
+	exports.push([module.id, "ul.ghu-file-chooser {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\nul.ghu-file-chooser li.file {\n  padding: 10px 30px;\n  border-top: 1px solid #eee;\n  cursor: pointer;\n}\nul.ghu-file-chooser li.file:hover {\n  background: #444;\n  color: white;\n}\n", ""]);
 
 /***/ },
 
@@ -1173,7 +1174,7 @@ webpackJsonp([0],{
 	
 	Reflux = __webpack_require__(/*! reflux */ 5);
 	
-	Github = __webpack_require__(/*! github-api */ 2);
+	Github = __webpack_require__(/*! github-api */ 4);
 	
 	accessTokenStore = __webpack_require__(/*! ./AccessTokenStore.coffee */ 167);
 	
@@ -1250,6 +1251,13 @@ webpackJsonp([0],{
 	        };
 	      })(this));
 	    }
+	  },
+	  getAll: function() {
+	    return {
+	      loading: _reposLoading,
+	      error: _reposLoadingError,
+	      repos: _repos
+	    };
 	  },
 	  isLoading: function() {
 	    return _reposLoading;
