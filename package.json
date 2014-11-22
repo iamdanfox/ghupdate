@@ -23,6 +23,6 @@
   },
   "scripts": {
     "watch": "webpack --watch -d",
-    "test": "webpack --config webpack.test.config.js --devtool inline-source-map; ./node_modules/.bin/mocha --ui tdd test.bundle.js"
+    "test": "./node_modules/.bin/mocha --ui tdd test.bundle.js"
   }
 }
